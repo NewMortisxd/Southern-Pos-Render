@@ -1,13 +1,24 @@
-# In southern_food_pos/views.py
+"""
+Vistas de error personalizadas para el proyecto
+"""
 from django.shortcuts import render
 
-def home(request):
-    return render(request, 'home.html')
 
-# Then in urls.py
-from . import views
+def error_404(request, exception):
+    """Vista personalizada para error 404"""
+    return render(request, '404.html', status=404)
 
-urlpatterns = [
-    path('', views.home, name='home'),
-    # ... rest of your URLs
-]
+
+def error_500(request):
+    """Vista personalizada para error 500"""
+    return render(request, '500.html', status=500)
+
+
+def error_403(request, exception):
+    """Vista personalizada para error 403"""
+    return render(request, '403.html', status=403)
+
+
+def error_400(request, exception):
+    """Vista personalizada para error 400"""
+    return render(request, '400.html', status=400)

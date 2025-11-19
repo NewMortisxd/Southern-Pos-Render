@@ -172,9 +172,12 @@ STORAGES = {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
     },
     "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
     },
 }
+
+# Permitir archivos estáticos faltantes sin error
+WHITENOISE_MANIFEST_STRICT = False
 
 # Media files (uploads)
 MEDIA_URL = '/media/'

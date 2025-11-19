@@ -33,3 +33,9 @@ urlpatterns = [
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+# Handlers de error personalizados
+handler404 = 'southern_food_pos.views.error_404'
+handler500 = 'southern_food_pos.views.error_500'
+handler403 = 'southern_food_pos.views.error_403'
+handler400 = 'southern_food_pos.views.error_400'

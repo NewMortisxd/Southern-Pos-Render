@@ -48,10 +48,10 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
-    # Cloudinary
+    # Cloudinary debe estar ANTES de staticfiles
     'cloudinary_storage',
     'cloudinary',
+    'django.contrib.staticfiles',
     # Add your apps here
     'apps.productos',
     'apps.reportes',

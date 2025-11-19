@@ -48,10 +48,9 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    # Cloudinary debe estar ANTES de staticfiles
-    'cloudinary_storage',
-    'cloudinary',
     'django.contrib.staticfiles',
+    # Cloudinary (solo cloudinary, sin cloudinary_storage que causa problemas)
+    'cloudinary',
     # Add your apps here
     'apps.productos',
     'apps.reportes',
@@ -182,8 +181,6 @@ if DEBUG:
             "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
         },
     }
-    # Compatibilidad con cloudinary_storage
-    STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"
 else:
     STORAGES = {
         "default": {
@@ -193,8 +190,6 @@ else:
             "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
         },
     }
-    # Compatibilidad con cloudinary_storage
-    STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
 
 # Media files (uploads)
 MEDIA_URL = '/media/'
@@ -265,10 +260,7 @@ LOGGING = {
 # Cloudinary configuration
 CLOUDINARY_URL = config('CLOUDINARY_URL', default='')
 
-# Inicializar valores por defecto
-CLOUDINARY_STORAGE = {}
-DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
-
+# Configurar Cloudinary si está disponible
 if CLOUDINARY_URL:
     try:
         # Parsear la URL de Cloudinary: cloudinary://api_key:api_secret@cloud_name
@@ -283,17 +275,7 @@ if CLOUDINARY_URL:
                 api_secret=api_secret,
                 secure=True
             )
-            
-            # Cloudinary storage settings
-            CLOUDINARY_STORAGE = {
-                'CLOUD_NAME': cloud_name,
-                'API_KEY': api_key,
-                'API_SECRET': api_secret,
-            }
-            
-            # Use Cloudinary for media files
-            DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
     except Exception as e:
-        # Si hay algún error, usar almacenamiento local
+        # Si hay algún error, continuar sin Cloudinary
         import sys
         print(f"Warning: Could not configure Cloudinary: {e}", file=sys.stderr)

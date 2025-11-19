@@ -265,34 +265,35 @@ LOGGING = {
 # Cloudinary configuration
 CLOUDINARY_URL = config('CLOUDINARY_URL', default='')
 
+# Inicializar valores por defecto
+CLOUDINARY_STORAGE = {}
+DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+
 if CLOUDINARY_URL:
-    # Parsear la URL de Cloudinary: cloudinary://api_key:api_secret@cloud_name
-    import re
-    match = re.match(r'cloudinary://(\d+):([^@]+)@(.+)', CLOUDINARY_URL)
-    if match:
-        api_key, api_secret, cloud_name = match.groups()
-        
-        cloudinary.config(
-            cloud_name=cloud_name,
-            api_key=api_key,
-            api_secret=api_secret,
-            secure=True
-        )
-        
-        # Cloudinary storage settings
-        CLOUDINARY_STORAGE = {
-            'CLOUD_NAME': cloud_name,
-            'API_KEY': api_key,
-            'API_SECRET': api_secret,
-        }
-        
-        # Use Cloudinary for media files
-        DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-    else:
-        # Fallback to local storage if URL is invalid
-        DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
-        CLOUDINARY_STORAGE = {}
-else:
-    # Fallback to local storage if Cloudinary is not configured
-    DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
-    CLOUDINARY_STORAGE = {}
+    try:
+        # Parsear la URL de Cloudinary: cloudinary://api_key:api_secret@cloud_name
+        import re
+        match = re.match(r'cloudinary://(\d+):([^@]+)@(.+)', CLOUDINARY_URL)
+        if match:
+            api_key, api_secret, cloud_name = match.groups()
+            
+            cloudinary.config(
+                cloud_name=cloud_name,
+                api_key=api_key,
+                api_secret=api_secret,
+                secure=True
+            )
+            
+            # Cloudinary storage settings
+            CLOUDINARY_STORAGE = {
+                'CLOUD_NAME': cloud_name,
+                'API_KEY': api_key,
+                'API_SECRET': api_secret,
+            }
+            
+            # Use Cloudinary for media files
+            DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+    except Exception as e:
+        # Si hay algún error, usar almacenamiento local
+        import sys
+        print(f"Warning: Could not configure Cloudinary: {e}", file=sys.stderr)

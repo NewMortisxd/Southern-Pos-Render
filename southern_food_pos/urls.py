@@ -6,7 +6,9 @@ from django.views.generic import TemplateView, RedirectView
 from django.contrib.auth import views as auth_views
 from django.contrib.auth import logout
 from django.shortcuts import redirect
+from django.views.static import serve
 from core import views
+import os
 
 def custom_logout(request):
     logout(request)
@@ -27,6 +29,8 @@ urlpatterns = [
     path('logout/', custom_logout, name='logout'),
     path('register/', views.register, name='register'),
     path('dashboard/', views.dashboard, name='dashboard'),
+    # Favicon
+    path('favicon.ico', RedirectView.as_view(url=settings.STATIC_URL + 'img/logo.png', permanent=True)),
 ]
 
 # Servir archivos media en desarrollo y producción

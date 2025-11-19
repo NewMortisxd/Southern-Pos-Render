@@ -21,3 +21,7 @@ Pillow>=10.0.0
 
 # dj-database-url para parsear DATABASE_URL
 dj-database-url>=2.1.0
+
+# Cloudinary para almacenamiento de imagenes
+cloudinary>=1.36.0
+django-cloudinary-storage>=0.3.0

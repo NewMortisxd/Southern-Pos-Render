@@ -2,6 +2,7 @@ from django.db import models
 from django.conf import settings
 import os
 from django.utils.text import slugify
+from cloudinary.models import CloudinaryField
 
 def producto_imagen_path(instance, filename):
     """
@@ -56,8 +57,8 @@ class Producto(models.Model):
     descripcion = models.TextField(blank=True)  # Hacerlo opcional
     # Cantidad en stock, solo valores enteros positivos
     stock = models.PositiveIntegerField(default=0)
-    # Imagen del producto, se guarda en la carpeta 'productos/' con nombre truncado
-    imagen = models.ImageField(upload_to=producto_imagen_path, blank=True, null=True)  # Hacerlo opcional
+    # Imagen del producto, se guarda en Cloudinary
+    imagen = CloudinaryField('imagen', folder='productos', blank=True, null=True)  # Cloudinary field
     # Código de barras del producto, opcional
     codigo_barras = models.CharField(max_length=50, blank=True, null=True, unique=True, verbose_name="Código de barras"
     )  # Añadido campo de código de barras

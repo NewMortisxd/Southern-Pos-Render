@@ -2,8 +2,10 @@ services:
   - type: web
     name: southern-food-pos
     env: python
+    region: oregon
+    plan: free
     buildCommand: "./build.sh"
-    startCommand: "gunicorn southern_food_pos.wsgi:application"
+    startCommand: "gunicorn southern_food_pos.wsgi:application -c gunicorn_config.py"
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.0
@@ -14,7 +16,7 @@ services:
       - key: SECRET_KEY
         generateValue: true
       - key: DEBUG
-        value: False
+        value: "False"
       - key: ALLOWED_HOSTS
         sync: false
 
@@ -22,3 +24,4 @@ databases:
   - name: southern-food-pos-db
     databaseName: southern_food_pos
     user: southern_food_pos_user
+    plan: free

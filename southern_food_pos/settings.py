@@ -212,3 +212,32 @@ if not DEBUG:
 LOGIN_URL = '/login/'  # This should match your usuarios.urls login path
 LOGIN_REDIRECT_URL = 'dashboard'  # Change to match your dashboard URL name
 LOGOUT_REDIRECT_URL = 'login'    # Redirect to login after logout
+
+# Logging configuration
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+            'propagate': False,
+        },
+    },
+}

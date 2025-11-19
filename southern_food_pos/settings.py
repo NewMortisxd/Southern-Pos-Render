@@ -262,20 +262,33 @@ LOGGING = {
 CLOUDINARY_URL = config('CLOUDINARY_URL', default='')
 
 if CLOUDINARY_URL:
-    # Parse Cloudinary URL
-    cloudinary.config(
-        cloudinary_url=CLOUDINARY_URL
-    )
-    
-    # Use Cloudinary for media files
-    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+    # Parsear la URL de Cloudinary: cloudinary://api_key:api_secret@cloud_name
+    import re
+    match = re.match(r'cloudinary://(\d+):([^@]+)@(.+)', CLOUDINARY_URL)
+    if match:
+        api_key, api_secret, cloud_name = match.groups()
+        
+        cloudinary.config(
+            cloud_name=cloud_name,
+            api_key=api_key,
+            api_secret=api_secret,
+            secure=True
+        )
+        
+        # Cloudinary storage settings
+        CLOUDINARY_STORAGE = {
+            'CLOUD_NAME': cloud_name,
+            'API_KEY': api_key,
+            'API_SECRET': api_secret,
+        }
+        
+        # Use Cloudinary for media files
+        DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+    else:
+        # Fallback to local storage if URL is invalid
+        DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+        CLOUDINARY_STORAGE = {}
 else:
     # Fallback to local storage if Cloudinary is not configured
     DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
-
-# Cloudinary storage settings
-CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': config('CLOUDINARY_CLOUD_NAME', default=''),
-    'API_KEY': config('CLOUDINARY_API_KEY', default=''),
-    'API_SECRET': config('CLOUDINARY_API_SECRET', default=''),
-}
+    CLOUDINARY_STORAGE = {}

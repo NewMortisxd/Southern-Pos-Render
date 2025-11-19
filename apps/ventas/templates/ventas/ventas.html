@@ -1,0 +1,856 @@
+{% extends 'base.html' %}
+
+{% block title %}Ventas{% endblock %}
+{% block section_title %}Ventas{% endblock %}
+
+{% block content %}
+<div class="flex h-full">
+    <!-- Products Section -->
+    <div class="flex-1 p-4 overflow-y-auto">
+        <!-- Filters and Search -->
+        <div class="mb-6 bg-white p-4 rounded-lg shadow-sm">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div class="relative flex-grow max-w-md">
+                    <input type="text" id="search-products" placeholder="Buscar productos..." 
+                           class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all">
+                    <div class="absolute left-3 top-3.5">
+                        <i data-lucide="search" class="w-5 h-5 text-emerald-500"></i>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button id="filter-button" class="flex items-center px-4 py-3 bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-lg hover:bg-emerald-100 transition-all">
+                        <i data-lucide="sliders-horizontal" class="w-4 h-4 mr-2"></i>
+                        <span>Filtros</span>
+                    </button>
+                    <div class="relative">
+                        <button id="view-toggle" class="flex items-center px-4 py-3 bg-gray-50 text-gray-700 border border-gray-100 rounded-lg hover:bg-gray-100 transition-all">
+                            <i data-lucide="layout-grid" class="w-4 h-4 mr-2"></i>
+                            <span>Vista</span>
+                        </button>
+                        <div id="view-options" class="hidden absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg z-10 py-2">
+                            <button class="view-option w-full text-left px-4 py-2 hover:bg-gray-50" data-view="grid">
+                                <i data-lucide="layout-grid" class="w-4 h-4 inline mr-2"></i> Cuadrícula
+                            </button>
+                            <button class="view-option w-full text-left px-4 py-2 hover:bg-gray-50" data-view="list">
+                                <i data-lucide="list" class="w-4 h-4 inline mr-2"></i> Lista
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="filters-container" class="hidden mt-4 p-4 bg-gray-50 rounded-lg border border-gray-100 animate-fade-in">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label for="category-filter" class="block text-sm font-medium text-gray-700 mb-1">Categoría</label>
+                        <select id="category-filter" class="w-full border border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                            <option value="">Todas las categorías</option>
+                            {% for categoria in categorias %}
+                                <option value="{{ categoria.id }}">{{ categoria.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        <label for="price-filter" class="block text-sm font-medium text-gray-700 mb-1">Precio máximo: $<span id="price-value">100</span></label>
+                        <input type="range" min="0" max="100" value="100" class="w-full accent-emerald-500" id="price-filter">
+                    </div>
+                    <div class="flex items-end">
+                        <button id="apply-filters" class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-all">
+                            Aplicar filtros
+                        </button>
+                        <button id="clear-filters" class="ml-2 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-all">
+                            Limpiar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Products Grid -->
+        <div id="products-container">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6" id="products-grid">
+                <!-- Product Card Template - Using actual products from database -->
+                {% for producto in productos %}
+                {% if producto.stock > 0 %}
+                <div class="bg-white rounded-lg shadow-sm overflow-hidden product-card hover:shadow-md transition-all" 
+                     data-product-id="{{ producto.id }}" 
+                     data-product-name="{{ producto.nombre }}" 
+                     data-product-price="{{ producto.precio }}"
+                     data-category-id="{{ producto.categoria.id }}"
+                     data-product-description="{{ producto.descripcion }}"
+                     data-product-stock="{{ producto.stock }}">
+                    <div class="h-48 bg-gray-100 flex items-center justify-center overflow-hidden product-image">
+                        {% if producto.imagen %}
+                            <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}" class="object-cover w-full h-full transition-transform duration-300">
+                        {% else %}
+                            <div class="flex flex-col items-center justify-center w-full h-full text-gray-400">
+                                <i data-lucide="image" class="w-12 h-12 mb-2"></i>
+                                <span class="text-sm">Sin imagen</span>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="p-4">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="font-semibold text-lg text-gray-800">{{ producto.nombre }}</h3>
+                            <span class="bg-emerald-50 text-emerald-700 text-xs font-medium px-2 py-1 rounded">{{ producto.categoria.nombre }}</span>
+                        </div>
+                        <p class="text-gray-600 text-sm mb-3">{{ producto.descripcion|truncatechars:50 }}</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-emerald-600 font-bold">${{ producto.precio }}</span>
+                            <button class="add-to-cart bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm transition-all flex items-center"
+                                    data-id="{{ producto.id }}" 
+                                    data-name="{{ producto.nombre }}" 
+                                    data-price="{{ producto.precio }}">
+                                <i data-lucide="shopping-cart" class="w-4 h-4 mr-1"></i>
+                                Agregar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+                
+                {% if not productos %}
+                <div class="col-span-full flex flex-col items-center justify-center py-12 bg-white rounded-lg shadow-sm">
+                    <i data-lucide="package-x" class="w-16 h-16 text-gray-300 mb-4"></i>
+                    <p class="text-gray-500 text-lg">No hay productos disponibles.</p>
+                    <p class="text-gray-400 text-sm mt-2">Intenta cambiar los filtros o agrega nuevos productos.</p>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Products List View (Hidden by default) -->
+            <div class="hidden" id="products-list">
+                <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                    <div class="grid grid-cols-12 bg-gray-50 p-3 border-b border-gray-200 font-medium text-gray-700">
+                        <div class="col-span-5">Producto</div>
+                        <div class="col-span-3">Categoría</div>
+                        <div class="col-span-2 text-right">Precio</div>
+                        <div class="col-span-2 text-right">Acción</div>
+                    </div>
+                    
+                    {% for producto in productos %}
+                    {% if producto.stock > 0 %}
+                    <div class="grid grid-cols-12 p-3 border-b border-gray-100 items-center product-card hover:bg-gray-50 transition-all" 
+                         data-product-id="{{ producto.id }}" 
+                         data-product-name="{{ producto.nombre }}" 
+                         data-product-price="{{ producto.precio }}"
+                         data-category-id="{{ producto.categoria.id }}"
+                         data-product-description="{{ producto.descripcion }}"
+                         data-product-stock="{{ producto.stock }}">
+                        <div class="col-span-5 flex items-center">
+                            <div class="w-10 h-10 bg-gray-100 rounded-md flex items-center justify-center mr-3 overflow-hidden">
+                                {% if producto.imagen %}
+                                    <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}" class="object-cover w-full h-full">
+                                {% else %}
+                                    <i data-lucide="image" class="w-5 h-5 text-gray-400"></i>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <h3 class="font-medium text-gray-800">{{ producto.nombre }}</h3>
+                                <p class="text-gray-500 text-xs">{{ producto.descripcion|truncatechars:30 }}</p>
+                            </div>
+                        </div>
+                        <div class="col-span-3">
+                            <span class="bg-emerald-50 text-emerald-700 text-xs font-medium px-2 py-1 rounded">{{ producto.categoria.nombre }}</span>
+                        </div>
+                        <div class="col-span-2 text-right font-medium text-emerald-600">${{ producto.precio }}</div>
+                        <div class="col-span-2 text-right">
+                            <button class="add-to-cart bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1 rounded text-xs transition-all"
+                                    data-id="{{ producto.id }}" 
+                                    data-name="{{ producto.nombre }}" 
+                                    data-price="{{ producto.precio }}">
+                                Agregar
+                            </button>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                    
+                    {% if not productos %}
+                    <div class="p-8 text-center">
+                        <p class="text-gray-500">No hay productos disponibles.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shopping Cart Section -->
+    <div id="cart-container" class="w-96 bg-white shadow-lg border-l border-gray-200 transform transition-transform duration-300 ease-in-out translate-y-full h-[calc(100vh-110px)] fixed bottom-0 right-4 z-10 rounded-t-lg">
+        <div class="flex flex-col h-full">
+            <div class="p-4 border-b border-gray-200 flex justify-between items-center bg-emerald-600 text-white rounded-t-lg">
+                <h2 class="font-bold text-lg flex items-center">
+                    <i data-lucide="shopping-cart" class="w-5 h-5 mr-2"></i>
+                    Carrito de Compras
+                </h2>
+                <button id="close-cart" class="focus:outline-none hover:bg-emerald-700 p-1 rounded-full transition-all">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            
+            <div id="cart-items" class="flex-1 overflow-y-auto p-4">
+                <!-- Cart items will be added here dynamically -->
+                <div class="text-center text-gray-500 py-12" id="empty-cart-message">
+                    <i data-lucide="shopping-cart" class="w-16 h-16 mx-auto mb-4 text-gray-200"></i>
+                    <p class="text-lg">Tu carrito está vacío</p>
+                    <p class="text-sm mt-2">Agrega productos para comenzar</p>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-200 p-4 bg-gray-50 sticky bottom-0">
+                <div class="flex justify-between mb-4">
+                    <span class="font-semibold text-gray-700">Total:</span>
+                    <span class="font-bold text-emerald-600 text-xl" id="cart-total">$0.00</span>
+                </div>
+                <button id="checkout-button" class="w-full bg-emerald-600 text-white py-3 rounded-lg hover:bg-emerald-700 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed transition-all" disabled>
+                    <i data-lucide="credit-card" class="w-5 h-5 mr-2"></i>
+                    Proceder al Pago
+                </button>
+                <button id="clear-cart-button" class="w-full mt-2 bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300 flex items-center justify-center transition-all">
+                    <i data-lucide="trash-2" class="w-4 h-4 mr-2"></i>
+                    Vaciar Carrito
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cart Toggle Button -->
+    <button id="toggle-cart" class="fixed bottom-6 right-6 bg-emerald-600 text-white p-4 rounded-full shadow-lg hover:bg-emerald-700 z-20 transition-all">
+        <div class="relative">
+            <i data-lucide="shopping-cart" class="w-6 h-6"></i>
+            <span id="cart-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">0</span>
+        </div>
+    </button>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize Lucide icons
+        lucide.createIcons();
+        
+        // Filter toggle functionality
+        const filterButton = document.getElementById('filter-button');
+        const filtersContainer = document.getElementById('filters-container');
+        
+        filterButton.addEventListener('click', function() {
+            filtersContainer.classList.toggle('hidden');
+        });
+        
+        // View toggle functionality
+        const viewToggle = document.getElementById('view-toggle');
+        const viewOptions = document.getElementById('view-options');
+        // Get products grid element, already declared above
+        const productsGridView = document.getElementById('products-grid');
+        const productsList = document.getElementById('products-list');
+        
+        viewToggle.addEventListener('click', function() {
+            viewOptions.classList.toggle('hidden');
+        });
+        
+        // Close view options when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!viewToggle.contains(event.target) && !viewOptions.contains(event.target)) {
+                viewOptions.classList.add('hidden');
+            }
+        });
+        
+        // Fix the variable name mismatch (productsGrid -> productsGridView)
+        document.querySelectorAll('.view-option').forEach(option => {
+            option.addEventListener('click', function() {
+                const viewType = this.dataset.view;
+                
+                if (viewType === 'grid') {
+                    productsGridView.classList.remove('hidden');  // Fixed variable name
+                    productsList.classList.add('hidden');
+                    viewToggle.querySelector('i').setAttribute('data-lucide', 'layout-grid');
+                } else if (viewType === 'list') {
+                    productsGridView.classList.add('hidden');    // Fixed variable name
+                    productsList.classList.remove('hidden');
+                    viewToggle.querySelector('i').setAttribute('data-lucide', 'list');
+                }
+                
+                viewOptions.classList.add('hidden');
+                lucide.createIcons();
+            });
+        });
+        
+        // Cart functionality
+        const cartContainer = document.getElementById('cart-container');
+        const toggleCartBtn = document.getElementById('toggle-cart');
+        const closeCartBtn = document.getElementById('close-cart');
+        const cartItems = document.getElementById('cart-items');
+        const cartTotal = document.getElementById('cart-total');
+        const cartCount = document.getElementById('cart-count');
+        const checkoutButton = document.getElementById('checkout-button');
+        const emptyCartMessage = document.getElementById('empty-cart-message');
+        const addToCartButtons = document.querySelectorAll('.add-to-cart');
+        const clearCartButton = document.getElementById('clear-cart-button');
+        
+        let cart = [];
+        
+        // Toggle cart visibility
+        toggleCartBtn.addEventListener('click', function() {
+            cartContainer.classList.toggle('translate-y-full');
+            // Hide the toggle button when cart is visible
+            toggleCartBtn.classList.add('hidden');
+        });
+        
+        closeCartBtn.addEventListener('click', function() {
+            cartContainer.classList.add('translate-y-full');
+            // Show the toggle button when cart is closed
+            toggleCartBtn.classList.remove('hidden');
+        });
+        
+        // Clear cart functionality
+        clearCartButton.addEventListener('click', function() {
+            if (confirm('¿Estás seguro de que deseas vaciar el carrito?')) {
+                cart = [];
+                updateCart();
+            }
+        });
+        
+        // Add to cart functionality with animation
+                addToCartButtons.forEach(button => {
+                    button.addEventListener('click', function() {
+                        const productCard = this.closest('.product-card');
+                        const productId = productCard.dataset.productId;
+                        const productName = productCard.dataset.productName;
+                        const productPrice = parseFloat(productCard.dataset.productPrice);
+                        const productStock = parseInt(productCard.dataset.productStock) || 0;
+                        
+                        // Check if product is already in cart
+                        const existingItem = cart.find(item => item.id === productId);
+                        
+                        // Check if adding one more would exceed stock
+                        if (existingItem && existingItem.quantity >= productStock) {
+                            alert(`No se pueden agregar más unidades. Stock disponible: ${productStock}`);
+                            return;
+                        }
+                        
+                        // Create a visual feedback animation
+                        const btnRect = this.getBoundingClientRect();
+                        const cartBtnRect = toggleCartBtn.getBoundingClientRect();
+                        
+                        const animEl = document.createElement('div');
+                        animEl.className = 'fixed z-50 bg-emerald-500 rounded-full w-5 h-5 animate-fly-to-cart';
+                        animEl.style.top = `${btnRect.top + btnRect.height/2}px`;
+                        animEl.style.left = `${btnRect.left + btnRect.width/2}px`;
+                        document.body.appendChild(animEl);
+                        
+                        // Set the animation end position (cart button)
+                        animEl.style.setProperty('--end-x', `${cartBtnRect.left + cartBtnRect.width/2 - (btnRect.left + btnRect.width/2)}px`);
+                        animEl.style.setProperty('--end-y', `${cartBtnRect.top + cartBtnRect.height/2 - (btnRect.top + btnRect.height/2)}px`);
+                        
+                        // Remove the element after animation completes
+                        setTimeout(() => {
+                            animEl.remove();
+                        }, 500);
+                        
+                        if (existingItem) {
+                            existingItem.quantity += 1;
+                            existingItem.stock = productStock; // Store stock info with item
+                        } else {
+                            cart.push({
+                                id: productId,
+                                name: productName,
+                                price: productPrice,
+                                quantity: 1,
+                                stock: productStock // Store stock info with item
+                            });
+                        }
+                        
+                        updateCart();
+                        
+                        // Show cart if it's hidden AND user hasn't manually closed it
+                        if (cartContainer.classList.contains('translate-y-full') && !cartManuallyClosed) {
+                            cartContainer.classList.remove('translate-y-full');
+                            // Hide the toggle button when cart is shown
+                            toggleCartBtn.classList.add('hidden');
+                        }
+                    });
+                });
+        
+        // Update cart display
+        function updateCart() {
+            // Clear cart items
+            while (cartItems.firstChild) {
+                cartItems.removeChild(cartItems.firstChild);
+            }
+            
+            if (cart.length === 0) {
+                cartItems.appendChild(emptyCartMessage);
+                checkoutButton.disabled = true;
+                cartCount.textContent = '0';
+                cartTotal.textContent = '$0.00';
+                return;
+            }
+            
+            // Hide empty cart message
+            if (emptyCartMessage.parentNode === cartItems) {
+                cartItems.removeChild(emptyCartMessage);
+            }
+            checkoutButton.disabled = false;
+            
+            // Calculate total and count
+            let total = 0;
+            let count = 0;
+            
+            // Add items to cart
+            cart.forEach(item => {
+                const itemTotal = item.price * item.quantity;
+                total += itemTotal;
+                count += item.quantity;
+                
+                const cartItem = document.createElement('div');
+                cartItem.className = 'flex items-start justify-between mb-4 pb-4 border-b border-gray-100 animate-fade-in';
+                cartItem.innerHTML = `
+                    <div class="flex-1">
+                        <h4 class="text-sm font-medium text-gray-800">${item.name}</h4>
+                        <div class="flex items-center mt-2 bg-gray-50 rounded-lg inline-flex">
+                            <button class="decrease-quantity text-gray-500 hover:text-gray-700 p-1 hover:bg-gray-100 rounded-l-lg transition-all" data-id="${item.id}">
+                                <i data-lucide="minus" class="w-4 h-4"></i>
+                            </button>
+                            <span class="mx-3 text-sm font-medium">${item.quantity}</span>
+                            <button class="increase-quantity text-gray-500 hover:text-gray-700 p-1 hover:bg-gray-100 rounded-r-lg transition-all" data-id="${item.id}">
+                                <i data-lucide="plus" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-sm font-medium text-emerald-600">$${itemTotal.toFixed(2)}</div>
+                        <button class="remove-item text-red-500 text-xs hover:text-red-700 mt-2 flex items-center justify-end" data-id="${item.id}">
+                            <i data-lucide="trash-2" class="w-3 h-3 mr-1"></i>
+                            Eliminar
+                        </button>
+                    </div>
+                `;
+                
+                cartItems.appendChild(cartItem);
+            });
+            
+            // Update total and count
+            cartTotal.textContent = '$' + total.toFixed(2);
+            cartCount.textContent = count;
+            
+            // Initialize Lucide icons for new elements
+            lucide.createIcons();
+            
+            // Add event listeners for quantity buttons
+            document.querySelectorAll('.decrease-quantity').forEach(button => {
+                button.addEventListener('click', function() {
+                    const id = this.dataset.id;
+                    const item = cart.find(item => item.id === id);
+                    if (item.quantity > 1) {
+                        item.quantity -= 1;
+                    } else {
+                        cart = cart.filter(item => item.id !== id);
+                    }
+                    updateCart();
+                });
+            });
+            
+            document.querySelectorAll('.increase-quantity').forEach(button => {
+                button.addEventListener('click', function() {
+                    const id = this.dataset.id;
+                    const item = cart.find(item => item.id === id);
+                    
+                    // Check if increasing would exceed stock
+                    if (item.quantity >= item.stock) {
+                        alert(`No se pueden agregar más unidades. Stock disponible: ${item.stock}`);
+                        return;
+                    }
+                    
+                    item.quantity += 1;
+                    updateCart();
+                });
+            });
+            
+            document.querySelectorAll('.remove-item').forEach(button => {
+                button.addEventListener('click', function() {
+                    const id = this.dataset.id;
+                    cart = cart.filter(item => item.id !== id);
+                    updateCart();
+                });
+            });
+        }
+        
+        // Search functionality
+        const searchInput = document.getElementById('search-products');
+        // Get products grid element, handle potential null case
+        const productsGrid = document.getElementById('products-grid') || document.createElement('div');
+        const productCards = document.querySelectorAll('.product-card');
+        
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            
+            productCards.forEach(card => {
+                const productName = card.dataset.productName.toLowerCase();
+                const productDesc = card.querySelector('p').textContent.toLowerCase();
+                
+                if (productName.includes(searchTerm) || productDesc.includes(searchTerm)) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+        
+        // Category filter functionality
+        const categoryFilter = document.getElementById('category-filter');
+        const applyFiltersBtn = document.getElementById('apply-filters');
+        const clearFiltersBtn = document.getElementById('clear-filters');
+        
+        applyFiltersBtn.addEventListener('click', function() {
+            applyFilters();
+        });
+        
+        clearFiltersBtn.addEventListener('click', function() {
+            // Reset filters
+            categoryFilter.value = '';
+            priceFilter.value = priceFilter.max;
+            priceValue.textContent = priceFilter.max;
+            
+            // Show all products
+            productCards.forEach(card => {
+                card.style.display = '';
+            });
+        });
+        
+        function applyFilters() {
+            const selectedCategoryId = categoryFilter.value;
+            const maxPriceValue = parseFloat(priceFilter.value);
+            
+            productCards.forEach(card => {
+                const productCategoryId = card.dataset.categoryId;
+                const productPrice = parseFloat(card.dataset.productPrice);
+                
+                const categoryMatch = selectedCategoryId === '' || productCategoryId === selectedCategoryId;
+                const priceMatch = productPrice <= maxPriceValue;
+                
+                if (categoryMatch && priceMatch) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+        
+        // Price filter functionality
+        const priceFilter = document.getElementById('price-filter');
+        const priceValue = document.getElementById('price-value');
+        
+        // Set max value based on highest product price
+        let maxPrice = 0;
+        productCards.forEach(card => {
+            const price = parseFloat(card.dataset.productPrice);
+            if (price > maxPrice) maxPrice = price;
+        });
+        
+        priceFilter.max = Math.ceil(maxPrice);
+        priceFilter.value = Math.ceil(maxPrice);
+        priceValue.textContent = Math.ceil(maxPrice);
+        
+        priceFilter.addEventListener('input', function() {
+            const maxPriceValue = parseFloat(this.value);
+            priceValue.textContent = maxPriceValue;
+        });
+        
+        // Product detail modal functionality
+        const productImages = document.querySelectorAll('.product-image');
+        
+        productImages.forEach(image => {
+            image.addEventListener('click', function() {
+                const productCard = this.closest('.product-card');
+                const productId = productCard.dataset.productId;
+                const productName = productCard.dataset.productName;
+                const productPrice = productCard.dataset.productPrice;
+                const productCategory = productCard.querySelector('.bg-emerald-50').textContent;
+                const productDescription = productCard.dataset.productDescription || productCard.querySelector('p').textContent;
+                const productImageSrc = productCard.querySelector('img')?.src || '';
+                const hasImage = productCard.querySelector('img') !== null;
+                const productStock = parseInt(productCard.dataset.productStock) || 0;
+                
+                // Create modal
+                const modal = document.createElement('div');
+                modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+                modal.innerHTML = `
+                    <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full animate-fade-in overflow-hidden">
+                        <!-- Modal header with close button -->
+                        <div class="flex justify-between items-center p-4 border-b border-gray-100">
+                            <h3 class="font-bold text-lg text-gray-800">Detalle del Producto</h3>
+                            <button id="close-product-modal" class="text-gray-500 hover:text-gray-700 focus:outline-none">
+                                <i data-lucide="x" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                        <div class="flex flex-col md:flex-row">
+                            <div class="md:w-1/2 p-4">
+                                ${hasImage 
+                                    ? `<img src="${productImageSrc}" alt="${productName}" class="w-full h-64 object-cover rounded-lg">`
+                                    : `<div class="w-full h-64 bg-gray-100 rounded-lg flex flex-col items-center justify-center">
+                                        <i data-lucide="image" class="w-16 h-16 text-gray-300 mb-2"></i>
+                                        <span class="text-gray-400">Sin imagen</span>
+                                      </div>`
+                                }
+                            </div>
+                            <div class="md:w-1/2 p-4">
+                                <div class="mb-4">
+                                    <span class="bg-emerald-50 text-emerald-700 text-xs font-medium px-2 py-1 rounded">${productCategory}</span>
+                                </div>
+                                <h2 class="text-2xl font-bold text-gray-800 mb-2">${productName}</h2>
+                                <p class="text-gray-600 mb-4">${productDescription}</p>
+                                <div class="flex justify-between items-center mb-6">
+                                    <span class="text-2xl font-bold text-emerald-600">$${productPrice}</span>
+                                    <button class="add-to-cart-modal bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg transition-all flex items-center"
+                                            data-id="${productId}" 
+                                            data-name="${productName}" 
+                                            data-price="${productPrice}"
+                                            data-stock="${productStock}">
+                                        <i data-lucide="shopping-cart" class="w-5 h-5 mr-2"></i>
+                                        Agregar al Carrito
+                                    </button>
+                                </div>
+                                <div class="border-t border-gray-100 pt-4">
+                                    <h4 class="font-medium text-gray-700 mb-2">Información adicional</h4>
+                                    <div class="grid grid-cols-2 gap-2 text-sm">
+                                        <div class="text-gray-600">ID:</div>
+                                        <div class="font-medium">${productId}</div>
+                                        <div class="text-gray-600">Categoría:</div>
+                                        <div class="font-medium">${productCategory}</div>
+                                        <div class="text-gray-600">Stock disponible:</div>
+                                        <div class="font-medium ${productStock < 5 ? 'text-orange-500' : ''}">${productStock} unidades</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                document.body.appendChild(modal);
+                lucide.createIcons();
+                
+                // Close modal when clicking the X button
+                modal.querySelector('#close-product-modal').addEventListener('click', function() {
+                    document.body.removeChild(modal);
+                });
+                
+                // Add to cart from modal
+                modal.querySelector('.add-to-cart-modal').addEventListener('click', function() {
+                    const productId = this.dataset.id;
+                    const productName = this.dataset.name;
+                    const productPrice = parseFloat(this.dataset.price);
+                    const productStock = parseInt(this.dataset.stock) || 0;
+                    
+                    // Check if product is already in cart
+                    const existingItem = cart.find(item => item.id === productId);
+                    
+                    // Check if adding one more would exceed stock
+                    if (existingItem && existingItem.quantity >= productStock) {
+                        alert(`No se pueden agregar más unidades. Stock disponible: ${productStock}`);
+                        return;
+                    }
+                    
+                    if (existingItem) {
+                        existingItem.quantity += 1;
+                        existingItem.stock = productStock; // Store stock info with item
+                    } else {
+                        cart.push({
+                            id: productId,
+                            name: productName,
+                            price: productPrice,
+                            quantity: 1,
+                            stock: productStock // Store stock info with item
+                        });
+                    }
+                    
+                    updateCart();
+                    
+                    // Show cart if it's hidden AND user hasn't manually closed it
+                    if (cartContainer.classList.contains('translate-y-full') && !cartManuallyClosed) {
+                        cartContainer.classList.remove('translate-y-full');
+                        // Hide the toggle button when cart is shown
+                        toggleCartBtn.classList.add('hidden');
+                    }
+                    
+                    // Close the modal
+                    document.body.removeChild(modal);
+                });
+                
+                // Close modal when clicking outside
+                modal.addEventListener('click', function(event) {
+                    if (event.target === modal) {
+                        document.body.removeChild(modal);
+                    }
+                });
+            });
+        });
+        
+        checkoutButton.addEventListener('click', function() {
+            // Force cart update before processing
+            updateCart();
+            
+            if (cart.length === 0) {
+                alert('El carrito está vacío. Agregue productos antes de completar la venta.');
+                return;
+            }
+            
+            try {
+                // Clone cart to prevent modification during stringify
+                const cartData = JSON.stringify([...cart]);
+                
+                // Enhanced validation
+                if (!cartData || cartData === '[]' || !Array.isArray(JSON.parse(cartData))) {
+                    throw new Error('Datos del carrito no válidos');
+                }
+            
+                // Store cart in localStorage as a backup
+                localStorage.setItem('southern_pos_cart_backup', cartData);
+                
+                // Generate SRI-compatible XML
+                const sriXml = generateSriXml(cart);
+                
+                // Create a form to submit the cart data
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = "{% url 'ventas:completar_venta' %}";
+                
+                // Add CSRF token
+                const csrfToken = document.createElement('input');
+                csrfToken.type = 'hidden';
+                csrfToken.name = 'csrfmiddlewaretoken';
+                csrfToken.value = '{{ csrf_token }}';
+                form.appendChild(csrfToken);
+                
+                // Add cart data as JSON
+                const cartDataInput = document.createElement('input');
+                cartDataInput.type = 'hidden';
+                cartDataInput.name = 'cart_data';
+                cartDataInput.value = cartData;
+                form.appendChild(cartDataInput);
+                
+                // Add SRI XML data
+                const xmlDataInput = document.createElement('input');
+                xmlDataInput.type = 'hidden';
+                xmlDataInput.name = 'sri_xml_data';
+                xmlDataInput.value = sriXml;
+                form.appendChild(xmlDataInput);
+            
+                // Debug - log the form data
+                console.log('Cart items before submit:', cart);
+                console.log('Cart JSON being sent:', cartData);
+                console.log('SRI XML being sent:', sriXml);
+                console.log('Form action:', form.action);
+                console.log('Form method:', form.method);
+                console.log('CSRF token:', csrfToken.value);
+                
+                // Prevent form from being garbage collected before submission
+                window.tempForm = form;
+                
+                // Submit form
+                document.body.appendChild(form);
+                form.submit();
+            } catch (error) {
+                console.error('Error preparing datos:', error);
+                alert('Error al procesar el carrito: ' + error.message);
+            }
+        });
+        
+        // Function to generate SRI-compatible XML
+        function generateSriXml(cartItems) {
+            // Get current date
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            
+            // Calculate total
+            let totalVenta = 0;
+            cartItems.forEach(item => {
+                totalVenta += item.price * item.quantity;
+            });
+            
+            // Create XML string according to SRI specifications
+            let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
+            xml += '<iva version="1.0.0">\n';
+            xml += `  <anio>${year}</anio>\n`;
+            xml += `  <mes>${month}</mes>\n`;
+            xml += '  <numEstabRuc>001</numEstabRuc>\n';
+            xml += `  <totalVentas>${totalVenta.toFixed(2)}</totalVentas>\n`;
+            
+            // Add ventas section
+            xml += '  <ventas>\n';
+            
+            // Group items by customer type (assuming all are the same type in this simple example)
+            xml += '    <vent>\n';
+            xml += '      <tpIdCliente>05</tpIdCliente>\n';  // Assuming consumer final
+            xml += '      <idCliente>9999999999</idCliente>\n';  // Generic consumer
+            xml += '      <parteRel>NO</parteRel>\n';
+            xml += '      <tipoComprobante>01</tipoComprobante>\n';  // Factura
+            xml += '      <numeroComprobantes>1</numeroComprobantes>\n';
+            xml += '      <baseNoGraIva>0.00</baseNoGraIva>\n';
+            xml += `      <baseImponible>${totalVenta.toFixed(2)}</baseImponible>\n`;
+            xml += `      <baseImpGrav>${totalVenta.toFixed(2)}</baseImpGrav>\n`;
+            
+            // Calculate IVA (assuming 12%)
+            const montoIva = totalVenta * 0.12;
+            xml += `      <montoIva>${montoIva.toFixed(2)}</montoIva>\n`;
+            xml += '    </vent>\n';
+            xml += '  </ventas>\n';
+            
+            // Close main tag
+            xml += '</iva>';
+            
+            return xml;
+        }
+        
+        // Add CSS for animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes flyToCart {
+                0% {
+                    transform: translate(0, 0) scale(1);
+                    opacity: 1;
+                }
+                100% {
+                    transform: translate(var(--end-x), var(--end-y)) scale(0.1);
+                    opacity: 0;
+                }
+            }
+            
+            .animate-fly-to-cart {
+                animation: flyToCart 0.5s ease-out forwards;
+            }
+            
+            .animate-fade-in {
+                animation: fadeIn 0.3s ease-out forwards;
+            }
+            
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(10px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+        `;
+        document.head.appendChild(style);
+    });
+</script>
+<script>
+    // Add this at the beginning of your script
+    const currencySymbol = '{{ currency_symbol }}';
+    
+    // Then replace all instances of '$' with currencySymbol in your JavaScript
+    // For example:
+    function updateCartDisplay() {
+        cartItemHTML += `<span class="font-medium text-emerald-600">${currencySymbol}${(item.precio * item.quantity).toFixed(2)}</span>`;
+    }
+</script>
+<script>
+    // Update the product price display in the template
+    document.querySelectorAll('.product-price').forEach(priceElement => {
+        const price = priceElement.textContent.trim();
+        if (price.startsWith('$')) {
+            priceElement.textContent = price.replace('$', currencySymbol);
+        }
+    });
+</script>
+{% endblock %}

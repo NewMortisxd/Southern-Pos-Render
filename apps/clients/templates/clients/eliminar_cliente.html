@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Eliminar Cliente
+{% endblock %}
+
+{% block content %}
+<!-- Contenedor principal con márgenes automáticos y padding -->
+<div class="container mx-auto px-4 py-8">
+    <!-- Encabezado con título y botón de volver -->
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold text-gray-800">{{ section_title }}</h1>
+        <a href="{% url 'clients:lista' %}" class="bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-lg transition duration-300 flex items-center">
+            <i class="fas fa-arrow-left mr-2"></i>Volver
+        </a>
+    </div>
+
+    <!-- Tarjeta con el formulario de eliminación -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <!-- Alerta de confirmación -->
+        <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <i data-lucide="alert-triangle" class="h-5 w-5 text-red-500"></i>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-sm font-medium text-red-800">¿Estás seguro de que deseas eliminar este cliente?</h3>
+                    <div class="mt-2 text-sm text-red-700">
+                        <p>Esta acción no se puede deshacer. Se eliminarán todos los datos asociados a este cliente.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Resumen de la información del cliente -->
+        <div class="bg-gray-50 p-4 rounded-lg mb-6">
+            <h4 class="text-lg font-medium text-gray-900 mb-3">Información del cliente</h4>
+            <dl class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2">
+                <div class="sm:col-span-1">
+                    <dt class="text-sm font-medium text-gray-500">Nombre</dt>
+                    <dd class="mt-1 text-sm text-gray-900">{{ cliente.nombre }}</dd>
+                </div>
+                <div class="sm:col-span-1">
+                    <dt class="text-sm font-medium text-gray-500">Identificación</dt>
+                    <dd class="mt-1 text-sm text-gray-900">{{ cliente.identificacion|default:"-" }}</dd>
+                </div>
+                <div class="sm:col-span-1">
+                    <dt class="text-sm font-medium text-gray-500">Teléfono</dt>
+                    <dd class="mt-1 text-sm text-gray-900">{{ cliente.telefono|default:"-" }}</dd>
+                </div>
+                <div class="sm:col-span-1">
+                    <dt class="text-sm font-medium text-gray-500">Email</dt>
+                    <dd class="mt-1 text-sm text-gray-900">{{ cliente.email|default:"-" }}</dd>
+                </div>
+            </dl>
+        </div>
+        
+        <!-- Formulario de eliminación -->
+        <form method="post" class="flex justify-end space-x-3">
+            {% csrf_token %}
+            <!-- Botón para cancelar -->
+            <a href="{% url 'clients:lista' %}" class="bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-lg transition duration-300">
+                Cancelar
+            </a>
+            <!-- Botón para confirmar eliminación -->
+            <button type="submit" class="bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded-lg transition duration-300">
+                Eliminar
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

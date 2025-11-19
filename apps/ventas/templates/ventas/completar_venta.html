@@ -1,0 +1,790 @@
+{% extends 'base.html' %}
+
+{% block title %}Completar Venta{% endblock %}
+{% block section_title %}Completar Venta{% endblock %}
+
+{% block content %}
+<div class="container mx-auto p-4 max-w-5xl">
+    <div class="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+        <h2 class="text-3xl font-bold mb-6 text-gray-800 border-b pb-3 flex items-center">
+            <i data-lucide="shopping-cart" class="w-7 h-7 mr-3 text-emerald-600"></i>
+            Resumen de la Compra
+        </h2>
+
+        <!-- Cart Items -->
+        <div class="mb-8">
+            <h3 class="text-xl font-semibold mb-3 text-gray-700 flex items-center">
+                <i data-lucide="package" class="w-5 h-5 mr-2 text-emerald-600"></i>
+                Productos
+            </h3>
+            <div class="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                {% if cart_items %}
+                    <div class="divide-y divide-gray-200">
+                        {% for item in cart_items %}
+                            <div class="py-4 flex justify-between items-center hover:bg-gray-100 dark:hover:bg-gray-700 px-3 rounded-lg transition-all duration-200">
+                                <div class="flex items-center">
+                                    <span class="font-medium text-gray-800">{{ item.nombre }}</span>
+                                    <span class="text-gray-600 font-medium ml-3 px-2 py-1 bg-gray-200 rounded-full text-sm">x{{ item.quantity }}</span>
+                                </div>
+                                <span class="font-medium text-emerald-600">{{ currency_symbol }}{{ item.subtotal|floatformat:2 }}</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="flex flex-col items-center justify-center py-6 text-center">
+                        <i data-lucide="shopping-cart" class="w-14 h-14 text-gray-300 mb-3"></i>
+                        <p class="text-gray-500">No hay productos en el carrito</p>
+                        <a href="{% url 'ventas:ventas' %}" class="mt-3 text-emerald-600 hover:text-emerald-700 underline">Volver a ventas</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Total sin mostrar IVA por separado -->
+        <!-- Total sin mostrar IVA por separado -->
+        <div class="bg-emerald-50 p-4 rounded-xl mb-6">
+            <div class="flex justify-between font-bold text-xl">
+                <span class="text-gray-800">Total:</span>
+                <span class="text-emerald-600">${{ total|floatformat:2 }}</span>
+            </div>
+            <div class="flex justify-between text-sm text-gray-600 mt-1">
+                <span>(Precio incluye IVA)</span>
+            </div>
+        </div>
+
+        <!-- Customer Type Selection -->
+        <div class="mb-8">
+            <h3 class="text-xl font-semibold mb-3 text-gray-700 flex items-center">
+                <i data-lucide="user" class="w-5 h-5 mr-2 text-emerald-600"></i>
+                Tipo de Cliente
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="border border-gray-200 rounded-xl p-4 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 cursor-pointer customer-type active">
+                    <div class="flex items-center">
+                        <input type="radio" name="customer_type" id="final_consumer" value="final_consumer" class="mr-3 h-5 w-5 text-emerald-600" checked>
+                        <label for="final_consumer" class="flex items-center cursor-pointer">
+                            <i data-lucide="user" class="w-5 h-5 mr-2 text-gray-600 dark:text-gray-400"></i>
+                            <span class="font-medium">Consumidor Final</span>
+                        </label>
+                    </div>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-2 ml-8">No requiere datos adicionales.</p>
+                </div>
+                <div class="border border-gray-200 dark:border-gray-700 rounded-xl p-4 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 cursor-pointer customer-type">
+                    <div class="flex items-center">
+                        <input type="radio" name="customer_type" id="registered_customer" value="registered_customer" class="mr-3 h-5 w-5 text-emerald-600">
+                        <label for="registered_customer" class="flex items-center cursor-pointer">
+                            <i data-lucide="users" class="w-5 h-5 mr-2 text-gray-600 dark:text-gray-400"></i>
+                            <span class="font-medium">Cliente Registrado</span>
+                        </label>
+                    </div>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-2 ml-8">Permite descuentos y factura.</p>
+                </div>
+                <div class="border border-gray-200 dark:border-gray-700 rounded-xl p-4 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 cursor-pointer customer-type" id="auto_data_customer_div">
+                    <div class="flex items-center">
+                        <input type="radio" name="customer_type" id="auto_data_customer" value="auto_data_customer" class="mr-3 h-5 w-5 text-emerald-600">
+                        <label for="auto_data_customer" class="flex items-center cursor-pointer">
+                            <i data-lucide="scan-face" class="w-5 h-5 mr-2 text-gray-600 dark:text-gray-400"></i>
+                            <span class="font-medium">Con datos</span>
+                        </label>
+                    </div>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-2 ml-8">Permite datos con cédula automáticamente.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Registered Customer Information -->
+        <div id="registered-customer-section" class="mb-8 hidden">
+            <h3 class="text-xl font-semibold mb-3 text-gray-700 flex items-center">
+                <i data-lucide="search" class="w-5 h-5 mr-2 text-emerald-600"></i>
+                Buscar Cliente Registrado
+            </h3>
+            
+            <!-- Client selection area -->
+            <div id="client-selection" class="mb-4">
+                <div class="relative flex-grow mb-3">
+                    <i data-lucide="search" class="absolute left-3 top-2.5 w-5 h-5 text-gray-400"></i>
+                    <input type="text" id="client-search" placeholder="Buscar por nombre, cédula o RUC" class="pl-10 w-full border rounded-xl py-2.5">
+                </div>
+                
+                <!-- Search results -->
+                <div id="client-results" class="bg-white rounded-xl border border-gray-200 shadow-md mt-2 hidden">
+                    <table class="w-full">
+                        <thead class="bg-gray-50 border-b">
+                            <tr>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Código</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Nombre</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Identificación</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="client-results-body">
+                            <!-- Results will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Selected client info -->
+                <div id="selected-client-info" class="bg-emerald-50 rounded-xl p-4 border border-emerald-100 mt-3 hidden">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h4 id="selected-client-name" class="font-medium text-gray-800"></h4>
+                            <p id="selected-client-id" class="text-sm text-gray-600 mt-1"></p>
+                            <p id="selected-client-address" class="text-sm text-gray-600 mt-1"></p>
+                        </div>
+                        <button id="change-client" class="text-sm text-emerald-600 hover:text-emerald-700">
+                            Cambiar
+                        </button>
+                    </div>
+                    <input type="hidden" id="selected-client-id-input" name="client_id">
+                </div>
+            </div>
+            
+            <div class="mt-4">
+                <label for="invoice_required" class="flex items-center cursor-pointer">
+                    <input type="checkbox" id="invoice_required" class="mr-2 h-5 w-5 text-emerald-600">
+                    <span class="font-medium">Generar factura</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Método de Pago -->
+        <div class="mb-8">
+            <h3 class="text-xl font-semibold mb-3 text-gray-700 flex items-center">
+                <i data-lucide="wallet" class="w-5 h-5 mr-2 text-emerald-600"></i>
+                Método de Pago
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="border rounded-xl p-4 hover:bg-emerald-50 cursor-pointer payment-method active">
+                    <div class="flex items-center">
+                        <input type="radio" name="metodo_pago" id="cash" value="cash" class="mr-3 h-5 w-5 text-emerald-600" checked>
+                        <label for="cash" class="flex items-center cursor-pointer">
+                            <i data-lucide="banknote" class="w-5 h-5 mr-2 text-gray-600 dark:text-gray-400"></i>
+                            <span class="font-medium">Efectivo</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="border rounded-xl p-4 hover:bg-emerald-50 cursor-pointer payment-method">
+                    <div class="flex items-center">
+                        <input type="radio" name="metodo_pago" id="card" value="card" class="mr-3 h-5 w-5 text-emerald-600">
+                        <label for="card" class="flex items-center cursor-pointer">
+                            <i data-lucide="credit-card" class="w-5 h-5 mr-2 text-gray-600 dark:text-gray-400"></i>
+                            <span class="font-medium">Tarjeta</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cash Payment Details -->
+        <div id="cash-payment-details" class="mb-8">
+            <h3 class="text-xl font-semibold mb-3 text-gray-700 flex items-center">
+                <i data-lucide="calculator" class="w-5 h-5 mr-2 text-emerald-600"></i>
+                Detalles de Pago en Efectivo
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-gray-50 p-4 rounded-xl">
+                    <label for="cash_amount" class="block text-sm font-medium text-gray-700 mb-2">Monto Recibido ($)</label>
+                    <input type="text" id="cash_amount" name="cash_amount" class="w-full border rounded-lg py-2.5 text-lg" placeholder="0.00">
+                </div>
+                <div class="bg-gray-50 p-4 rounded-xl">
+                    <label for="cash_change" class="block text-sm font-medium text-gray-700 mb-2">Cambio ($)</label>
+                    <input type="text" id="cash_change" name="cash_change" class="w-full border rounded-lg py-2.5 text-lg" readonly>
+                </div>
+            </div>
+            <div class="mt-4 bg-gray-100 p-4 rounded-xl shadow-inner">
+                <div class="grid grid-cols-3 gap-3 max-w-md mx-auto" id="cash-numpad">
+                    <button class="num-pad-btn bg-white hover:bg-emerald-100 text-gray-800 font-semibold py-4 rounded-xl shadow-sm border border-gray-200" data-value="1">1</button>
+                    <button class="num-pad-btn bg-white hover:bg-emerald-100 text-gray-800 font-semibold py-4 rounded-xl shadow-sm border border-gray-200" data-value="2">2</button>
+                    <button class="num-pad-btn bg-white hover:bg-emerald-100 text-gray-800 font-semibold py-4 rounded-xl shadow-sm border border-gray-200" data-value="3">3</button>
+                    <button class="num-pad-btn bg-white hover:bg-emerald-100 text-gray-800 font-semibold py-4 rounded-xl shadow-sm border border-gray-200" data-value="4">4</button>
+                    <button class="num-pad-btn bg-white hover:bg-emerald-100 text-gray-800 font-semibold py-4 rounded-xl shadow-sm border border-gray-200" data-value="5">5</button>
+                    <button class="num-pad-btn bg-white hover:bg-emerald-100 text-gray-800 font-semibold py-4 rounded-xl shadow-sm border border-gray-200" data-value="6">6</button>
+                    <button class="num-pad-btn bg-white hover:bg-emerald-100 text-gray-800 font-semibold py-4 rounded-xl shadow-sm border border-gray-200" data-value="7">7</button>
+                    <button class="num-pad-btn bg-white hover:bg-emerald-100 text-gray-800 font-semibold py-4 rounded-xl shadow-sm border border-gray-200" data-value="8">8</button>
+                    <button class="num-pad-btn bg-white hover:bg-emerald-100 text-gray-800 font-semibold py-4 rounded-xl shadow-sm border border-gray-200" data-value="9">9</button>
+                    <button class="num-pad-btn bg-white hover:bg-emerald-100 text-gray-800 font-semibold py-4 rounded-xl shadow-sm border border-gray-200" data-value="0">0</button>
+                    <button class="num-pad-btn bg-white hover:bg-emerald-100 text-gray-800 font-semibold py-4 rounded-xl shadow-sm border border-gray-200" data-value="00">00</button>
+                    <button class="num-pad-btn bg-white hover:bg-emerald-100 text-gray-800 font-semibold py-4 rounded-xl shadow-sm border border-gray-200" data-value=".">.</button>
+                </div>
+                <div class="grid grid-cols-5 gap-2 mt-3 max-w-md mx-auto">
+                    <button class="quick-amount-btn bg-emerald-100 hover:bg-emerald-200 text-emerald-800 font-medium py-2 rounded-lg shadow-sm" data-value="exact">Exacto</button>
+                    <button class="quick-amount-btn bg-blue-50 hover:bg-blue-100 text-blue-800 font-medium py-2 rounded-lg shadow-sm" data-value="50">$50</button>
+                    <button class="quick-amount-btn bg-blue-50 hover:bg-blue-100 text-blue-800 font-medium py-2 rounded-lg shadow-sm" data-value="100">$100</button>
+                    <button class="quick-amount-btn bg-blue-50 hover:bg-blue-100 text-blue-800 font-medium py-2 rounded-lg shadow-sm" data-value="200">$200</button>
+                    <button class="quick-amount-btn bg-blue-50 hover:bg-blue-100 text-blue-800 font-medium py-2 rounded-lg shadow-sm" data-value="500">$500</button>
+                </div>
+                <div class="mt-3 max-w-md mx-auto">
+                    <button class="num-pad-btn bg-red-100 hover:bg-red-200 text-red-800 font-semibold py-3 rounded-xl shadow-sm border border-red-200 w-full" data-value="clear">Clear</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card Payment Details -->
+        <div id="card-payment-details" class="mb-8 hidden">
+            <h3 class="text-xl font-semibold mb-3 text-gray-700 flex items-center">
+                <i data-lucide="credit-card" class="w-5 h-5 mr-2 text-emerald-600"></i>
+                Detalles de Pago con Tarjeta
+            </h3>
+            <div class="bg-gray-50 p-5 rounded-xl shadow-inner">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div class="relative">
+                        <label for="card_number" class="block text-sm font-medium text-gray-700 mb-2">Número de Tarjeta</label>
+                        <input type="text" id="card_number" name="card_number" placeholder="XXXX XXXX XXXX XXXX" class="w-full border rounded-lg py-2.5 pl-10" maxlength="19" pattern="\d{4} \d{4} \d{4} \d{4}">
+                        <i data-lucide="credit-card" class="absolute left-3 top-10 w-5 h-5 text-gray-400"></i>
+                    </div>
+                    <div>
+                        <label for="card_name" class="block text-sm font-medium text-gray-700 mb-2">Nombre en la Tarjeta</label>
+                        <input type="text" id="card_name" name="card_name" class="w-full border rounded-lg py-2.5" placeholder="Nombre completo">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="card_expiry" class="block text-sm font-medium text-gray-700 mb-2">Fecha de Expiración</label>
+                        <input type="text" id="card_expiry" name="card_expiry" placeholder="MM/AA" class="w-full border rounded-lg py-2.5" maxlength="5" pattern="\d{2}/\d{2}">
+                    </div>
+                    <div>
+                        <label for="card_cvv" class="block text-sm font-medium text-gray-700 mb-2">CVV</label>
+                        <input type="text" id="card_cvv" name="card_cvv" placeholder="123" class="w-full border rounded-lg py-2.5" maxlength="4" pattern="\d{3,4}">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex justify-between mt-8">
+            <a href="{% url 'ventas:ventas' %}" class="px-6 py-3.5 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 flex items-center">
+                <i data-lucide="arrow-left" class="w-5 h-5 mr-2"></i>
+                Volver
+            </a>
+            <form id="procesar-pago-form" action="{% url 'ventas:procesar_pago' %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="venta_id" value="{{ venta.id }}">
+                <input type="hidden" id="metodo_pago_input" name="metodo_pago" value="cash">
+                <!-- Add these two hidden inputs to capture cash payment details -->
+                <input type="hidden" id="monto_recibido" name="monto_recibido" value="0">
+                <input type="hidden" id="cambio" name="cambio" value="0">
+                <button type="submit" id="process-payment" class="px-8 py-3.5 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 flex items-center disabled:bg-gray-400 disabled:cursor-not-allowed" disabled>
+                    <i data-lucide="check-circle" class="w-5 h-5 mr-2"></i>
+                    Procesar Pago
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// Function to get CSRF token from cookies - moved to global scope
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Make sure Lucide icons are initialized
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+
+    // Elementos del DOM
+    const totalAmount = parseFloat('{{ total|floatformat:2 }}') || 0;
+    const cashAmountInput = document.getElementById('cash_amount');
+    const cashChangeInput = document.getElementById('cash_change');
+    const cashPaymentDetails = document.getElementById('cash-payment-details');
+    const cardPaymentDetails = document.getElementById('card-payment-details');
+    const registeredCustomerSection = document.getElementById('registered-customer-section');
+    const processPaymentBtn = document.getElementById('process-payment');
+    const cardNumberInput = document.getElementById('card_number');
+    const cardNameInput = document.getElementById('card_name');
+    const cardExpiryInput = document.getElementById('card_expiry');
+    const cardCvvInput = document.getElementById('card_cvv');
+    const metodoPagoInput = document.getElementById('metodo_pago_input');
+    const procesarPagoForm = document.getElementById('procesar-pago-form');
+    
+    // Agregar evento de submit al formulario para verificar stock antes de procesar
+    if (procesarPagoForm) {
+        procesarPagoForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            try {
+                // Use the getCookie function that's now in global scope
+                const csrftoken = getCookie('csrftoken');
+                
+                // Verificar stock disponible antes de procesar el pago
+                const response = await fetch('{% url "ventas:verificar_stock" %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrftoken
+                    },
+                    body: JSON.stringify({
+                        venta_id: '{{ venta.id }}'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (!data.success) {
+                    if (data.productos_sin_stock) {
+                        // Mostrar alerta con productos sin stock suficiente
+                        alert(`Error: No hay suficiente stock para los siguientes productos:\n${data.productos_sin_stock.join('\n')}`);
+                    } else if (data.error) {
+                        alert(`Error: ${data.error}`);
+                    } else {
+                        alert('Error desconocido al verificar el stock.');
+                    }
+                    return;
+                }
+                
+                // Si hay stock suficiente, enviar el formulario
+                this.submit();
+            } catch (error) {
+                console.error('Error al verificar stock:', error);
+                alert('Ocurrió un error al verificar el stock. Por favor, inténtelo de nuevo.');
+            }
+        });
+    }
+
+    // Actualizar método de pago en el formulario
+    document.querySelectorAll('input[name="metodo_pago"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            if (this.checked) {
+                metodoPagoInput.value = this.value;
+                document.querySelectorAll('.payment-method').forEach(m => m.classList.remove('active'));
+                this.closest('.payment-method').classList.add('active');
+                if (cardPaymentDetails && cashPaymentDetails) {
+                    cardPaymentDetails.classList.toggle('hidden', this.value !== 'card');
+                    cashPaymentDetails.classList.toggle('hidden', this.value !== 'cash');
+                }
+                validatePayment();
+            }
+        });
+    });
+
+    // Selección de tipo de cliente
+    document.querySelectorAll('.customer-type').forEach(type => {
+        type.addEventListener('click', function() {
+            document.querySelectorAll('.customer-type').forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+            this.querySelector('input[type="radio"]').checked = true;
+            
+            const customerType = this.querySelector('input').value;
+            
+            // Check if "Con datos" option is selected
+            if (customerType === 'auto_data_customer') {
+                // Show notification
+                alert('Esta opción no está disponible actualmente.');
+                
+                // Deselect "Con datos" option and select "Consumidor Final" by default
+                document.getElementById('final_consumer').checked = true;
+                document.querySelectorAll('.customer-type').forEach(t => t.classList.remove('active'));
+                document.getElementById('final_consumer').closest('.customer-type').classList.add('active');
+                
+                // Update customer type
+                customerType = 'final_consumer';
+            }
+            
+            if (registeredCustomerSection) {
+                registeredCustomerSection.classList.toggle('hidden', customerType === 'final_consumer');
+                
+                // Re-enable invoice checkbox for registered customers
+                if (invoiceRequiredCheckbox && customerType === 'registered_customer') {
+                    invoiceRequiredCheckbox.disabled = false;
+                    invoiceRequiredCheckbox.parentElement.classList.remove('opacity-50', 'cursor-not-allowed');
+                    
+                    // Remove message if it exists
+                    const messageElement = document.getElementById('invoice-disabled-message');
+                    if (messageElement) {
+                        messageElement.remove();
+                    }
+                }
+            }
+        });
+    });
+
+    // Lógica del panel numérico
+    document.querySelectorAll('.num-pad-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const value = this.getAttribute('data-value');
+            if (!cashAmountInput) return;
+            
+            let currentValue = cashAmountInput.value || '';
+
+            if (value === 'clear') {
+                cashAmountInput.value = '';
+                if (cashChangeInput) cashChangeInput.value = '';
+            } else if (value === '.') {
+                if (!currentValue.includes('.')) {
+                    cashAmountInput.value = currentValue + '.';
+                }
+            } else if (value === '00') {
+                cashAmountInput.value = currentValue + '00';
+            } else {
+                cashAmountInput.value = currentValue + value;
+            }
+            calculateChange();
+        });
+    });
+
+    // Lógica de montos rápidos
+    document.querySelectorAll('.quick-amount-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            if (!cashAmountInput) return;
+            
+            const value = this.getAttribute('data-value');
+            if (value === 'exact') {
+                cashAmountInput.value = totalAmount.toFixed(2);
+            } else {
+                cashAmountInput.value = value;
+            }
+            calculateChange();
+        });
+    });
+
+    // Entrada por teclado para efectivo
+    if (cashAmountInput) {
+        cashAmountInput.addEventListener('input', calculateChange);
+    }
+
+    // Formato y validación de tarjeta
+    if (cardNumberInput) {
+        cardNumberInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '').substring(0, 16);
+            value = value.match(/.{1,4}/g)?.join(' ') || value;
+            e.target.value = value;
+            validatePayment();
+        });
+    }
+
+    if (cardExpiryInput) {
+        cardExpiryInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '').substring(0, 4);
+            if (value.length >= 2) value = value.substring(0, 2) + '/' + value.substring(2);
+            e.target.value = value;
+            validatePayment();
+        });
+    }
+
+    if (cardCvvInput) {
+        cardCvvInput.addEventListener('input', function(e) {
+            e.target.value = e.target.value.replace(/\D/g, '').substring(0, 4);
+            validatePayment();
+        });
+    }
+
+    if (cardNameInput) {
+        cardNameInput.addEventListener('input', validatePayment);
+    }
+
+    // Cálculo del cambio en tiempo real
+    function calculateChange() {
+        if (!cashAmountInput || !cashChangeInput) return;
+        
+        const cashAmount = parseFloat(cashAmountInput.value) || 0;
+        const change = cashAmount - totalAmount;
+
+        if (cashAmount >= totalAmount) {
+            cashChangeInput.value = change.toFixed(2);
+            cashChangeInput.classList.remove('text-red-600', 'bg-red-50');
+            cashChangeInput.classList.add('text-emerald-600', 'bg-emerald-50');
+            
+            // Update hidden inputs for form submission
+            const montoRecibidoInput = document.getElementById('monto_recibido');
+            const cambioInput = document.getElementById('cambio');
+            
+            if (montoRecibidoInput) montoRecibidoInput.value = cashAmount.toFixed(2);
+            if (cambioInput) cambioInput.value = change.toFixed(2);
+        } else {
+            cashChangeInput.value = 'Monto insuficiente';
+            cashChangeInput.classList.remove('text-emerald-600', 'bg-emerald-50');
+            cashChangeInput.classList.add('text-red-600', 'bg-red-50');
+            
+            // Clear hidden inputs if amount is insufficient
+            const montoRecibidoInput = document.getElementById('monto_recibido');
+            const cambioInput = document.getElementById('cambio');
+            
+            if (montoRecibidoInput) montoRecibidoInput.value = '0';
+            if (cambioInput) cambioInput.value = '0';
+        }
+        validatePayment();
+    }
+
+    // Validación para habilitar el botón de procesar pago
+    function validatePayment() {
+        if (!processPaymentBtn || !metodoPagoInput) return;
+        
+        const metodoPago = metodoPagoInput.value;
+        let isValid = false;
+
+        if (metodoPago === 'cash') {
+            const cashAmount = parseFloat(cashAmountInput?.value) || 0;
+            isValid = cashAmount >= totalAmount;
+        } else if (metodoPago === 'card') {
+            const cardNumberValid = cardNumberInput?.value.replace(/\s/g, '').length === 16;
+            const cardNameValid = cardNameInput?.value.trim().length > 0;
+            const cardExpiryValid = cardExpiryInput?.value.match(/^\d{2}\/\d{2}$/);
+            const cardCvvValid = cardCvvInput?.value.length >= 3;
+            isValid = cardNumberValid && cardNameValid && cardExpiryValid && cardCvvValid;
+        } else if (metodoPago === 'transfer') {
+            isValid = true; // Transferencia no requiere validación adicional aquí
+        }
+
+        processPaymentBtn.disabled = !isValid;
+    }
+    
+    // Inicializar la validación al cargar la página
+    validatePayment();
+    
+    // Client selection functionality
+    const finalConsumerRadio = document.getElementById('final_consumer');
+    const registeredCustomerRadio = document.getElementById('registered_customer');
+    const clientSelection = document.getElementById('client-selection');
+    const clientSearch = document.getElementById('client-search');
+    const clientResults = document.getElementById('client-results');
+    const clientResultsBody = document.getElementById('client-results-body');
+    const selectedClientInfo = document.getElementById('selected-client-info');
+    const selectedClientName = document.getElementById('selected-client-name');
+    const selectedClientId = document.getElementById('selected-client-id');
+    const selectedClientAddress = document.getElementById('selected-client-address');
+    const selectedClientIdInput = document.getElementById('selected-client-id-input');
+    const changeClientBtn = document.getElementById('change-client');
+
+    // Toggle client selection based on customer type
+    if (finalConsumerRadio) {
+        finalConsumerRadio.addEventListener('change', function() {
+            if (this.checked && clientSelection) {
+                clientSelection.classList.add('hidden');
+                // Reset selected client
+                if (selectedClientIdInput) selectedClientIdInput.value = '';
+            }
+        });
+    }
+
+    if (registeredCustomerRadio) {
+        registeredCustomerRadio.addEventListener('change', function() {
+            if (this.checked && clientSelection) {
+                clientSelection.classList.remove('hidden');
+            }
+        });
+    }
+
+    // Client search functionality
+    let searchTimeout;
+    if (clientSearch) {
+        clientSearch.addEventListener('input', function() {
+            const searchTerm = this.value.trim();
+            
+            // Clear previous timeout
+            clearTimeout(searchTimeout);
+            
+            if (searchTerm.length < 2) {
+                if (clientResults) clientResults.classList.add('hidden');
+                return;
+            }
+            
+            // Set a timeout to avoid too many requests
+            searchTimeout = setTimeout(() => {
+                // The server-side search will now look for matches in both name and identification
+                fetch(`/clients/search/?q=${encodeURIComponent(searchTerm)}`, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json',
+                    }
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (!clientResultsBody) return;
+                        
+                        clientResultsBody.innerHTML = '';
+                        
+                        // Changed from data.results to data
+                        if (!data || data.length === 0) {
+                            clientResultsBody.innerHTML = `
+                                <tr>
+                                    <td colspan="4" class="px-4 py-3 text-center text-gray-500">
+                                        No se encontraron clientes
+                                    </td>
+                                </tr>
+                            `;
+                        } else {
+                            // Changed from data.results.forEach to data.forEach
+                            data.forEach(client => {
+                                const row = document.createElement('tr');
+                                row.className = 'hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer';
+                                row.innerHTML = `
+                                    <td class="px-4 py-2 text-sm">${client.codigo || '-'}</td>
+                                    <td class="px-4 py-2 text-sm">${client.nombre}</td>
+                                    <td class="px-4 py-2 text-sm">${client.identificacion}</td>
+                                    <td class="px-4 py-2 text-sm">
+                                        <button class="select-client-btn bg-emerald-100 hover:bg-emerald-200 text-emerald-800 px-2 py-1 rounded text-xs"
+                                                data-client-id="${client.id}"
+                                                data-client-name="${client.nombre}"
+                                                data-client-identification="${client.identificacion}"
+                                                data-client-address="${client.direccion || ''}"
+                                                data-client-city="${client.ciudad || ''}">
+                                            Seleccionar
+                                        </button>
+                                    </td>
+                                `;
+                                clientResultsBody.appendChild(row);
+                            });
+                        }
+                        
+                        if (clientResults) clientResults.classList.remove('hidden');
+                        
+                        // Add event listeners to select client buttons
+                        document.querySelectorAll('.select-client-btn').forEach(btn => {
+                            btn.addEventListener('click', function() {
+                                const clientId = this.dataset.clientId;
+                                const clientName = this.dataset.clientName;
+                                const clientIdentification = this.dataset.clientIdentification;
+                                const clientAddress = this.dataset.clientAddress;
+                                const clientCity = this.dataset.clientCity;
+                                
+                                // Update selected client info
+                                if (selectedClientName) selectedClientName.textContent = clientName;
+                                if (selectedClientId) selectedClientId.textContent = `Cédula/RUC: ${clientIdentification}`;
+                                
+                                let addressText = '';
+                                if (clientAddress) {
+                                    addressText += clientAddress;
+                                }
+                                if (clientCity) {
+                                    if (addressText) addressText += ', ';
+                                    addressText += clientCity;
+                                }
+                                if (selectedClientAddress) selectedClientAddress.textContent = addressText || 'Sin dirección';
+                                
+                                // Update hidden input
+                                if (selectedClientIdInput) selectedClientIdInput.value = clientId;
+                                
+                                // Show selected client info and hide search results
+                                if (selectedClientInfo) selectedClientInfo.classList.remove('hidden');
+                                if (clientResults) clientResults.classList.add('hidden');
+                                if (clientSearch) clientSearch.value = '';
+                                
+                                // Update the sale with the selected client
+                                const ventaId = '{{ venta.id }}';
+                                const csrftoken = getCookie('csrftoken');
+                                
+                                fetch('{% url "ventas:actualizar_cliente_venta" venta.id %}', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/x-www-form-urlencoded',
+                                        'X-CSRFToken': csrftoken
+                                    },
+                                    body: new URLSearchParams({
+                                        'client_id': clientId
+                                    })
+                                })
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (!data.success) {
+                                        console.error('Error al actualizar cliente:', data.error);
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error('Error:', error);
+                                });
+                            });
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        if (clientResultsBody) {
+                            clientResultsBody.innerHTML = `
+                                <tr>
+                                    <td colspan="4" class="px-4 py-3 text-center text-red-500">
+                                        Error al buscar clientes: ${error.message}
+                                    </td>
+                                </tr>
+                            `;
+                        }
+                        if (clientResults) clientResults.classList.remove('hidden');
+                    });
+            }, 300);
+        });
+    }
+
+    // Change client button
+    if (changeClientBtn) {
+        changeClientBtn.addEventListener('click', function() {
+            if (selectedClientInfo) selectedClientInfo.classList.add('hidden');
+            if (clientSearch) clientSearch.value = '';
+            if (clientResults) clientResults.classList.add('hidden');
+            if (selectedClientIdInput) selectedClientIdInput.value = '';
+        });
+    }
+});
+</script>
+
+<style>
+    .payment-method.active {
+        border-color: #10b981;
+        background-color: #ecfdf5;
+    }
+    .customer-type.active {
+        border-color: #10b981;
+        background-color: #ecfdf5;
+    }
+    
+    /* Add dark mode support for active states */
+    @media (prefers-color-scheme: dark) {
+        .payment-method.active, .customer-type.active {
+            border-color: #059669;
+            background-color: rgba(6, 78, 59, 0.3);
+        }
+        
+        /* Fix for hover states in dark mode */
+        .hover\:bg-gray-100:hover {
+            --tw-bg-opacity: 0.2;
+            background-color: rgb(55 65 81 / var(--tw-bg-opacity));
+        }
+        
+        .hover\:bg-emerald-100:hover {
+            --tw-bg-opacity: 0.2;
+            background-color: rgb(6 78 59 / var(--tw-bg-opacity));
+        }
+        
+        .hover\:bg-blue-100:hover {
+            --tw-bg-opacity: 0.2;
+            background-color: rgb(30 58 138 / var(--tw-bg-opacity));
+        }
+        
+        .hover\:bg-red-200:hover {
+            --tw-bg-opacity: 0.2;
+            background-color: rgb(153 27 27 / var(--tw-bg-opacity));
+        }
+    }
+    
+    .num-pad-btn, .quick-amount-btn {
+        transition: all 0.2s ease;
+        font-size: 1.1rem;
+    }
+    .num-pad-btn:hover, .quick-amount-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .num-pad-btn:active, .quick-amount-btn:active {
+        transform: translateY(1px);
+        box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
+    }
+    #card-payment-details .relative {
+        position: relative;
+    }
+</style>
+{% endblock %}

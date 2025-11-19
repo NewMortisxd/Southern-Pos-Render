@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SouthernPOS - Gestión de ventas desde cualquier dispositivo</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <style>
+        .hero-gradient {
+            background: linear-gradient(135deg, #4ade80 0%, #ffffff 100%);
+        }
+        .nav-link {
+            position: relative;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: #16a34a;
+            transition: width 0.3s ease;
+        }
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        .nav-link:hover {
+            color: #16a34a;
+            transition: color 0.3s ease;
+        }
+        .feature-card {
+            transition: all 0.3s ease;
+        }
+        .feature-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        .feature-icon {
+            transition: transform 0.5s ease;
+        }
+        /* Remove the icon scale effect */
+        /* .feature-card:hover .feature-icon {
+            transform: scale(1.2);
+        } */
+        .hamburger-menu {
+            display: none;
+        }
+        .mobile-menu {
+            display: none;
+        }
+        
+        @media (max-width: 768px) {
+            .desktop-menu {
+                display: none;
+            }
+            .hamburger-menu {
+                display: block;
+            }
+            .mobile-menu {
+                display: none;
+                position: absolute;
+                top: 70px;
+                right: 0;
+                width: 100%;
+                background: white;
+                padding: 20px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                z-index: 100;
+            }
+            .mobile-menu.active {
+                display: block;
+            }
+        }
+        
+        .cta-button {
+            transition: all 0.3s ease;
+        }
+        .cta-button:hover {
+            transform: scale(1.05);
+        }
+        
+        .testimonial-card {
+            transition: all 0.3s ease;
+        }
+        .testimonial-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .social-icon {
+            transition: all 0.3s ease;
+        }
+        .social-icon:hover {
+            transform: translateY(-3px) scale(1.2);
+        }
+        
+        /* Animated dots for hero section */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        .floating {
+            animation: float 5s ease-in-out infinite;
+        }
+        
+        .floating-delay-1 {
+            animation-delay: 1s;
+        }
+        
+        .floating-delay-2 {
+            animation-delay: 2s;
+        }
+    </style>
+</head>
+<body class="font-sans">
+    <!-- Header -->
+    <header class="bg-white shadow-sm fixed w-full top-0 z-50">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center animate__animated animate__fadeIn">
+                <img src="{% static 'img/logo.png' %}" alt="SouthernPOS Logo" class="h-8 mr-2">
+                <span class="text-xl font-bold">SouthernPOS</span>
+            </div>
+            
+            <!-- Desktop Menu -->
+            <nav class="desktop-menu animate__animated animate__fadeIn">
+                <ul class="flex space-x-6">
+                    <li><a href="#" class="nav-link font-medium">Inicio</a></li>
+                    <li><a href="#features" class="nav-link font-medium">Características</a></li>
+                    <li><a href="#pricing" class="nav-link font-medium">Precios</a></li>
+                    <li><a href="#support" class="nav-link font-medium">Soporte</a></li>
+                    <li><a href="{% url 'login' %}" class="nav-link font-medium">Iniciar Sesión</a></li>
+                    <li><a href="{% url 'register' %}" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition transform hover:scale-105">Registrarse</a></li>
+                </ul>
+            </nav>
+            
+            <!-- Hamburger Menu - Only for Mobile -->
+            <div class="hamburger-menu">
+                <button id="menu-toggle" class="focus:outline-none">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Mobile Menu - Only for Mobile -->
+        <div id="mobile-menu" class="mobile-menu">
+            <ul class="space-y-4">
+                <li><a href="#" class="block py-2 hover:text-green-600">Inicio</a></li>
+                <li><a href="#features" class="block py-2 hover:text-green-600">Características</a></li>
+                <li><a href="#pricing" class="block py-2 hover:text-green-600">Precios</a></li>
+                <li><a href="#support" class="block py-2 hover:text-green-600">Soporte</a></li>
+                <li><a href="{% url 'login' %}" class="block py-2 hover:text-green-600">Iniciar Sesión</a></li>
+                <li><a href="{% url 'register' %}" class="block py-2 bg-green-600 text-white px-4 rounded hover:bg-green-700 text-center">Registrarse</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+<!-- Hero Section -->
+<!-- Hero Section -->
+<!-- Hero Section -->
+<!-- Hero Section -->
+<section class="hero-gradient pt-24 pb-12 md:pt-32 md:pb-20 overflow-hidden relative">
+    <!-- Background con degradado verde original -->
+    <div class="absolute inset-0 bg-gradient-to-r from-green-400 to-white"></div>
+    
+    <div class="container mx-auto px-4 relative z-10">
+        <!-- Animated Background Elements -->
+        <div class="absolute top-10 right-10 h-16 w-16 bg-green-400 rounded-full opacity-20 floating"></div>
+        <div class="absolute bottom-20 left-10 h-8 w-8 bg-green-300 rounded-full opacity-20 floating floating-delay-1"></div>
+        <div class="absolute top-40 left-1/4 h-12 w-12 bg-green-500 rounded-full opacity-10 floating floating-delay-2"></div>
+        
+        <div class="flex flex-col md:flex-row items-center">
+            <div class="md:w-2/5 mb-8 md:mb-0 animate__animated animate__fadeInLeft">
+                <h1 class="text-4xl md:text-5xl font-bold mb-4">Gestiona tus ventas de forma rápida y segura</h1>
+                <p class="text-lg mb-6">Accede desde cualquier dispositivo y lleva el control total de tu negocio.</p>
+                <div class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">
+                    <a href="{% url 'register' %}" class="cta-button bg-green-600 text-white px-6 py-3 rounded font-medium text-center hover:bg-green-700 transition shadow-md">Registrarse Gratis</a>
+                    <a href="{% url 'login' %}" class="cta-button border-2 border-green-600 text-green-600 px-6 py-3 rounded font-medium text-center hover:bg-green-50 transition">Iniciar Sesión</a>
+                </div>
+            </div>
+            
+            <!-- Imagen a la derecha más grande y alineada con el final de la sección -->
+            <div class="md:w-3/5 flex justify-end md:absolute md:right-0 md:bottom-0 md:top-0 animate__animated animate__fadeInRight">
+                <img src="{% static 'img/pulbicidad.png' %}" alt="Sistema POS en múltiples dispositivos" 
+                     class="h-auto w-full max-w-3xl object-contain opacity-95 transition-all hover:opacity-100"
+                     style="filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));">
+            </div>
+        </div>
+    </div>
+</section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-16 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-4 animate__animated animate__fadeIn">Todas las herramientas que necesitas</h2>
+            <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto animate__animated animate__fadeIn">Descubre cómo SouthernPOS puede transformar la gestión de tu negocio con estas potentes funcionalidades.</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Feature 1 -->
+                <div class="feature-card bg-white p-6 rounded-lg shadow-md">
+                    <div class="text-green-500 text-4xl mb-4 feature-icon">
+                        <i class="fas fa-box"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Gestión de productos</h3>
+                    <p class="text-gray-600">Organiza tu inventario con facilidad y mantén el control de tu stock en tiempo real.</p>
+                </div>
+                
+                <!-- Feature 2 -->
+                <div class="feature-card bg-white p-6 rounded-lg shadow-md">
+                    <div class="text-green-500 text-4xl mb-4 feature-icon">
+                        <i class="fas fa-credit-card"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Control de ventas</h3>
+                    <p class="text-gray-600">Registra cada venta en tiempo real y procesa pagos de forma segura y eficiente.</p>
+                </div>
+                
+                <!-- Feature 3 -->
+                <div class="feature-card bg-white p-6 rounded-lg shadow-md">
+                    <div class="text-green-500 text-4xl mb-4 feature-icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Reportes en tiempo real</h3>
+                    <p class="text-gray-600">Visualiza el crecimiento de tu negocio con gráficos intuitivos y personalizables.</p>
+                </div>
+                
+                <!-- Feature 4 -->
+                <div class="feature-card bg-white p-6 rounded-lg shadow-md">
+                    <div class="text-green-500 text-4xl mb-4 feature-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Control de clientes</h3>
+                    <p class="text-gray-600">Administra y fideliza a tus clientes con nuestras herramientas avanzadas.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-4 animate__animated animate__fadeIn">Lo que dicen nuestros clientes</h2>
+            <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto animate__animated animate__fadeIn">Descubre por qué cientos de negocios confían en SouthernPOS para su gestión diaria.</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Testimonial 1 -->
+                <div class="testimonial-card bg-gray-50 p-6 rounded-lg">
+                    <div class="flex items-center mb-4">
+                        <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Lucía Pérez" class="w-12 h-12 rounded-full mr-4 object-cover">
+                        <div>
+                            <h4 class="font-semibold">Lucía Pérez</h4>
+                            <p class="text-sm text-gray-600">Dueña de Cafetería</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-700">"Con SouthernPOS duplicamos nuestras ventas y tenemos todo bajo control desde el celular. La mejor inversión para mi negocio."</p>
+                    <div class="mt-3 text-yellow-400">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                </div>
+                
+                <!-- Testimonial 2 -->
+                <div class="testimonial-card bg-gray-50 p-6 rounded-lg">
+                    <div class="flex items-center mb-4">
+                        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Carlos Rodríguez" class="w-12 h-12 rounded-full mr-4 object-cover">
+                        <div>
+                            <h4 class="font-semibold">Carlos Rodríguez</h4>
+                            <p class="text-sm text-gray-600">Tienda de Electrónica</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-700">"La facilidad para gestionar inventario y ventas es impresionante. Ahorramos tiempo y dinero desde el primer día de uso."</p>
+                    <div class="mt-3 text-yellow-400">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                    </div>
+                </div>
+                
+                <!-- Testimonial 3 -->
+                <div class="testimonial-card bg-gray-50 p-6 rounded-lg">
+                    <div class="flex items-center mb-4">
+                        <img src="https://randomuser.me/api/portraits/women/63.jpg" alt="Ana García" class="w-12 h-12 rounded-full mr-4 object-cover">
+                        <div>
+                            <h4 class="font-semibold">Ana García</h4>
+                            <p class="text-sm text-gray-600">Boutique de Ropa</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-700">"Los reportes me ayudan a tomar mejores decisiones. Recomiendo SouthernPOS a todos mis colegas emprendedores."</p>
+                    <div class="mt-3 text-yellow-400">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-16 bg-green-600 relative overflow-hidden">
+        <!-- Animated Background Elements -->
+        <div class="absolute top-10 right-10 h-32 w-32 bg-white rounded-full opacity-10 floating"></div>
+        <div class="absolute bottom-10 left-20 h-24 w-24 bg-white rounded-full opacity-10 floating floating-delay-1"></div>
+        
+        <div class="container mx-auto px-4 text-center relative z-10">
+            <h2 class="text-3xl font-bold text-white mb-6 animate__animated animate__fadeIn">Únete a cientos de negocios que ya utilizan SouthernPOS</h2>
+            <a href="/register" class="inline-block bg-white text-green-600 px-8 py-4 rounded-lg shadow-lg hover:bg-gray-100 transition font-medium cta-button animate__animated animate__pulse animate__infinite animate__slower">Comenzar ahora</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-gray-300 py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Column 1 -->
+                <div>
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-cash-register text-green-400 text-xl mr-2"></i>
+                        <span class="text-lg font-semibold text-white">SouthernPOS</span>
+                    </div>
+                    <p class="mb-4">Solución completa para la gestión de ventas de tu negocio desde cualquier dispositivo.</p>
+                    <p>&copy; 2025 SouthernPOS. Todos los derechos reservados.</p>
+                </div>
+                
+                <!-- Column 2 -->
+                <div>
+                    <h3 class="text-lg font-semibold text-white mb-4">Enlaces</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="hover:text-green-400 transition">Política de privacidad</a></li>
+                        <li><a href="#" class="hover:text-green-400 transition">Términos de uso</a></li>
+                        <li><a href="#" class="hover:text-green-400 transition">Contacto</a></li>
+                        <li><a href="#" class="hover:text-green-400 transition">Blog</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Column 3 -->
+                <div>
+                    <h3 class="text-lg font-semibold text-white mb-4">Síguenos</h3>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-2xl hover:text-green-400 transition social-icon"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="text-2xl hover:text-green-400 transition social-icon"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-2xl hover:text-green-400 transition social-icon"><i class="fab fa-linkedin"></i></a>
+                        <a href="#" class="text-2xl hover:text-green-400 transition social-icon"><i class="fab fa-facebook"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Hamburger menu toggle for mobile only
+            const menuToggle = document.getElementById('menu-toggle');
+            const mobileMenu = document.getElementById('mobile-menu');
+            
+            if (menuToggle) {
+                menuToggle.addEventListener('click', function() {
+                    mobileMenu.classList.toggle('active');
+                });
+            }
+            
+            // Intersection Observer for scroll animations
+            const observerOptions = {
+                threshold: 0.1
+            };
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        if (entry.target.classList.contains('feature-card')) {
+                            entry.target.classList.add('animate__animated', 'animate__fadeInUp');
+                        }
+                        if (entry.target.classList.contains('testimonial-card')) {
+                            entry.target.classList.add('animate__animated', 'animate__fadeIn');
+                        }
+                    }
+                });
+            }, observerOptions);
+            
+            // Observe all feature cards
+            document.querySelectorAll('.feature-card').forEach(card => {
+                observer.observe(card);
+            });
+            
+            // Observe all testimonial cards
+            document.querySelectorAll('.testimonial-card').forEach(card => {
+                observer.observe(card);
+            });
+            
+            // Smooth scrolling for navigation links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    const targetId = this.getAttribute('href');
+                    if (targetId === '#') return;
+                    
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 80,
+                            behavior: 'smooth'
+                        });
+                        
+                        // Close mobile menu if open
+                        if (mobileMenu && mobileMenu.classList.contains('active')) {
+                            mobileMenu.classList.remove('active');
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+
+// Add this CSS to your existing style section
+<style>
+    .image-container {
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .image-container img {
+        transition: transform 0.3s ease;
+    }
+    
+    .image-container:hover img {
+        transform: scale(1.1);
+    }
+</style>

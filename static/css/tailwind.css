@@ -1,0 +1,51 @@
+/* Tailwind CSS base styles */
+@import 'https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css';
+
+/* Custom theme variables */
+:root {
+  --primary-color: #10b981;
+  --secondary-color: #6366f1;
+}
+
+/* Custom theme classes */
+.bg-primary {
+  background-color: var(--primary-color) !important;
+}
+.text-primary {
+  color: var(--primary-color) !important;
+}
+.border-primary {
+  border-color: var(--primary-color) !important;
+}
+.bg-secondary {
+  background-color: var(--secondary-color) !important;
+}
+.text-secondary {
+  color: var(--secondary-color) !important;
+}
+.border-secondary {
+  border-color: var(--secondary-color) !important;
+}
+
+/* Override Tailwind classes with theme variables */
+.bg-emerald-600 {
+  background-color: var(--primary-color) !important;
+}
+.text-emerald-600 {
+  color: var(--primary-color) !important;
+}
+.border-emerald-600 {
+  border-color: var(--primary-color) !important;
+}
+.hover\:bg-emerald-700:hover {
+  background-color: rgba(var(--primary-color-rgb), 0.8) !important;
+}
+.hover\:text-emerald-600:hover {
+  color: var(--primary-color) !important;
+}
+.bg-emerald-100 {
+  background-color: rgba(var(--primary-color-rgb), 0.1) !important;
+}
+.bg-emerald-50 {
+  background-color: rgba(var(--primary-color-rgb), 0.05) !important;
+}

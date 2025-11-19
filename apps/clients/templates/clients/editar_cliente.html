@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Editar Cliente
+{% endblock %}
+
+{% block section_title %}
+    Editar Cliente
+{% endblock %}
+
+{% block content %}
+<!-- Tarjeta con fondo blanco, bordes redondeados y sombra -->
+<div class="bg-white rounded-lg shadow-md p-6">
+    <!-- Formulario para editar un cliente -->
+    <form method="POST" class="space-y-6">
+        {% csrf_token %}
+        
+        <!-- Cuadrícula de dos columnas para los campos -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Campo Nombre -->
+            <div>
+                <label for="{{ form.nombre.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
+                {{ form.nombre }}
+                {% if form.nombre.errors %}
+                <p class="text-red-500 text-xs mt-1">{{ form.nombre.errors.0 }}</p>
+                {% endif %}
+            </div>
+            
+            <!-- Campo Identificación -->
+            <div>
+                <label for="{{ form.identificacion.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Identificación</label>
+                {{ form.identificacion }}
+                {% if form.identificacion.errors %}
+                <p class="text-red-500 text-xs mt-1">{{ form.identificacion.errors.0 }}</p>
+                {% endif %}
+            </div>
+            
+            <!-- Campo Teléfono -->
+            <div>
+                <label for="{{ form.telefono.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
+                {{ form.telefono }}
+                {% if form.telefono.errors %}
+                <p class="text-red-500 text-xs mt-1">{{ form.telefono.errors.0 }}</p>
+                {% endif %}
+            </div>
+            
+            <!-- Campo Email -->
+            <div>
+                <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                {{ form.email }}
+                {% if form.email.errors %}
+                <p class="text-red-500 text-xs mt-1">{{ form.email.errors.0 }}</p>
+                {% endif %}
+            </div>
+            
+            <!-- Campo Dirección (ocupa ambas columnas) -->
+            <div class="md:col-span-2">
+                <label for="{{ form.direccion.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Dirección</label>
+                {{ form.direccion }}
+                {% if form.direccion.errors %}
+                <p class="text-red-500 text-xs mt-1">{{ form.direccion.errors.0 }}</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Botones de acción -->
+        <div class="flex justify-end space-x-3 pt-4 border-t border-gray-200">
+            <!-- Botón para cancelar y volver a la lista -->
+            <a href="{% url 'clientes:lista' %}" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-all">
+                Cancelar
+            </a>
+            <!-- Botón para enviar el formulario -->
+            <button type="submit" class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-all">
+                Actualizar Cliente
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

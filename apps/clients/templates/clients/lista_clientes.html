@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Lista de Clientes
+{% endblock %}
+
+{% block content %}
+<!-- Contenedor principal con márgenes automáticos y padding -->
+<div class="container mx-auto px-4 py-8">
+    <!-- Encabezado con título y botón para agregar cliente -->
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold text-gray-800">{{ section_title }}</h1>
+        <a href="{% url 'clients:agregar' %}" class="bg-emerald-500 hover:bg-emerald-600 text-white font-medium py-2 px-4 rounded-lg transition duration-300 flex items-center shadow-sm hover:shadow">
+            <i class="fas fa-plus mr-2"></i>Agregar Cliente
+        </a>
+    </div>
+
+    <!-- Barra de búsqueda y filtros -->
+    <div class="bg-white rounded-lg shadow-sm p-4 mb-6">
+        <form method="get" class="flex flex-wrap gap-4">
+            <!-- Campo de búsqueda -->
+            <div class="flex-1 min-w-[200px]">
+                <div class="relative">
+                    <input type="text" name="q" value="{{ query }}" placeholder="Buscar clientes..." autocomplete="off"
+                           class="w-full border border-gray-300 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                    <button type="submit" class="absolute right-2 top-2 text-gray-400 hover:text-emerald-500 transition duration-300">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+            <!-- Filtro de ordenación -->
+            <div class="flex items-center">
+                <label class="mr-2 text-gray-600">Ordenar por:</label>
+                <select name="sort" onchange="this.form.submit()" 
+                        class="border border-gray-300 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                    <option value="nombre" {% if sort_by == 'nombre' %}selected{% endif %}>Nombre</option>
+                    <option value="identificacion" {% if sort_by == 'identificacion' %}selected{% endif %}>Identificación</option>
+                    <option value="email" {% if sort_by == 'email' %}selected{% endif %}>Email</option>
+                    <option value="grupo" {% if sort_by == 'grupo' %}selected{% endif %}>Grupo</option>
+                    <option value="estado" {% if sort_by == 'estado' %}selected{% endif %}>Estado</option>
+                </select>
+            </div>
+            <!-- Filtro por estado -->
+            <div class="flex items-center">
+                <label class="mr-2 text-gray-600">Filtrar por estado:</label>
+                <select name="estado" onchange="this.form.submit()" 
+                        class="border border-gray-300 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                    <option value="" {% if not estado_filter %}selected{% endif %}>Todos</option>
+                    <option value="activo" {% if estado_filter == 'activo' %}selected{% endif %}>Activos</option>
+                    <option value="inactivo" {% if estado_filter == 'inactivo' %}selected{% endif %}>Inactivos</option>
+                    <option value="suspendido" {% if estado_filter == 'suspendido' %}selected{% endif %}>Suspendidos</option>
+                </select>
+            </div>
+        </form>
+    </div>
+
+    <!-- Lista de clientes -->
+    <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Código</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Identificación</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Grupo</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                {% for cliente in clientes %}
+                <!-- Fila para cada cliente -->
+                <tr class="hover:bg-gray-50 transition duration-150">
+                    <td class="px-6 py-4 whitespace-nowrap">{{ cliente.codigo|default:"-" }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap font-medium">{{ cliente.nombre }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">{{ cliente.identificacion }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full 
+                            {% if cliente.grupo == 'vip' %}bg-purple-100 text-purple-800
+                            {% elif cliente.grupo == 'corporativo' %}bg-blue-100 text-blue-800
+                            {% else %}bg-gray-100 text-gray-800{% endif %}">
+                            {{ cliente.get_grupo_display }}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full 
+                            {% if cliente.estado == 'activo' %}bg-green-100 text-green-800
+                            {% elif cliente.estado == 'inactivo' %}bg-gray-100 text-gray-800
+                            {% else %}bg-red-100 text-red-800{% endif %}">
+                            {{ cliente.get_estado_display }}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right">
+                        <div class="flex justify-end space-x-2">
+                            <!-- Botón para editar -->
+                            <a href="{% url 'clients:editar' cliente.id %}" 
+                               class="text-white bg-blue-500 hover:bg-blue-600 px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-300 shadow-sm hover:shadow flex items-center">
+                                <i class="fas fa-edit mr-1.5"></i>Editar
+                            </a>
+                            <!-- Botón para eliminar -->
+                            <a href="{% url 'clients:eliminar' cliente.id %}" 
+                               class="text-white bg-red-500 hover:bg-red-600 px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-300 shadow-sm hover:shadow flex items-center">
+                                <i class="fas fa-trash mr-1.5"></i>Eliminar
+                            </a>
+                            <!-- Botón para ver detalles -->
+                            <a href="{% url 'clients:detalle' cliente.id %}" 
+                               class="text-white bg-gray-500 hover:bg-gray-600 px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-300 shadow-sm hover:shadow flex items-center">
+                                <i class="fas fa-eye mr-1.5"></i>Ver
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <!-- Mensaje cuando no hay clientes -->
+                <tr>
+                    <td colspan="6" class="px-6 py-8 text-center text-gray-500">
+                        <div class="flex flex-col items-center justify-center">
+                            <i class="fas fa-users text-gray-300 text-4xl mb-3"></i>
+                            <p class="text-lg">No hay clientes registrados.</p>
+                            <p class="text-sm text-gray-400 mt-1">Agrega un nuevo cliente para comenzar.</p>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,193 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Reportes{% endblock %}
+{% block section_title %}Reportes{% endblock %}
+{% block back_url %}{% url 'dashboard' %}{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-6">
+    <div class="max-w-6xl mx-auto">
+        <!-- Introducción a Reportes -->
+        <div class="bg-white dark:bg-gray-900 rounded-lg shadow-md overflow-hidden mb-6">
+            <div class="text-white px-6 py-4" style="background-color: var(--primary-color);">
+                <h3 class="text-2xl font-bold flex items-center">
+                    <i data-lucide="bar-chart-2" class="w-6 h-6 mr-2"></i>Panel de Reportes
+                </h3>
+            </div>
+            
+            <div class="p-6 bg-white dark:bg-gray-900">
+                
+                <!-- Categorías de Reportes con Tarjetas Mejoradas -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    
+                    <!-- Reportes Financieros y Fiscales -->
+                    <div class="bg-gradient-to-br from-emerald-50 to-white dark:from-gray-800 dark:to-gray-800 p-6 rounded-lg border border-emerald-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-1">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-emerald-100 dark:bg-emerald-800/40 p-3 rounded-full mr-3">
+                                <i data-lucide="dollar-sign" class="w-6 h-6 text-emerald-600 dark:text-emerald-400"></i>
+                            </div>
+                            <h4 class="text-xl font-bold text-gray-800 dark:text-white">Financieros y Fiscales</h4>
+                        </div>
+                        <p class="text-gray-600 dark:text-gray-300 mb-4 text-sm">Información sobre ventas, impuestos y documentos fiscales para cumplimiento tributario.</p>
+                        <ul class="space-y-2 border-t border-emerald-100 dark:border-emerald-800/50 pt-4">
+                            <li>
+                                <a href="{% url 'reportes:ventas' %}" class="flex items-center text-gray-700 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 p-2 rounded-md transition-colors">
+                                    <i data-lucide="trending-up" class="w-4 h-4 mr-2"></i>
+                                    <span>Ventas</span>
+                                    <i data-lucide="chevron-right" class="w-4 h-4 ml-auto"></i>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'reportes:iva' %}" class="flex items-center text-gray-700 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 p-2 rounded-md transition-colors">
+                                    <i data-lucide="percent" class="w-4 h-4 mr-2"></i>
+                                    <span>Reportes de IVA</span>
+                                    <i data-lucide="chevron-right" class="w-4 h-4 ml-auto"></i>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'reportes:facturas' %}" class="flex items-center text-gray-700 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 p-2 rounded-md transition-colors">
+                                    <i data-lucide="file-text" class="w-4 h-4 mr-2"></i>
+                                    <span>Facturas y Comprobantes</span>
+                                    <i data-lucide="chevron-right" class="w-4 h-4 ml-auto"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Reportes Operativos -->
+                    <div class="bg-gradient-to-br from-blue-50 to-white dark:from-blue-900/20 dark:to-gray-800 p-6 rounded-lg border border-blue-100 dark:border-blue-800 shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-1">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-blue-100 dark:bg-blue-800/40 p-3 rounded-full mr-3">
+                                <i data-lucide="activity" class="w-6 h-6 text-blue-600 dark:text-blue-400"></i>
+                            </div>
+                            <h4 class="text-xl font-bold text-gray-800 dark:text-white">Operativos</h4>
+                        </div>
+                        <p class="text-gray-600 dark:text-gray-300 mb-4 text-sm">Análisis del funcionamiento diario del negocio, inventario y comportamiento de clientes.</p>
+                        <ul class="space-y-2 border-t border-blue-100 dark:border-blue-800/50 pt-4">
+                            <li>
+                                <a href="{% url 'reportes:inventario' %}" class="flex items-center text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 p-2 rounded-md transition-colors">
+                                    <i data-lucide="package" class="w-4 h-4 mr-2"></i>
+                                    <span>Inventario</span>
+                                    <i data-lucide="chevron-right" class="w-4 h-4 ml-auto"></i>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'reportes:analisis_ventas' %}" class="flex items-center text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 p-2 rounded-md transition-colors">
+                                    <i data-lucide="pie-chart" class="w-4 h-4 mr-2"></i>
+                                    <span>Análisis de Ventas</span>
+                                    <i data-lucide="chevron-right" class="w-4 h-4 ml-auto"></i>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'reportes:clientes' %}" class="flex items-center text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 p-2 rounded-md transition-colors">
+                                    <i data-lucide="users" class="w-4 h-4 mr-2"></i>
+                                    <span>Clientes</span>
+                                    <i data-lucide="chevron-right" class="w-4 h-4 ml-auto"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Reportes para el SRI -->
+                    <div class="bg-gradient-to-br from-amber-50 to-white dark:from-amber-900/20 dark:to-gray-800 p-6 rounded-lg border border-amber-100 dark:border-amber-800 shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-1">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-amber-100 dark:bg-amber-800/40 p-3 rounded-full mr-3">
+                                <i data-lucide="file" class="w-6 h-6 text-amber-600 dark:text-amber-400"></i>
+                            </div>
+                            <h4 class="text-xl font-bold text-gray-800 dark:text-white">SRI</h4>
+                        </div>
+                        <p class="text-gray-600 dark:text-gray-300 mb-4 text-sm">Documentos y reportes requeridos por el Servicio de Rentas Internas para cumplimiento legal.</p>
+                        <ul class="space-y-2 border-t border-amber-100 dark:border-amber-800/50 pt-4">
+                            <li>
+                                <a href="{% url 'reportes:ats' %}" class="flex items-center text-gray-700 dark:text-gray-300 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/30 p-2 rounded-md transition-colors">
+                                    <i data-lucide="file-plus" class="w-4 h-4 mr-2"></i>
+                                    <span>Anexo Transaccional (ATS)</span>
+                                    <i data-lucide="chevron-right" class="w-4 h-4 ml-auto"></i>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'reportes:iva_declaracion' %}" class="flex items-center text-gray-700 dark:text-gray-300 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/30 p-2 rounded-md transition-colors">
+                                    <i data-lucide="clipboard" class="w-4 h-4 mr-2"></i>
+                                    <span>Declaración del IVA</span>
+                                    <i data-lucide="chevron-right" class="w-4 h-4 ml-auto"></i>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'reportes:renta' %}" class="flex items-center text-gray-700 dark:text-gray-300 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/30 p-2 rounded-md transition-colors">
+                                    <i data-lucide="briefcase" class="w-4 h-4 mr-2"></i>
+                                    <span>Impuesto a la Renta</span>
+                                    <i data-lucide="chevron-right" class="w-4 h-4 ml-auto"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Reportes Rápidos con Indicadores -->
+                <div class="mt-10">
+                    <div class="flex items-center justify-between mb-6">
+                        <h4 class="text-xl font-bold text-gray-800 dark:text-white flex items-center">
+                            <i data-lucide="zap" class="w-5 h-5 mr-2 text-purple-600 dark:text-purple-400"></i>Acceso Rápido
+                        </h4>
+                        <span class="text-sm text-gray-500 dark:text-gray-400">Informes de uso frecuente</span>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <a href="{% url 'reportes:ventas_diarias' %}" class="bg-white dark:bg-gray-700 p-5 rounded-lg border border-gray-200 dark:border-gray-600 shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col items-center group">
+                            <div class="bg-purple-100 dark:bg-purple-800/40 p-3 rounded-full mb-3 group-hover:bg-purple-200 dark:group-hover:bg-purple-700/60 transition-colors">
+                                <i data-lucide="calendar" class="w-8 h-8 text-purple-600 dark:text-purple-400"></i>
+                            </div>
+                            <span class="text-gray-800 dark:text-white font-medium mb-2">Ventas del Día</span>
+                            <p class="text-gray-500 dark:text-gray-400 text-xs text-center">Resumen de transacciones de hoy</p>
+                        </a>
+                        
+                        <a href="{% url 'reportes:productos_top' %}" class="bg-white dark:bg-gray-700 p-5 rounded-lg border border-gray-200 dark:border-gray-600 shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col items-center group">
+                            <div class="bg-green-100 dark:bg-green-800/40 p-3 rounded-full mb-3 group-hover:bg-green-200 dark:group-hover:bg-green-700/60 transition-colors">
+                                <i data-lucide="award" class="w-8 h-8 text-green-600 dark:text-green-400"></i>
+                            </div>
+                            <span class="text-gray-800 dark:text-white font-medium mb-2">Productos Top</span>
+                            <p class="text-gray-500 dark:text-gray-400 text-xs text-center">Los productos más vendidos</p>
+                        </a>
+                        
+                        <a href="{% url 'reportes:stock_bajo' %}" class="bg-white dark:bg-gray-700 p-5 rounded-lg border border-gray-200 dark:border-gray-600 shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col items-center group">
+                            <div class="bg-red-100 dark:bg-red-800/40 p-3 rounded-full mb-3 group-hover:bg-red-200 dark:group-hover:bg-red-700/60 transition-colors">
+                                <i data-lucide="alert-triangle" class="w-8 h-8 text-red-600 dark:text-red-400"></i>
+                            </div>
+                            <span class="text-gray-800 dark:text-white font-medium mb-2">Stock Bajo</span>
+                            <p class="text-gray-500 dark:text-gray-400 text-xs text-center">Productos que necesitan reposición</p>
+                        </a>
+                        
+                        <a href="{% url 'reportes:generar_xml' %}" class="bg-white dark:bg-gray-700 p-5 rounded-lg border border-gray-200 dark:border-gray-600 shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col items-center group">
+                            <div class="bg-blue-100 dark:bg-blue-800/40 p-3 rounded-full mb-3 group-hover:bg-blue-200 dark:group-hover:bg-blue-700/60 transition-colors">
+                                <i data-lucide="file-text" class="w-8 h-8 text-blue-600 dark:text-blue-400"></i>
+                            </div>
+                            <span class="text-gray-800 dark:text-white font-medium mb-2">Generar XML</span>
+                            <p class="text-gray-500 dark:text-gray-400 text-xs text-center">Archivos para declaraciones SRI</p>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Ayuda Rápida -->
+                <div class="mt-10 bg-gray-50 dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
+                    <h4 class="text-lg font-bold text-gray-800 dark:text-white mb-3 flex items-center">
+                        <i data-lucide="help-circle" class="w-5 h-5 mr-2 text-gray-600 dark:text-gray-300"></i>¿Necesitas ayuda?
+                    </h4>
+                    <p class="text-gray-600 dark:text-gray-300 text-sm mb-4">
+                        Los reportes te permiten visualizar datos importantes de tu negocio. Selecciona una categoría para ver información detallada 
+                        o usa el acceso rápido para los informes más comunes.
+                    </p>
+                    <div class="flex flex-wrap gap-2">
+                        <a href="#" class="text-sm text-emerald-600 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 flex items-center">
+                            <i data-lucide="book-open" class="w-4 h-4 mr-1"></i>Ver tutorial
+                        </a>
+                        <a href="#" class="text-sm text-emerald-600 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 flex items-center ml-4">
+                            <i data-lucide="download" class="w-4 h-4 mr-1"></i>Descargar guía de reportes
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Configuraciones{% endblock %}
+{% block section_title %}Configuraciones{% endblock %}
+{% block back_url %}{% url 'dashboard' %}{% endblock %}
+
+{% block content %}
+<!-- Contenedor principal con márgenes automáticos y padding -->
+<div class="container mx-auto px-4 py-6">
+    <!-- Contenedor centrado con ancho máximo -->
+    <div class="max-w-4xl mx-auto">
+        <!-- Tarjeta para el panel de configuraciones -->
+        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+            <!-- Encabezado de la tarjeta con título -->
+            <div class="bg-emerald-600 text-white px-6 py-4">
+                <h3 class="text-2xl font-bold flex items-center">
+                    <i data-lucide="settings" class="w-6 h-6 mr-2"></i>Configuraciones del Sistema
+                </h3>
+            </div>
+            
+            <!-- Cuerpo del panel -->
+            <div class="p-6">
+                <!-- Sección para mostrar notificaciones/mensajes -->
+                {% if messages %}
+                    {% for message in messages %}
+                        <!-- Notificación dinámica según tipo (éxito, error, info) -->
+                        <div id="notification-{{ forloop.counter }}" class="{% if message.tags == 'success' %}bg-emerald-50 border-l-4 border-emerald-500{% elif message.tags == 'error' %}bg-red-50 border-l-4 border-red-500{% else %}bg-blue-50 border-l-4 border-blue-500{% endif %} p-4 mb-6 transition-opacity duration-300">
+                            <p class="{% if message.tags == 'success' %}text-emerald-700{% elif message.tags == 'error' %}text-red-700{% else %}text-blue-700{% endif %} font-medium flex items-center">
+                                <i data-lucide="{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}alert-circle{% else %}info{% endif %}" class="w-5 h-5 mr-2"></i>
+                                {{ message }}
+                            </p>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+                
+                <!-- Cuadrícula de enlaces a opciones de configuración -->
+                <div class="grid grid-cols-1 gap-4">
+                    <!-- Enlace a Configuración del Negocio -->
+                    <a href="{% url 'configuraciones:business_config' %}" class="block bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300">
+                        <div class="p-6 flex items-center">
+                            <!-- Icono representativo -->
+                            <div class="flex-shrink-0 h-12 w-12 flex items-center justify-center bg-emerald-100 rounded-full">
+                                <i data-lucide="store" class="h-6 w-6 text-emerald-600"></i>
+                            </div>
+                            <!-- Descripción del enlace -->
+                            <div class="ml-6 flex-1">
+                                <h4 class="text-lg font-medium text-gray-900">Configuración del Negocio</h4>
+                                <p class="text-sm text-gray-500 mt-1">Información básica, impuestos y facturación</p>
+                            </div>
+                            <!-- Icono de navegación -->
+                            <div class="ml-4">
+                                <i data-lucide="chevron-right" class="h-5 w-5 text-gray-400"></i>
+                            </div>
+                        </div>
+                    </a>
+                    
+                    <!-- Enlace a Personalización -->
+                    <a href="{% url 'configuraciones:personalizacion' %}" class="block bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300">
+                        <div class="p-6 flex items-center">
+                            <!-- Icono representativo -->
+                            <div class="flex-shrink-0 h-12 w-12 flex items-center justify-center bg-purple-100 rounded-full">
+                                <i data-lucide="palette" class="h-6 w-6 text-purple-600"></i>
+                            </div>
+                            <!-- Descripción del enlace -->
+                            <div class="ml-6 flex-1">
+                                <h4 class="text-lg font-medium text-gray-900">Personalización</h4>
+                                <p class="text-sm text-gray-500 mt-1">Temas, colores y opciones de visualización</p>
+                            </div>
+                            <!-- Icono de navegación -->
+                            <div class="ml-4">
+                                <i data-lucide="chevron-right" class="h-5 w-5 text-gray-400"></i>
+                            </div>
+                        </div>
+                    </a>
+                    
+                    <!-- Enlace a Usuarios y Permisos -->
+                    <a href="{% url 'configuraciones:usuarios' %}" class="block bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300">
+                        <div class="p-6 flex items-center">
+                            <!-- Icono representativo -->
+                            <div class="flex-shrink-0 h-12 w-12 flex items-center justify-center bg-blue-100 rounded-full">
+                                <i data-lucide="users" class="h-6 w-6 text-blue-600"></i>
+                            </div>
+                            <!-- Descripción del enlace -->
+                            <div class="ml-6 flex-1">
+                                <h4 class="text-lg font-medium text-gray-900">Usuarios y Permisos</h4>
+                                <p class="text-sm text-gray-500 mt-1">Gestión de usuarios, roles y permisos</p>
+                            </div>
+                            <!-- Icono de navegación -->
+                            <div class="ml-4">
+                                <i data-lucide="chevron-right" class="h-5 w-5 text-gray-400"></i>
+                            </div>
+                        </div>
+                    </a>
+                    
+                    <!-- Enlace a Configuración del Sistema -->
+                    <a href="{% url 'configuraciones:sistema' %}" class="block bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300">
+                        <div class="p-6 flex items-center">
+                            <!-- Icono representativo -->
+                            <div class="flex-shrink-0 h-12 w-12 flex items-center justify-center bg-amber-100 rounded-full">
+                                <i data-lucide="cpu" class="h-6 w-6 text-amber-600"></i>
+                            </div>
+                            <!-- Descripción del enlace -->
+                            <div class="ml-6 flex-1">
+                                <h4 class="text-lg font-medium text-gray-900">Configuración del Sistema</h4>
+                                <p class="text-sm text-gray-500 mt-1">Opciones generales, copias de seguridad y mantenimiento</p>
+                            </div>
+                            <!-- Icono de navegación -->
+                            <div class="ml-4">
+                                <i data-lucide="chevron-right" class="h-5 w-5 text-gray-400"></i>
+                            </div>
+                        </div>
+                    </a>
+                    
+                    <!-- Enlace a Configuración de Cuenta -->
+                    <a href="{% url 'configuraciones:cuenta' %}" class="block bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300">
+                        <div class="p-6 flex items-center">
+                            <!-- Icono representativo -->
+                            <div class="flex-shrink-0 h-12 w-12 flex items-center justify-center bg-purple-100 rounded-full">
+                                <i data-lucide="user" class="h-6 w-6 text-purple-600"></i>
+                            </div>
+                            <!-- Descripción del enlace -->
+                            <div class="ml-6 flex-1">
+                                <h4 class="text-lg font-medium text-gray-900">Configuración de Cuenta</h4>
+                                <p class="text-sm text-gray-500 mt-1">Información personal y datos de acceso</p>
+                            </div>
+                            <!-- Icono de navegación -->
+                            <div class="ml-4">
+                                <i data-lucide="chevron-right" class="h-5 w-5 text-gray-400"></i>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Script para inicializar iconos y manejar notificaciones -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        <!-- Inicializa los iconos de Lucide -->
+        lucide.createIcons();
+        
+       // Oculta notificaciones automáticamente después de 5 segundos -->
+        const notifications = document.querySelectorAll('[id^="notification-"]');
+        notifications.forEach(notification => {
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                setTimeout(() => {
+                    notification.style.display = 'none';
+                }, 300);
+            }, 5000);
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,474 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Punto de Venta - Supermercado{% endblock %}
+{% block section_title %}Sistema POS - Cajero{% endblock %}
+
+{% block content %}
+<div class="flex h-full">
+    <!-- Main POS Section -->
+    <div class="flex-1 flex flex-col">
+        <!-- Barcode Scanner and Search Section -->
+        <div class="bg-white p-4 rounded-lg shadow-sm mb-4">
+            <div class="flex flex-col md:flex-row gap-4">
+                <div class="relative flex-grow">
+                    <input type="text" id="barcode-input" placeholder="Escanear código de barras o buscar producto..." 
+                           class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                           autofocus>
+                    <div class="absolute left-3 top-3.5">
+                        <i data-lucide="barcode" class="w-5 h-5 text-blue-500"></i>
+                    </div>
+                </div>
+                <button id="manual-search" class="px-4 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all flex items-center">
+                    <i data-lucide="search" class="w-4 h-4 mr-2"></i>
+                    Buscar
+                </button>
+            </div>
+        </div>
+
+<!-- Current Transaction -->
+<div class="bg-white rounded-lg shadow-sm flex-1 flex flex-col overflow-hidden">
+    <div class="p-4 border-b border-gray-200 flex justify-between items-center bg-blue-600 text-white">
+        <h2 class="font-bold text-lg">Venta Actual</h2>
+        <div class="flex items-center">
+            <span class="mr-2">Cliente:</span>
+            <!-- Replace this dropdown with the customer display -->
+            <span id="selected-customer-display" class="text-gray-200">Consumidor final</span>
+            <button id="customer-search-btn" class="ml-2 bg-blue-700 hover:bg-blue-800 p-1 rounded flex items-center">
+                <i data-lucide="user-search" class="w-5 h-5"></i>
+            </button>
+            <button id="clear-customer-btn" class="ml-2 bg-red-700 hover:bg-red-800 p-1 rounded hidden flex items-center">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+        </div>
+    </div>
+    
+    <div class="overflow-y-auto flex-1 h-[calc(100vh-350px)]">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50 sticky top-0">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Código</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Producto</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Precio</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cantidad</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subtotal</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cart-items" class="bg-white divide-y divide-gray-200">
+                        <!-- Cart items will be added here dynamically -->
+                        <tr id="empty-cart-row">
+                            <td colspan="6" class="px-6 py-12 text-center text-gray-500">
+                                <i data-lucide="shopping-cart" class="w-12 h-12 mx-auto mb-4 text-gray-300"></i>
+                                <p class="text-lg">No hay productos en la venta actual</p>
+                                <p class="text-sm mt-2">Escanee un código de barras o busque un producto para comenzar</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Totals and Actions -->
+            <div class="border-t border-gray-200 p-4 bg-gray-50">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <div class="flex justify-between mb-2">
+                            <span class="text-gray-600">Subtotal:</span>
+                            <span class="font-medium" id="subtotal">$0.00</span>
+                        </div>
+                        <div class="flex justify-between mb-2">
+                            <span class="text-gray-600">IVA (12%):</span>
+                            <span class="font-medium" id="tax-amount">$0.00</span>
+                        </div>
+                        <div class="flex justify-between text-lg font-bold">
+                            <span class="text-gray-800">Total:</span>
+                            <span class="text-blue-600" id="total-amount">$0.00</span>
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <button id="checkout-button" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed transition-all" disabled>
+                            <i data-lucide="credit-card" class="w-5 h-5 mr-2"></i>
+                            Procesar Pago
+                        </button>
+                        <div class="flex gap-2">
+                            <button id="hold-sale-button" class="flex-1 bg-amber-500 text-white py-2 rounded-lg hover:bg-amber-600 flex items-center justify-center transition-all">
+                                <i data-lucide="pause" class="w-4 h-4 mr-2"></i>
+                                Poner en Espera
+                            </button>
+                            <button id="clear-sale-button" class="flex-1 bg-red-500 text-white py-2 rounded-lg hover:bg-red-600 flex items-center justify-center transition-all">
+                                <i data-lucide="trash-2" class="w-4 h-4 mr-2"></i>
+                                Cancelar Venta
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Sidebar - Product Info and Held Sales -->
+    <div id="product-sidebar" class="w-96 bg-white shadow-lg border-l border-gray-200 overflow-y-auto">
+        <div class="p-4 border-b border-gray-200 bg-blue-600 text-white flex justify-between items-center">
+            <h2 class="font-bold text-lg">Información del Producto</h2>
+            <button id="close-product-info" class="text-white hover:text-gray-200 focus:outline-none">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+        </div>
+        
+        <!-- Product Info Section -->
+        <div id="product-info" class="p-4 border-b border-gray-200 hidden">
+            <div class="flex flex-col items-center mb-4">
+                <div class="w-32 h-32 bg-gray-100 rounded-lg flex items-center justify-center mb-4 overflow-hidden" id="product-image-container">
+                    <i data-lucide="package" class="w-16 h-16 text-gray-300" id="product-no-image"></i>
+                    <img src="" alt="" class="object-cover w-full h-full hidden" id="product-image">
+                </div>
+                <h3 class="font-bold text-lg text-gray-800 text-center" id="product-name">Nombre del Producto</h3>
+                <div class="flex items-center mt-1">
+                    <span class="bg-blue-50 text-blue-700 text-xs font-medium px-2 py-1 rounded" id="product-category">Categoría</span>
+                    <span class="ml-2 text-sm text-gray-500" id="product-code">Código: 123456</span>
+                </div>
+            </div>
+            
+            <div class="mb-4">
+                <div class="flex justify-between mb-1">
+                    <span class="text-gray-600">Precio:</span>
+                    <span class="font-bold text-blue-600" id="product-price">$0.00</span>
+                </div>
+                <div class="flex justify-between mb-1">
+                    <span class="text-gray-600">Stock:</span>
+                    <span id="product-stock">0 unidades</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-600">Impuesto:</span>
+                    <span id="product-tax">12%</span>
+                </div>
+            </div>
+            
+            <div class="mb-4">
+                <label for="product-quantity" class="block text-sm font-medium text-gray-700 mb-1">Cantidad:</label>
+                <div class="flex">
+                    <button id="decrease-quantity" class="px-3 py-2 bg-gray-100 text-gray-700 rounded-l-lg hover:bg-gray-200">-</button>
+                    <input type="number" id="product-quantity" value="1" min="1" class="flex-1 text-center border-y border-gray-200 py-2">
+                    <button id="increase-quantity" class="px-3 py-2 bg-gray-100 text-gray-700 rounded-r-lg hover:bg-gray-200">+</button>
+                </div>
+            </div>
+            
+            <button id="add-to-cart" class="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 flex items-center justify-center transition-all">
+                <i data-lucide="shopping-cart" class="w-4 h-4 mr-2"></i>
+                Agregar a la Venta
+            </button>
+        </div>
+        
+        <!-- No Product Selected Message -->
+        <div id="no-product-selected" class="p-8 text-center text-gray-500">
+            <i data-lucide="package-search" class="w-16 h-16 mx-auto mb-4 text-gray-200"></i>
+            <p class="text-lg">Ningún producto seleccionado</p>
+            <p class="text-sm mt-2">Escanee un código de barras o busque un producto para ver su información</p>
+        </div>
+    </div>
+</div>
+
+<!-- Product Search Modal -->
+<div id="search-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full animate-fade-in overflow-hidden">
+        <div class="flex justify-between items-center p-4 border-b border-gray-100">
+            <h3 class="font-bold text-lg text-gray-800">Buscar Productos</h3>
+            <button id="close-search-modal" class="text-gray-500 hover:text-gray-700 focus:outline-none">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+        </div>
+        
+        <div class="p-4">
+            <div class="relative mb-4">
+                <input type="text" id="modal-search-input" placeholder="Nombre, código o descripción del producto..." 
+                       class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+                <div class="absolute left-3 top-3.5">
+                    <i data-lucide="search" class="w-5 h-5 text-blue-500"></i>
+                </div>
+            </div>
+            
+            <div class="max-h-96 overflow-y-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50 sticky top-0">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Código</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Producto</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Categoría</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Precio</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="search-results" class="bg-white divide-y divide-gray-200">
+                        <!-- Search results will be added here dynamically -->
+                        <tr id="no-results-row">
+                            <td colspan="6" class="px-6 py-8 text-center text-gray-500">
+                                <p>Ingrese un término de búsqueda para encontrar productos</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Customer Search Modal -->
+<div id="customer-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full animate-fade-in overflow-hidden">
+        <div class="flex justify-between items-center p-4 border-b border-gray-100">
+            <h3 class="font-bold text-lg text-gray-800">Buscar Cliente</h3>
+            <button id="close-customer-modal" class="text-gray-500 hover:text-gray-700 focus:outline-none">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+        </div>
+        
+        <div class="p-4">
+            <div class="relative mb-4">
+                <input type="text" id="customer-search-input" placeholder="Nombre, cédula o RUC del cliente..." 
+                       class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+                <div class="absolute left-3 top-3.5">
+                    <i data-lucide="search" class="w-5 h-5 text-blue-500"></i>
+                </div>
+            </div>
+            
+            <div class="max-h-72 overflow-y-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50 sticky top-0">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cédula/RUC</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="customer-results" class="bg-white divide-y divide-gray-200">
+                        <!-- Customer results will be added here dynamically -->
+                        <tr id="no-customers-row">
+                            <td colspan="4" class="px-6 py-8 text-center text-gray-500">
+                                <p>Ingrese un término de búsqueda para encontrar clientes</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="mt-4 flex justify-end">
+                <button id="new-customer-button" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-all flex items-center">
+                    <i data-lucide="user-plus" class="w-4 h-4 mr-2"></i>
+                    Nuevo Cliente
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal de Procesamiento de Pago -->
+<div id="payment-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full animate-fade-in overflow-hidden">
+        <div class="flex justify-between items-center p-4 border-b border-gray-100">
+            <h3 class="font-bold text-lg text-gray-800">Procesar Pago</h3>
+            <button id="close-payment-modal" class="text-gray-500 hover:text-gray-700 focus:outline-none">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+        </div>
+        
+        <div class="p-4">
+            <!-- Resumen de la compra -->
+            <div class="mb-6 bg-gray-50 p-4 rounded-lg">
+                <h4 class="font-medium text-gray-700 mb-2">Resumen de la compra</h4>
+                <div class="flex justify-between mb-1">
+                    <span class="text-gray-600">Subtotal:</span>
+                    <span id="payment-subtotal" class="font-medium">$0.00</span>
+                </div>
+                <div class="flex justify-between mb-1">
+                    <span class="text-gray-600">IVA (12%):</span>
+                    <span id="payment-tax" class="font-medium">$0.00</span>
+                </div>
+                <div class="flex justify-between text-lg font-bold">
+                    <span class="text-gray-800">Total a pagar:</span>
+                    <span id="payment-total" class="text-blue-600">$0.00</span>
+                </div>
+            </div>
+            
+            <!-- Tipo de cliente -->
+            <div class="mb-6">
+                <h4 class="font-medium text-gray-700 mb-2">Tipo de cliente</h4>
+                <div class="grid grid-cols-3 gap-3">
+                    <div id="customer-final" class="customer-type border border-gray-200 rounded-lg p-3 text-center cursor-pointer hover:bg-gray-50 active">
+                        <i data-lucide="user" class="w-6 h-6 mx-auto mb-2 text-gray-400"></i>
+                        <span class="block text-sm font-medium">Consumidor Final</span>
+                    </div>
+                    <div id="customer-registered" class="customer-type border border-gray-200 rounded-lg p-3 text-center cursor-pointer hover:bg-gray-50">
+                        <i data-lucide="users" class="w-6 h-6 mx-auto mb-2 text-gray-400"></i>
+                        <span class="block text-sm font-medium">Cliente Registrado</span>
+                    </div>
+                    <div id="customer-data" class="customer-type border border-gray-200 rounded-lg p-3 text-center cursor-pointer hover:bg-gray-50">
+                        <i data-lucide="clipboard-list" class="w-6 h-6 mx-auto mb-2 text-gray-400"></i>
+                        <span class="block text-sm font-medium">Con Datos</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Búsqueda de cliente (inicialmente oculto) -->
+            <div id="client-search-section" class="mb-6 hidden">
+                <div class="relative mb-4">
+                    <input type="text" id="client-search" placeholder="Buscar cliente por nombre o identificación..." 
+                           class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+                    <div class="absolute left-3 top-3.5">
+                        <i data-lucide="search" class="w-5 h-5 text-blue-500"></i>
+                    </div>
+                </div>
+                
+                <!-- Resultados de búsqueda de cliente -->
+                <div id="client-results" class="border border-gray-200 rounded-lg overflow-hidden mb-4 hidden">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Código</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Nombre</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Identificación</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="client-results-body" class="bg-white divide-y divide-gray-200">
+                            <!-- Los resultados se agregarán dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Información del cliente seleccionado -->
+                <div id="selected-client-info" class="border border-gray-200 rounded-lg p-4 hidden">
+                    <div class="flex justify-between items-start mb-2">
+                        <h5 id="selected-client-name" class="font-medium text-gray-800">Nombre del Cliente</h5>
+                        <button id="change-client-btn" class="text-sm text-blue-600 hover:text-blue-800">Cambiar</button>
+                    </div>
+                    <p id="selected-client-id" class="text-sm text-gray-600 mb-1">Cédula/RUC: 1234567890</p>
+                    <p id="selected-client-address" class="text-sm text-gray-600">Dirección del cliente</p>
+                    <input type="hidden" id="selected-client-id-input" name="client_id" value="">
+                </div>
+            </div>
+            
+            <!-- Método de pago -->
+            <div class="mb-6">
+                <h4 class="font-medium text-gray-700 mb-2">Método de pago</h4>
+                <div class="grid grid-cols-2 gap-3">
+                    <div id="payment-cash" class="payment-method border border-gray-200 rounded-lg p-3 text-center cursor-pointer hover:bg-gray-50 active">
+                        <i data-lucide="banknote" class="w-6 h-6 mx-auto mb-2 text-gray-400"></i>
+                        <span class="block text-sm font-medium">Efectivo</span>
+                    </div>
+                    <div id="payment-card" class="payment-method border border-gray-200 rounded-lg p-3 text-center cursor-pointer hover:bg-gray-50">
+                        <i data-lucide="credit-card" class="w-6 h-6 mx-auto mb-2 text-gray-400"></i>
+                        <span class="block text-sm font-medium">Tarjeta</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Detalles de pago en efectivo -->
+            <div id="cash-payment-details" class="mb-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="cash-amount" class="block text-sm font-medium text-gray-700 mb-1">Monto recibido:</label>
+                        <div class="relative">
+                            <span class="absolute left-3 top-3 text-gray-500">$</span>
+                            <input type="text" id="cash-amount" class="w-full pl-8 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="0.00">
+                        </div>
+                        <div class="mt-2 grid grid-cols-3 gap-2">
+                            <button class="quick-amount-btn bg-gray-100 hover:bg-gray-200 text-gray-800 py-2 rounded-lg" data-amount="1">$1</button>
+                            <button class="quick-amount-btn bg-gray-100 hover:bg-gray-200 text-gray-800 py-2 rounded-lg" data-amount="5">$5</button>
+                            <button class="quick-amount-btn bg-gray-100 hover:bg-gray-200 text-gray-800 py-2 rounded-lg" data-amount="10">$10</button>
+                            <button class="quick-amount-btn bg-gray-100 hover:bg-gray-200 text-gray-800 py-2 rounded-lg" data-amount="20">$20</button>
+                            <button class="quick-amount-btn bg-gray-100 hover:bg-gray-200 text-gray-800 py-2 rounded-lg" data-amount="50">$50</button>
+                            <button class="quick-amount-btn bg-gray-100 hover:bg-gray-200 text-gray-800 py-2 rounded-lg" data-amount="100">$100</button>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="block text-sm font-medium text-gray-700">Cambio a devolver:</label>
+                            <span id="cash-change" class="text-lg font-bold text-green-600">$0.00</span>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2 mt-4">
+                            <button class="num-pad-btn bg-gray-100 hover:bg-gray-200 text-gray-800 py-3 rounded-lg">1</button>
+                            <button class="num-pad-btn bg-gray-100 hover:bg-gray-200 text-gray-800 py-3 rounded-lg">2</button>
+                            <button class="num-pad-btn bg-gray-100 hover:bg-gray-200 text-gray-800 py-3 rounded-lg">3</button>
+                            <button class="num-pad-btn bg-gray-100 hover:bg-gray-200 text-gray-800 py-3 rounded-lg">4</button>
+                            <button class="num-pad-btn bg-gray-100 hover:bg-gray-200 text-gray-800 py-3 rounded-lg">5</button>
+                            <button class="num-pad-btn bg-gray-100 hover:bg-gray-200 text-gray-800 py-3 rounded-lg">6</button>
+                            <button class="num-pad-btn bg-gray-100 hover:bg-gray-200 text-gray-800 py-3 rounded-lg">7</button>
+                            <button class="num-pad-btn bg-gray-100 hover:bg-gray-200 text-gray-800 py-3 rounded-lg">8</button>
+                            <button class="num-pad-btn bg-gray-100 hover:bg-gray-200 text-gray-800 py-3 rounded-lg">9</button>
+                            <button class="num-pad-btn bg-gray-100 hover:bg-gray-200 text-gray-800 py-3 rounded-lg">.</button>
+                            <button class="num-pad-btn bg-gray-100 hover:bg-gray-200 text-gray-800 py-3 rounded-lg">0</button>
+                            <button id="clear-amount-btn" class="bg-red-100 hover:bg-red-200 text-red-800 py-3 rounded-lg">C</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Detalles de pago con tarjeta (inicialmente oculto) -->
+            <div id="card-payment-details" class="mb-6 hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="relative">
+                        <label for="card-number" class="block text-sm font-medium text-gray-700 mb-1">Número de tarjeta:</label>
+                        <input type="text" id="card-number" class="w-full pl-4 pr-10 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="XXXX XXXX XXXX XXXX" maxlength="19">
+                        <div class="absolute right-3 top-8">
+                            <i data-lucide="credit-card" class="w-5 h-5 text-gray-400"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="card-holder" class="block text-sm font-medium text-gray-700 mb-1">Nombre del titular:</label>
+                        <input type="text" id="card-holder" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Como aparece en la tarjeta">
+                    </div>
+                    <div class="relative">
+                        <label for="card-expiry" class="block text-sm font-medium text-gray-700 mb-1">Fecha de expiración:</label>
+                        <input type="text" id="card-expiry" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="MM/AA" maxlength="5">
+                    </div>
+                    <div class="relative">
+                        <label for="card-cvv" class="block text-sm font-medium text-gray-700 mb-1">CVV:</label>
+                        <input type="text" id="card-cvv" class="w-full pl-4 pr-10 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="XXX" maxlength="4">
+                        <div class="absolute right-3 top-8">
+                            <i data-lucide="help-circle" class="w-5 h-5 text-gray-400"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Botones de acción -->
+            <div class="flex justify-between">
+                <button id="back-to-cart-btn" class="px-6 py-3 bg-gray-100 text-gray-800 rounded-lg hover:bg-gray-200 transition-all flex items-center">
+                    <i data-lucide="arrow-left" class="w-4 h-4 mr-2"></i>
+                    Volver
+                </button>
+                <button id="process-payment-btn" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all flex items-center disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                    <i data-lucide="check-circle" class="w-4 h-4 mr-2"></i>
+                    Procesar Pago
+                </button>
+            </div>
+            
+            <!-- Formulario oculto para procesar el pago -->
+            <form id="payment-form" method="post" action="/ventas/api/procesar/" class="hidden">
+                {% csrf_token %}
+                <input type="hidden" name="venta_id" id="venta-id-input" value="">
+                <input type="hidden" name="metodo_pago" id="metodo-pago-input" value="efectivo">
+                <input type="hidden" name="monto_recibido" id="monto-recibido-input" value="">
+                <input type="hidden" name="cambio" id="cambio-input" value="">
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<style>
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .animate-fade-in {
+        animation: fadeIn 0.3s ease-out forwards;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/pos.js' %}"></script>
+{% endblock %}

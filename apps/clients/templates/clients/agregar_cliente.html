@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {{ form_title }}
+{% endblock %}
+
+{% block content %}
+<!-- Contenedor principal con márgenes automáticos y padding -->
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-3xl mx-auto">
+        <!-- Encabezado con título y botón de volver -->
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-2xl font-bold text-gray-800">{{ form_title }}</h1>
+            <a href="{% url 'clients:lista' %}" class="bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-lg transition duration-300 flex items-center shadow-sm hover:shadow">
+                <i class="fas fa-arrow-left mr-2"></i>Volver a la lista
+            </a>
+        </div>
+
+        <!-- Tarjeta con el formulario -->
+        <div class="bg-white rounded-lg shadow-sm p-6">
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+                
+                <!-- Cuadrícula de dos columnas para los campos -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Columna izquierda -->
+                    <div>
+                        <!-- Sección de identificación -->
+                        <div class="border-b border-gray-200 pb-4 mb-4">
+                            <h2 class="text-lg font-semibold text-gray-800 mb-4">Identificación</h2>
+                            
+                            <!-- Campo Código -->
+                            <div class="form-group mb-4">
+                                <label for="{{ form.codigo.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Código</label>
+                                {{ form.codigo }}
+                                {% if form.codigo.errors %}
+                                    <p class="text-red-500 text-xs mt-1">{{ form.codigo.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Campo Nombre -->
+                            <div class="form-group mb-4">
+                                <label for="{{ form.nombre.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Nombre *</label>
+                                {{ form.nombre }}
+                                {% if form.nombre.errors %}
+                                    <p class="text-red-500 text-xs mt-1">{{ form.nombre.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Campo Razón Social -->
+                            <div class="form-group mb-4">
+                                <label for="{{ form.razon_social.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Razón Social</label>
+                                {{ form.razon_social }}
+                                {% if form.razon_social.errors %}
+                                    <p class="text-red-500 text-xs mt-1">{{ form.razon_social.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Campo Identificación -->
+                            <div class="form-group">
+                                <label for="{{ form.identificacion.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Cédula/RUC *</label>
+                                {{ form.identificacion }}
+                                {% if form.identificacion.errors %}
+                                    <p class="text-red-500 text-xs mt-1">{{ form.identificacion.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Sección de clasificación y preferencias -->
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <h2 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">Preferencias</h2>
+                            <div class="grid grid-cols-1 gap-4">
+                                <!-- Campo Grupo -->
+                                <div>
+                                    <label for="{{ form.grupo.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Grupo</label>
+                                    {{ form.grupo }}
+                                    {% if form.grupo.errors %}
+                                        <p class="text-red-500 text-xs mt-1">{{ form.grupo.errors.0 }}</p>
+                                    {% endif %}
+                                </div>
+                                <!-- Campo Crédito -->
+                                <div>
+                                    <label for="{{ form.credito.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Crédito (días)</label>
+                                    {{ form.credito }}
+                                    {% if form.credito.errors %}
+                                        <p class="text-red-500 text-xs mt-1">{{ form.credito.errors.0 }}</p>
+                                    {% endif %}
+                                </div>
+                                <!-- Campo Estado -->
+                                <div>
+                                    <label for="{{ form.estado.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
+                                    {{ form.estado }}
+                                    {% if form.estado.errors %}
+                                        <p class="text-red-500 text-xs mt-1">{{ form.estado.errors.0 }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Sección de comentarios -->
+                        <div>
+                            <h2 class="text-lg font-semibold text-gray-800 mb-4">Comentarios</h2>
+                            
+                            <!-- Campo Notas -->
+                            <div class="form-group">
+                                <label for="{{ form.notas.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Comentarios adicionales</label>
+                                {{ form.notas }}
+                                {% if form.notas.errors %}
+                                    <p class="text-red-500 text-xs mt-1">{{ form.notas.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Columna derecha -->
+                    <div>
+                        <!-- Sección de contacto -->
+                        <div class="border-b border-gray-200 pb-4 mb-4">
+                            <h2 class="text-lg font-semibold text-gray-800 mb-4">Contacto</h2>
+                            
+                            <!-- Campo Email -->
+                            <div class="form-group mb-4">
+                                <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                                {{ form.email }}
+                                {% if form.email.errors %}
+                                    <p class="text-red-500 text-xs mt-1">{{ form.email.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Campo Teléfono -->
+                            <div class="form-group mb-4">
+                                <label for="{{ form.telefono.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
+                                {{ form.telefono }}
+                                {% if form.telefono.errors %}
+                                    <p class="text-red-500 text-xs mt-1">{{ form.telefono.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Campo Dirección -->
+                            <div class="form-group">
+                                <label for="{{ form.direccion.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Dirección</label>
+                                {{ form.direccion }}
+                                {% if form.direccion.errors %}
+                                    <p class="text-red-500 text-xs mt-1">{{ form.direccion.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Sección de información comercial -->
+                        <div class="border-b border-gray-200 pb-4 mb-4">
+                            <h2 class="text-lg font-semibold text-gray-800 mb-4">Información comercial</h2>
+                            
+                            <!-- Campo Cupo -->
+                            <div class="form-group mb-4">
+                                <label for="{{ form.cupo.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Cupo</label>
+                                {{ form.cupo }}
+                                {% if form.cupo.errors %}
+                                    <p class="text-red-500 text-xs mt-1">{{ form.cupo.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Campo Tasa de descuento -->
+                            <div class="form-group mb-4">
+                                <label for="{{ form.tasa_descuento.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Tasa de descuento (%)</label>
+                                {{ form.tasa_descuento }}
+                                {% if form.tasa_descuento.errors %}
+                                    <p class="text-red-500 text-xs mt-1">{{ form.tasa_descuento.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Campo Tasa de recargo -->
+                            <div class="form-group">
+                                <label for="{{ form.tasa_recargo.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Tasa de recargo (%)</label>
+                                {{ form.tasa_recargo }}
+                                {% if form.tasa_recargo.errors %}
+                                    <p class="text-red-500 text-xs mt-1">{{ form.tasa_recargo.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Botones de acción -->
+                <div class="flex justify-end space-x-4 pt-4">
+                    <!-- Botón para cancelar -->
+                    <a href="{% url 'clients:lista' %}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-medium py-2 px-4 rounded-lg transition duration-300">
+                        Cancelar
+                    </a>
+                    <!-- Botón para guardar -->
+                    <button type="submit" class="bg-emerald-500 hover:bg-emerald-600 text-white font-medium py-2 px-4 rounded-lg transition duration-300 flex items-center">
+                        <i class="fas fa-save mr-2"></i>Guardar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,364 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load ventas_filters %}
+
+{% block title %}Detalle de Transacción #{{ transaccion.factuID }}{% endblock %}
+{% block section_title %}Detalle de Transacción{% endblock %}
+{% block back_url %}{% url 'transacciones:lista_transacciones' %}{% endblock %}
+
+{% block content %}
+<!-- Update template to use transaccion instead of venta -->
+<div class="container mx-auto px-4 py-6">
+    <div class="max-w-4xl mx-auto">
+        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+            <div class="bg-emerald-600 text-white px-6 py-4">
+                <h3 class="text-2xl font-bold flex items-center"><i class="fas fa-receipt mr-2"></i>Detalle de Transacción #{{ transaccion.factuID }}</h3>
+            </div>
+            
+            <div class="p-6">
+                <!-- Quick action buttons at the top -->
+                <div class="flex justify-center space-x-4 mb-6">
+                    <button id="print-invoice" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg transition duration-300 flex items-center text-lg">
+                        <i class="fas fa-print mr-2"></i>Imprimir Factura
+                    </button>
+                    <a href="{% url 'ventas:ventas' %}" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 px-6 rounded-lg transition duration-300 flex items-center text-lg">
+                        <i class="fas fa-shopping-cart mr-2"></i>Nueva Venta
+                    </a>
+                </div>
+                
+                <!-- Transaction details in a card format -->
+                <div class="bg-gray-50 rounded-lg p-5 border border-gray-200 mb-6">
+                    <h4 class="text-xl font-bold text-gray-800 mb-4 border-b border-gray-200 pb-2">
+                        <i class="fas fa-receipt mr-2 text-emerald-600"></i>Detalles de la Transacción
+                    </h4>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Left column -->
+                        <div>
+                            <!-- Update the invoice number display -->
+                            <div class="mb-4">
+                                <p class="text-sm text-gray-500">Número de Factura</p>
+                                <p class="text-lg font-semibold">#{{ transaccion.factuID }}</p>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <p class="text-sm text-gray-500">Número de Transacción</p>
+                                <p class="text-lg font-semibold">#{{ transaccion.transaction_id }}</p>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <p class="text-sm text-gray-500">Método de Pago</p>
+                                <p class="text-lg">
+                                    <span class="bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full">
+                                        {% if venta.metodo_pago == 'cash' %}Efectivo{% elif venta.metodo_pago == 'card' %}Tarjeta{% elif venta.metodo_pago == 'transfer' %}Transferencia{% else %}{{ venta.metodo_pago }}{% endif %}
+                                    </span>
+                                </p>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <p class="text-sm text-gray-500">Fecha y Hora</p>
+                                <p class="text-lg">{{ venta.fecha_hora|date:"d/m/Y H:i:s" }}</p>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <p class="text-sm text-gray-500">Cliente</p>
+                                <p class="text-lg font-semibold">
+                                    {% if venta.cliente %}
+                                        {{ venta.cliente.nombre }}
+                                        <span class="text-sm font-normal">({{ venta.cliente.identificacion }})</span>
+                                    {% else %}
+                                        Consumidor Final
+                                    {% endif %}
+                                </p>
+                                {% if venta.cliente and venta.cliente.direccion %}
+                                    <p class="text-sm text-gray-600">{{ venta.cliente.direccion }}{% if venta.cliente.ciudad %}, {{ venta.cliente.ciudad }}{% endif %}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Right column - Payment details -->
+                        <div class="bg-white p-4 rounded-lg border border-gray-200">
+                            <div class="mb-4">
+                                <p class="text-sm text-gray-500">Subtotal</p>
+                                <p class="text-lg">{{ currency_symbol }}{{ venta.subtotal|divide_by_iva|floatformat:2 }}</p>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <p class="text-sm text-gray-500">Total</p>
+                                <p class="text-2xl font-bold text-emerald-600">{{ currency_symbol }}{{ venta.total|floatformat:2 }}</p>
+                                <p class="text-xs text-gray-500">(Precio incluye IVA)</p>
+                            </div>
+                            
+                            {% if venta.metodo_pago == 'cash' %}
+                            <div class="border-t border-gray-200 pt-3 mt-3">
+                                <div class="flex justify-between mb-2">
+                                    <p class="text-gray-600">Monto Recibido:</p>
+                                    <p class="font-semibold">{{ currency_symbol }}{{ venta.monto_recibido|floatformat:2 }}</p>
+                                </div>
+                                <div class="flex justify-between">
+                                    <p class="text-gray-600">Cambio:</p>
+                                    <p class="font-semibold text-blue-600">{{ currency_symbol }}{{ venta.cambio|floatformat:2 }}</p>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Products list -->
+                <div class="mb-6">
+                    <h4 class="text-xl font-bold text-gray-800 mb-4 border-b border-gray-200 pb-2">
+                        <i class="fas fa-shopping-basket mr-2 text-emerald-600"></i>Productos Vendidos
+                    </h4>
+                    
+                    <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                        <table class="w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase">Producto</th>
+                                    <th class="py-3 px-4 text-center text-xs font-medium text-gray-500 uppercase">Cantidad</th>
+                                    <th class="py-3 px-4 text-right text-xs font-medium text-gray-500 uppercase">Precio</th>
+                                    <th class="py-3 px-4 text-right text-xs font-medium text-gray-500 uppercase">Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                {% for detalle in detalles %}
+                                <tr>
+                                    <td class="py-3 px-4">
+                                        <div class="flex items-center">
+                                            {% if detalle.producto.imagen %}
+                                                <div class="w-10 h-10 flex-shrink-0 mr-3">
+                                                    <img src="{{ detalle.producto.imagen.url }}" alt="{{ detalle.producto.nombre }}" class="w-10 h-10 rounded-full object-cover border border-gray-200">
+                                                </div>
+                                            {% else %}
+                                                <div class="w-10 h-10 flex-shrink-0 mr-3 bg-gray-100 rounded-full flex items-center justify-center">
+                                                    <i class="fas fa-utensils text-gray-400"></i>
+                                                </div>
+                                            {% endif %}
+                                            <span>{{ detalle.producto.nombre }}</span>
+                                        </div>
+                                    </td>
+                                    <td class="py-3 px-4 text-center">
+                                        <span class="bg-gray-100 text-gray-800 px-2 py-1 rounded-full">{{ detalle.cantidad }}</span>
+                                    </td>
+                                    <td class="py-3 px-4 text-right">
+                                        {{ currency_symbol }}{{ detalle.precio_unitario|divide_by_iva|floatformat:2 }}
+                                    </td>
+                                    <td class="py-3 px-4 text-right font-medium">{{ currency_symbol }}{{ detalle.subtotal|divide_by_iva|floatformat:2 }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4" class="py-4 px-4 text-center text-gray-500">No hay productos en esta venta</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Bottom action buttons -->
+                <div class="flex flex-wrap justify-between mt-8 gap-4">
+                    <a href="{% url 'ventas:descargar_factura' venta.id %}" class="bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-lg transition duration-300 flex items-center">
+                        <i class="fas fa-download mr-2"></i>Descargar Factura
+                    </a>
+                    <a href="{% url 'dashboard' %}" class="border border-gray-500 text-gray-700 hover:bg-gray-50 font-medium py-2 px-4 rounded-lg transition duration-300 flex items-center">
+                        <i class="fas fa-home mr-2"></i>Ir al Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Invoice Print Template (Hidden) -->
+<div id="invoicePrintTemplate" style="display: none;">
+    <div class="invoice-print">
+        <div class="text-center mb-4">
+            <h2 class="text-2xl font-bold">{{ request.user.business.nombre_negocio|default:"SouthernPOS" }}</h2>
+            <p class="mb-1">{{ request.user.business.direccion_negocio|default:"" }}</p>
+            <p class="mb-1">Teléfono: {{ request.user.business.telefono_negocio|default:"" }}</p>
+            <p class="mb-1">RUC: {{ request.user.business.ruc_negocio|default:"" }}</p>
+            <p>Email: {{ request.user.business.email_negocio|default:"" }}</p>
+            <hr class="my-4">
+            <h3 class="text-xl font-bold">FACTURA</h3>
+            <p class="font-bold mb-1">No. 001-001-{{ transaccion.factuID|stringformat:"08d" }}</p>
+            <p>Fecha: {{ venta.fecha_hora|date:"d/m/Y H:i:s" }}</p>
+        </div>
+        
+        <div class="border p-4 rounded mb-4">
+            <h4 class="font-bold border-b pb-2 mb-3">Cliente: 
+            {% if venta.cliente %}
+                {{ venta.cliente.nombre }}
+            {% else %}
+                Consumidor Final
+            {% endif %}
+            </h4>
+            {% if venta.cliente %}
+                <p class="mb-1">ID/RUC: {{ venta.cliente.identificacion }}</p>
+                {% if venta.cliente.razon_social %}
+                    <p class="mb-1">Razón Social: {{ venta.cliente.razon_social }}</p>
+                {% endif %}
+                {% if venta.cliente.direccion %}
+                    <p class="mb-1">Dirección: {{ venta.cliente.direccion }}</p>
+                {% endif %}
+                {% if venta.cliente.ciudad %}
+                    <p class="mb-1">Ciudad: {{ venta.cliente.ciudad }}</p>
+                {% endif %}
+                {% if venta.cliente.telefono %}
+                    <p class="mb-1">Teléfono: {{ venta.cliente.telefono }}</p>
+                {% endif %}
+                {% if venta.cliente.email %}
+                    <p>Email: {{ venta.cliente.email }}</p>
+                {% endif %}
+            {% endif %}
+        </div>
+        
+        <table class="w-full border-collapse mb-6">
+            <thead class="bg-gray-800 text-white">
+                <tr>
+                    <th class="py-2 px-4 text-left">Producto</th>
+                    <th class="py-2 px-4 text-left">Cantidad</th>
+                    <th class="py-2 px-4 text-left">Precio Unit.</th>
+                    <th class="py-2 px-4 text-left">Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for detalle in detalles %}
+                <tr class="border-b">
+                    <td class="py-2 px-4">{{ detalle.producto.nombre }}</td>
+                    <td class="py-2 px-4">{{ detalle.cantidad }}</td>
+                    <td class="py-2 px-4">
+                        {{ currency_symbol }}{{ detalle.precio_unitario|divide_by_iva|floatformat:2 }}
+                    </td>
+                    <td class="py-2 px-4">{{ currency_symbol }}{{ detalle.subtotal|divide_by_iva|floatformat:2 }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="py-4 px-4 text-center">No hay productos en esta venta</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <div class="mb-6">
+            <div class="w-1/2 ml-auto">
+                <table class="w-full border-collapse">
+                    <tr class="border-b">
+                        <th class="py-2 px-4 text-left bg-gray-50">Subtotal 15%:</th>
+                        <td class="py-2 px-4">{{ currency_symbol }}{{ venta.subtotal|divide_by_iva|floatformat:2 }}</td>
+                    </tr>
+                    <tr class="border-b">
+                        <th class="py-2 px-4 text-left bg-gray-50">Subtotal 0%:</th>
+                        <td class="py-2 px-4">{{ currency_symbol }}0.00</td>
+                    </tr>
+                    <tr class="border-b">
+                        <th class="py-2 px-4 text-left bg-gray-50">Subtotal:</th>
+                        <td class="py-2 px-4">{{ currency_symbol }}{{ venta.subtotal|divide_by_iva|floatformat:2 }}</td>
+                    </tr>
+                    <tr class="border-b">
+                        <th class="py-2 px-4 text-left bg-gray-50">IVA 15%:</th>
+                        <td class="py-2 px-4">{{ currency_symbol }}{{ venta.subtotal|subtract_pretax|floatformat:2 }}</td>
+                    </tr>
+                    <tr class="border-b bg-emerald-50">
+                        <th class="py-2 px-4 text-left">Total:</th>
+                        <td class="py-2 px-4 font-bold">{{ currency_symbol }}{{ venta.total|floatformat:2 }}</td>
+                    </tr>
+                    <tr class="border-b">
+                        <th class="py-2 px-4 text-left bg-gray-50">Método de Pago:</th>
+                        <td class="py-2 px-4">{% if venta.metodo_pago == 'cash' %}Efectivo{% elif venta.metodo_pago == 'card' %}Tarjeta{% elif venta.metodo_pago == 'transfer' %}Transferencia{% else %}{{ venta.metodo_pago }}{% endif %}</td>
+                    </tr>
+                    {% if venta.metodo_pago == 'cash' %}
+                    <tr class="border-b">
+                        <th class="py-2 px-4 text-left bg-gray-50">Monto Recibido:</th>
+                        <td class="py-2 px-4">{{ currency_symbol }}{{ venta.monto_recibido|floatformat:2 }}</td>
+                    </tr>
+                    <tr class="border-b">
+                        <th class="py-2 px-4 text-left bg-gray-50">Cambio:</th>
+                        <td class="py-2 px-4">{{ currency_symbol }}{{ venta.cambio|floatformat:2 }}</td>
+                    </tr>
+                    {% endif %}
+                </table>
+            </div>
+        </div>
+        
+        <div class="text-center border-t pt-4 mt-8">
+            <p class="font-bold mb-1">{{ request.user.business.mensaje_factura|default:"¡Gracias por su compra!" }}</p>
+            <p class="mb-1">{{ request.user.business.politica_devolucion|default:"Para devoluciones, presente este comprobante dentro de los próximos 7 días." }}</p>
+            <p>Contacto: {{ request.user.business.telefono_negocio|default:"" }} | {{ request.user.business.email_negocio|default:"" }}</p>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Get the print button
+    const printButton = document.getElementById('print-invoice');
+    
+    // Add click event listener
+    printButton.addEventListener('click', function() {
+        // Get the invoice template
+        const invoiceTemplate = document.getElementById('invoicePrintTemplate');
+        
+        // Create a new window for printing
+        const printWindow = window.open('', '_blank', 'height=600,width=800');
+        
+        // Add basic styling for the print view
+        printWindow.document.write(`
+            <html>
+            <head>
+                <title>Factura #{{ venta.numero_factura_usuario }} - SouthernPOS</title>
+                <style>
+                    body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
+                    .invoice-print { max-width: 800px; margin: 0 auto; }
+                    table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+                    th, td { padding: 8px; text-align: left; border-bottom: 1px solid #ddd; }
+                    th { background-color: #f2f2f2; }
+                    .text-center { text-align: center; }
+                    .mb-1 { margin-bottom: 5px; }
+                    .mb-4 { margin-bottom: 20px; }
+                    .my-4 { margin-top: 20px; margin-bottom: 20px; }
+                    .font-bold { font-weight: bold; }
+                    .text-2xl { font-size: 1.5rem; }
+                    .text-xl { font-size: 1.25rem; }
+                    .border { border: 1px solid #ddd; }
+                    .p-4 { padding: 16px; }
+                    .rounded { border-radius: 4px; }
+                    .bg-gray-800 { background-color: #1f2937; color: white; }
+                    .bg-gray-50 { background-color: #f9fafb; }
+                    .bg-emerald-50 { background-color: #ecfdf5; }
+                    .border-b { border-bottom: 1px solid #ddd; }
+                    .border-t { border-top: 1px solid #ddd; }
+                    .pt-4 { padding-top: 16px; }
+                    .mt-8 { margin-top: 32px; }
+                    .w-1\/2 { width: 50%; }
+                    .ml-auto { margin-left: auto; }
+                    .print-buttons { text-align: center; margin-bottom: 20px; }
+                    @media print {
+                        body { padding: 0; }
+                        .print-buttons { display: none; }
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="print-buttons">
+                    <button onclick="window.print();" style="padding: 10px 20px; background-color: #10b981; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; vertical-align: middle; margin-right: 5px;"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                        Imprimir Factura
+                    </button>
+                    <button onclick="window.close();" style="padding: 10px 20px; background-color: #6b7280; color: white; border: none; border-radius: 4px; margin-left: 10px; cursor: pointer; font-weight: bold;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; vertical-align: middle; margin-right: 5px;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        Cerrar
+                    </button>
+                </div>
+                ${invoiceTemplate.innerHTML}
+            </body>
+            </html>
+        `);
+        
+        // Finish loading the document
+        printWindow.document.close();
+        printWindow.focus();
+    });
+});
+</script>
+{% endblock %}

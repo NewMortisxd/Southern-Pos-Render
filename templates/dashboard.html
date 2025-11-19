@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block section_title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+    <div class="bg-white rounded-lg shadow-md p-6 dark:bg-gray-800 transition-colors duration-200">
+        <div class="flex items-center">
+            <div class="p-3 rounded-full bg-emerald-100 text-emerald-500 mr-4 dark:bg-emerald-900 dark:text-emerald-300">
+                <i data-lucide="dollar-sign" class="w-6 h-6"></i>
+            </div>
+            <div>
+                <p class="text-gray-500 text-sm dark:text-gray-400">Ventas de hoy</p>
+                <p class="text-2xl font-bold dark:text-white">{{ currency_symbol }}{{ ventas_hoy_pagadas_total|floatformat:2 }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow-md p-6 dark:bg-gray-800 transition-colors duration-200">
+        <div class="flex items-center">
+            <div class="p-3 rounded-full bg-blue-100 text-blue-500 mr-4 dark:bg-blue-900 dark:text-blue-300">
+                <i data-lucide="shopping-cart" class="w-6 h-6"></i>
+            </div>
+            <div>
+                <p class="text-gray-500 text-sm dark:text-gray-400">Órdenes de hoy</p>
+                <p class="text-2xl font-bold dark:text-white">{{ ordenes_hoy_pagadas_count }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow-md p-6 dark:bg-gray-800 transition-colors duration-200">
+        <div class="flex items-center">
+            <div class="p-3 rounded-full bg-purple-100 text-purple-500 mr-4 dark:bg-purple-900 dark:text-purple-300">
+                <i data-lucide="users" class="w-6 h-6"></i>
+            </div>
+            <div>
+                <p class="text-gray-500 text-sm dark:text-gray-400">Clientes nuevos</p>
+                <p class="text-2xl font-bold dark:text-white">{{ clientes_nuevos_count }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow-md p-6 dark:bg-gray-800 transition-colors duration-200">
+        <div class="flex items-center">
+            <div class="p-3 rounded-full bg-yellow-100 text-yellow-500 mr-4 dark:bg-yellow-900 dark:text-yellow-300">
+                <i data-lucide="package" class="w-6 h-6"></i>
+            </div>
+            <div>
+                <p class="text-gray-500 text-sm dark:text-gray-400">Productos vendidos</p>
+                <p class="text-2xl font-bold dark:text-white">{{ productos_nuevos_count }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="bg-white rounded-lg shadow-md p-6 dark:bg-gray-800 transition-colors duration-200">
+        <h3 class="text-lg font-semibold mb-4 dark:text-white">Ventas recientes</h3>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <thead>
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">ID</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">Cliente</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">Total</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">Estado</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
+                    {% for venta in ventas_recientes_pagadas %}
+                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                            {% if venta.transaccion_set.first.transaction_id %}
+                                #{{ venta.transaccion_set.first.transaction_id }}
+                            {% else %}
+                                #{{ venta.id }}
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
+                            {% if venta.cliente %}
+                                {{ venta.cliente.nombre }}
+                            {% else %}
+                                Consumidor Final
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">{{ currency_symbol }}{{ venta.total|floatformat:2 }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">Pagado</span>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400">No hay ventas recientes pagadas</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow-md p-6 dark:bg-gray-800 transition-colors duration-200">
+        <h3 class="text-lg font-semibold mb-4 dark:text-white">Productos más vendidos</h3>
+        <div class="space-y-4">
+            {% for producto in productos_mas_vendidos_pagados %}
+            <div class="flex items-center hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded-lg transition-colors duration-150">
+                <div class="w-12 h-12 bg-gray-200 rounded-lg mr-4 dark:bg-gray-600 overflow-hidden flex items-center justify-center">
+                    {% if producto.imagen %}
+                        <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}" class="w-12 h-12 rounded-lg object-cover">
+                    {% else %}
+                        <div class="w-12 h-12 flex items-center justify-center bg-gray-200 rounded-lg dark:bg-gray-600">
+                            <i data-lucide="utensils" class="w-6 h-6 text-gray-400 dark:text-gray-300"></i>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="flex-1">
+                    <h4 class="text-sm font-medium dark:text-white">{{ producto.nombre }}</h4>
+                    <div class="flex items-center justify-between mt-1">
+                        <div class="text-sm text-gray-500 dark:text-gray-400">
+                            {{ producto.cantidad_vendida_pagada|default:0 }} vendidos
+                        </div>
+                        <div class="text-sm font-medium dark:text-gray-300">{{ currency_symbol }}{{ producto.precio|floatformat:2 }}</div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="text-center text-gray-500 dark:text-gray-400 py-4">No hay datos de productos vendidos pagados</div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

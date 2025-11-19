@@ -1,0 +1,135 @@
+<nav class="bg-emerald-600 text-white shadow-md dark:bg-gray-800 dark:text-gray-100">
+    <div class="container mx-auto px-4 py-3">
+        <div class="flex items-center justify-between">
+            <!-- Left side: Toggle button and section title -->
+            <div class="flex items-center">
+                <button id="sidebarToggle" class="md:hidden text-white p-2 rounded-lg hover:bg-emerald-700 dark:hover:bg-gray-700 transition-all duration-200 flex items-center justify-center mr-3">
+                    <i data-lucide="menu" class="w-6 h-6"></i>
+                </button>
+                
+                <!-- Logo y título -->
+                <div class="flex items-center">
+                    <!-- Título de la sección o botón de regreso -->
+                    {% if request.resolver_match.url_name != 'nueva_venta' %}
+                        <a href="javascript:history.back()" class="text-white hover:text-emerald-200 dark:hover:text-gray-300 transition-colors duration-200 mr-3 {% if request.resolver_match.url_name == 'dashboard' %}hidden{% endif %}">
+                            <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                        </a>
+                        <h1 class="text-lg font-bold text-white bg-emerald-700 dark:bg-gray-700 px-3 py-1.5 rounded-lg shadow-sm truncate max-w-[180px] sm:max-w-xs md:max-w-md">
+                            {% if section_title %}
+                                {{ section_title }}
+                            {% else %}
+                                {% if request.resolver_match.url_name == 'dashboard' %}
+                                    Dashboard
+                                {% elif 'productos' in request.path %}
+                                    Productos
+                                {% elif 'ventas' in request.path %}
+                                    Ventas
+                                {% elif 'clients' in request.path %}
+                                    Clientes
+                                {% elif 'transacciones' in request.path %}
+                                    Transacciones
+                                {% elif 'reportes' in request.path %}
+                                    Reportes
+                                {% elif 'configuracion' in request.path %}
+                                    Configuración
+                                {% else %}
+                                    {{ request.resolver_match.url_name|title }}
+                                {% endif %}
+                            {% endif %}
+                        </h1>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Right side: User menu button -->
+            <div class="flex items-center">
+                <!-- Botón de usuario con menú desplegable -->
+                <div class="relative">
+                    <button id="userMenuButton" class="text-white p-2 rounded-lg hover:bg-emerald-700 dark:hover:bg-gray-700 transition-all duration-200 flex items-center">
+                        <i data-lucide="user" class="w-5 h-5 mr-2"></i>
+                        <span class="hidden sm:inline">{{ request.user.first_name }} {{ request.user.last_name }}</span>
+                    </button>
+                    
+                    <!-- Dropdown menu para opciones de usuario -->
+                    <div id="userMenu" class="absolute right-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-lg py-2 hidden z-10">
+                        <!-- Información de la cuenta -->
+                        <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+                            <p class="text-sm font-medium text-gray-900 dark:text-gray-200">Cuenta</p>
+                            <p class="text-sm text-gray-600 dark:text-gray-400 truncate">{{ request.user.email }}</p>
+                            {% if request.user.business %}
+                                <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">{{ request.user.business.name }}</p>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Enlaces de acción -->
+                        <a href="{% url 'configuraciones:index' %}" class="block px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
+                            <i data-lucide="settings" class="w-4 h-4 inline-block mr-2"></i> Configuración
+                        </a>
+                        <a href="{% url 'logout' %}" class="block px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
+                            <i data-lucide="log-out" class="w-4 h-4 inline-block mr-2"></i> Cerrar sesión
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // User menu toggle
+        const userMenuButton = document.getElementById('userMenuButton');
+        const userMenu = document.getElementById('userMenu');
+        
+        // Mobile sidebar toggle
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const mobileSidebar = document.getElementById('mobileSidebar');
+        const closeSidebar = document.getElementById('closeSidebar');
+        const sidebarContent = document.getElementById('sidebarContent');
+        
+        // Handle mobile sidebar toggle
+        if (sidebarToggle && mobileSidebar) {
+            sidebarToggle.addEventListener('click', function() {
+                mobileSidebar.classList.remove('hidden');
+                sidebarContent.classList.remove('-translate-x-full');
+                sidebarContent.classList.add('translate-x-0');
+            });
+            
+            // Close sidebar when clicking outside or on close button
+            if (closeSidebar) {
+                closeSidebar.addEventListener('click', function() {
+                    closeSidebar.classList.add('hidden');
+                    sidebarContent.classList.remove('translate-x-0');
+                    sidebarContent.classList.add('-translate-x-full');
+                    setTimeout(() => {
+                        mobileSidebar.classList.add('hidden');
+                    }, 300);
+                });
+            }
+            
+            // Close sidebar when clicking on the backdrop
+            mobileSidebar.addEventListener('click', function(event) {
+                if (event.target === mobileSidebar) {
+                    sidebarContent.classList.remove('translate-x-0');
+                    sidebarContent.classList.add('-translate-x-full');
+                    setTimeout(() => {
+                        mobileSidebar.classList.add('hidden');
+                    }, 300);
+                }
+            });
+        }
+        
+        if (userMenuButton && userMenu) {
+            userMenuButton.addEventListener('click', function() {
+                userMenu.classList.toggle('hidden');
+            });
+            
+            // Close menu when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!userMenuButton.contains(event.target) && !userMenu.contains(event.target)) {
+                    userMenu.classList.add('hidden');
+                }
+            });
+        }
+    });
+</script>

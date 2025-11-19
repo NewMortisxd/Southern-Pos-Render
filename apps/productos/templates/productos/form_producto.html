@@ -1,0 +1,223 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    {% if object %}Editar Producto{% else %}Nuevo Producto{% endif %}
+{% endblock %}
+
+{% block section_title %}
+    {% if object %}Editar Producto{% else %}Nuevo Producto{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="p-6">
+    <!-- Sección para mostrar notificaciones/mensajes -->
+    {% if messages %}
+        {% for message in messages %}
+            <!-- Notificación dinámica según tipo (éxito, error, info) -->
+            <div id="notification-{{ forloop.counter }}" class="{% if message.tags == 'success' %}bg-emerald-50 border-l-4 border-emerald-500{% elif message.tags == 'error' %}bg-red-50 border-l-4 border-red-500{% else %}bg-blue-50 border-l-4 border-blue-500{% endif %} p-4 mb-6 transition-opacity duration-300">
+                <p class="{% if message.tags == 'success' %}text-emerald-700{% elif message.tags == 'error' %}text-red-700{% else %}text-blue-700{% endif %} font-medium flex items-center">
+                    <i data-lucide="{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}alert-circle{% else %}info{% endif %}" class="w-5 h-5 mr-2"></i>
+                    {{ message }}
+                </p>
+            </div>
+        {% endfor %}
+    {% endif %}
+    
+    <div class="bg-gray-50 p-5 rounded-lg">
+        <h2 class="text-lg font-medium text-gray-800 mb-5">
+            {% if object %}Editar Producto{% else %}Nuevo Producto{% endif %}
+        </h2>
+        
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <!-- Nombre del producto -->
+            <div class="mb-4">
+                <label for="{{ form.nombre.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                    Nombre del producto *
+                </label>
+                <input type="text" name="{{ form.nombre.name }}" id="{{ form.nombre.id_for_label }}" 
+                       value="{{ form.nombre.value|default_if_none:'' }}"
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-emerald-500" required>
+                {% if form.nombre.errors %}
+                    <p class="text-red-500 text-xs mt-1">{{ form.nombre.errors.0 }}</p>
+                {% endif %}
+            </div>
+            
+            <!-- Categoría -->
+            <div class="mb-4">
+                <label for="{{ form.categoria.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                    Categoría *
+                </label>
+                <select name="{{ form.categoria.name }}" id="{{ form.categoria.id_for_label }}" 
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-emerald-500" required>
+                    <option value="">---------</option>
+                    {% for choice in form.categoria.field.choices %}
+                        <option value="{{ choice.0 }}" {% if form.categoria.value|stringformat:"s" == choice.0|stringformat:"s" %}selected{% endif %}>
+                            {{ choice.1 }}
+                        </option>
+                    {% endfor %}
+                </select>
+                {% if form.categoria.errors %}
+                    <p class="text-red-500 text-xs mt-1">{{ form.categoria.errors.0 }}</p>
+                {% endif %}
+                <a href="{% url 'productos:categoria_create' %}" class="text-xs text-emerald-600 hover:underline mt-1 inline-block">
+                    + Crear nueva categoría
+                </a>
+            </div>
+            
+            <!-- Descripción -->
+            <div class="mb-4">
+                <label for="{{ form.descripcion.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                    Descripción
+                </label>
+                <textarea name="{{ form.descripcion.name }}" id="{{ form.descripcion.id_for_label }}" rows="4" 
+                          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-emerald-500">{{ form.descripcion.value|default_if_none:'' }}</textarea>
+                {% if form.descripcion.errors %}
+                    <p class="text-red-500 text-xs mt-1">{{ form.descripcion.errors.0 }}</p>
+                {% endif %}
+            </div>
+            
+            <!-- Precio y Stock en horizontal -->
+            <div class="flex flex-wrap -mx-2 mb-4">
+                <!-- Precio -->
+                <div class="w-1/2 px-2">
+                    <label for="{{ form.precio.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                        Precio *
+                    </label>
+                    <input type="number" step="0.01" name="{{ form.precio.name }}" id="{{ form.precio.id_for_label }}" 
+                           value="{{ form.precio.value|default_if_none:'' }}"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-emerald-500" required>
+                    {% if form.precio.errors %}
+                        <p class="text-red-500 text-xs mt-1">{{ form.precio.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <!-- Stock -->
+                <div class="w-1/2 px-2">
+                    <label for="{{ form.stock.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                        Stock *
+                    </label>
+                    <input type="number" name="{{ form.stock.name }}" id="{{ form.stock.id_for_label }}" 
+                           value="{{ form.stock.value|default_if_none:'0' }}" 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-emerald-500" required>
+                    {% if form.stock.errors %}
+                        <p class="text-red-500 text-xs mt-1">{{ form.stock.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Imagen con checkbox alineado a la derecha -->
+            <div class="mb-4">
+                <div class="flex justify-between items-center mb-1">
+                    <label for="{{ form.imagen.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                        Imagen del producto
+                    </label>
+                    <div class="flex items-center">
+                        <input type="checkbox" name="no_imagen" id="no_imagen" class="mr-1" 
+                               {% if not form.imagen.value and not object.imagen %}checked{% endif %}>
+                        <label for="no_imagen" class="text-sm text-gray-600">
+                            No tiene imagen
+                        </label>
+                    </div>
+                </div>
+                <input type="file" name="{{ form.imagen.name }}" id="{{ form.imagen.id_for_label }}" 
+                       class="w-full border border-gray-300 rounded-md px-3 py-2"
+                       {% if not form.imagen.value and not object.imagen %}disabled{% endif %}>
+                {% if form.imagen.errors %}
+                    <p class="text-red-500 text-xs mt-1">{{ form.imagen.errors.0 }}</p>
+                {% endif %}
+                {% if object and object.imagen %}
+                    <div class="mt-2">
+                        <p class="text-sm text-gray-600">Imagen actual:</p>
+                        <img src="{{ object.imagen.url }}" alt="{{ object.nombre }}" class="h-24 mt-1 border rounded">
+                    </div>
+                {% endif %}
+            </div>
+            
+            <!-- Código de barras con checkbox alineado a la derecha -->
+            <div class="mb-5">
+                <div class="flex justify-between items-center mb-1">
+                    <label for="{{ form.codigo_barras.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                        Código de barras
+                    </label>
+                    <div class="flex items-center">
+                        <input type="checkbox" name="no_codigo" id="no_codigo" class="mr-1" 
+                               {% if not form.codigo_barras.value and not object.codigo_barras %}checked{% endif %}>
+                        <label for="no_codigo" class="text-sm text-gray-600">
+                            No tiene código
+                        </label>
+                    </div>
+                </div>
+                <input type="text" name="{{ form.codigo_barras.name }}" id="{{ form.codigo_barras.id_for_label }}" 
+                       value="{{ form.codigo_barras.value|default_if_none:'' }}"
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                       {% if not form.codigo_barras.value and not object.codigo_barras %}disabled{% endif %}>
+                {% if form.codigo_barras.errors %}
+                    <p class="text-red-500 text-xs mt-1">{{ form.codigo_barras.errors.0 }}</p>
+                {% endif %}
+            </div>
+            
+            <!-- Botones de acción alineados a la derecha -->
+            <div class="flex justify-end space-x-2">
+                <a href="{% url 'productos:lista' %}" class="px-4 py-2 bg-white border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
+                    Cancelar
+                </a>
+                <button type="submit" class="px-4 py-2 bg-emerald-500 border border-transparent rounded-md text-sm font-medium text-white hover:bg-emerald-600">
+                    {% if object %}Actualizar{% else %}Crear{% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Para la imagen
+        const noImagenCheckbox = document.getElementById('no_imagen');
+        const imagenInput = document.getElementById('{{ form.imagen.id_for_label }}');
+        
+        noImagenCheckbox.addEventListener('change', function() {
+            imagenInput.disabled = this.checked;
+            imagenInput.required = !this.checked;
+            if(this.checked) {
+                imagenInput.classList.add('opacity-50', 'bg-gray-100');
+            } else {
+                imagenInput.classList.remove('opacity-50', 'bg-gray-100');
+            }
+        });
+        
+        // Para el código de barras
+        const noCodigoCheckbox = document.getElementById('no_codigo');
+        const codigoInput = document.getElementById('{{ form.codigo_barras.id_for_label }}');
+        
+        noCodigoCheckbox.addEventListener('change', function() {
+            codigoInput.disabled = this.checked;
+            if(this.checked) {
+                codigoInput.classList.add('opacity-50', 'bg-gray-100');
+            } else {
+                codigoInput.classList.remove('opacity-50', 'bg-gray-100');
+            }
+        });
+
+        // Set initial state of inputs
+        if(noImagenCheckbox.checked) {
+            imagenInput.classList.add('opacity-50', 'bg-gray-100');
+        }
+        
+        if(noCodigoCheckbox.checked) {
+            codigoInput.classList.add('opacity-50', 'bg-gray-100');
+        }
+
+        // Make notifications disappear after 3 seconds
+        const notifications = document.querySelectorAll('[id^="notification-"]');
+        notifications.forEach(notification => {
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                setTimeout(() => notification.remove(), 300); // Remove after transition
+            }, 3000);
+        });
+    });
+</script>
+{% endblock %}

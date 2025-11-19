@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<!-- Contenedor principal con ancho máximo y padding -->
+<div class="max-w-4xl mx-auto p-6">
+    <!-- Tarjeta con fondo blanco, bordes redondeados y sombra -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <!-- Título de la sección -->
+        <h2 class="text-2xl font-semibold mb-4">{{ section_title|default:"Nueva Categoría" }}</h2>
+
+        {% if messages %}
+        {% for message in messages %}
+        <div
+            class="mb-4 p-4 rounded-lg {% if message.tags == 'success' %}bg-green-100 text-green-700{% elif message.tags == 'error' %}bg-red-100 text-red-700{% else %}bg-emerald-100 text-emerald-700{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+
+        <!-- Formulario para crear/editar una categoría -->
+        <form method="post">
+            {% csrf_token %}
+            <!-- Contenedor para los campos del formulario -->
+            <div class="space-y-4">
+                <!-- Campo para el nombre de la categoría -->
+                <div class="form-group">
+                    <label class="block text-sm font-medium mb-1">{{ form.nombre.label }}</label>
+                    {{ form.nombre }}
+                    {% if form.nombre.errors %}
+                    <p class="text-red-500 text-sm mt-1">{{ form.nombre.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Campo para la descripción de la categoría -->
+                <div class="form-group">
+                    <label class="block text-sm font-medium mb-1">{{ form.descripcion.label }}</label>
+                    {{ form.descripcion }}
+                    {% if form.descripcion.errors %}
+                    <p class="text-red-500 text-sm mt-1">{{ form.descripcion.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+            <!-- Botones de acción -->
+            <div class="mt-6 flex justify-end space-x-3">
+                <!-- Botón para cancelar y volver a la lista -->
+                <a href="{% url 'productos:lista_categorias' %}" class="btn-secondary">
+                    Cancelar
+                </a>
+                <!-- Botón para enviar el formulario -->
+                <button type="submit" class="btn-primary">
+                    {% if object %}Actualizar{% else %}Crear{% endif %} Categoría
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

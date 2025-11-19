@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Detalle de Cliente
+{% endblock %}
+
+{% block content %}
+<!-- Contenedor principal con márgenes automáticos y padding -->
+<div class="container mx-auto px-4 py-8">
+    <!-- Encabezado con título y botones de acción -->
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold text-gray-800">
+            Detalle de Cliente
+        </h1>
+        <div class="flex space-x-3">
+            <!-- Botón para editar el cliente -->
+            <a href="{% url 'clients:editar' cliente.id %}" class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg transition duration-300 flex items-center">
+                <i class="fas fa-edit mr-2"></i>Editar
+            </a>
+            <!-- Botón para volver a la lista -->
+            <a href="{% url 'clients:lista' %}" class="bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-lg transition duration-300 flex items-center">
+                <i class="fas fa-arrow-left mr-2"></i>Volver
+            </a>
+        </div>
+    </div>
+
+    <!-- Cuadrícula de dos columnas para la información del cliente -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Sección de identificación -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">Identificación</h2>
+            <div class="space-y-3">
+                <div>
+                    <span class="text-sm font-medium text-gray-500">Código:</span>
+                    <p class="text-gray-800">{{ cliente.codigo|default:"--" }}</p>
+                </div>
+                <div>
+                    <span class="text-sm font-medium text-gray-500">Nombre:</span>
+                    <p class="text-gray-800">{{ cliente.nombre }}</p>
+                </div>
+                <div>
+                    <span class="text-sm font-medium text-gray-500">Razón Social:</span>
+                    <p class="text-gray-800">{{ cliente.razon_social|default:"--" }}</p>
+                </div>
+                <div>
+                    <span class="text-sm font-medium text-gray-500">Cédula/RUC:</span>
+                    <p class="text-gray-800">{{ cliente.identificacion }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección de contacto -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">Contacto</h2>
+            <div class="space-y-3">
+                <div>
+                    <span class="text-sm font-medium text-gray-500">Email:</span>
+                    <p class="text-gray-800">{{ cliente.email|default:"--" }}</p>
+                </div>
+                <div>
+                    <span class="text-sm font-medium text-gray-500">Teléfono:</span>
+                    <p class="text-gray-800">{{ cliente.telefono|default:"--" }}</p>
+                </div>
+                <div>
+                    <span class="text-sm font-medium text-gray-500">Dirección:</span>
+                    <p class="text-gray-800">{{ cliente.direccion|default:"--" }}</p>
+                </div>
+                <div>
+                    <span class="text-sm font-medium text-gray-500">Ciudad:</span>
+                    <p class="text-gray-800">{{ cliente.ciudad|default:"--" }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección de preferencias -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">Preferencias</h2>
+            <div class="space-y-3">
+                <div>
+                    <span class="text-sm font-medium text-gray-500">Grupo:</span>
+                    <p class="text-gray-800">{{ cliente.grupo|default:"--" }}</p>
+                </div>
+                <div>
+                    <span class="text-sm font-medium text-gray-500">Crédito (días):</span>
+                    <p class="text-gray-800">{{ cliente.credito|default:"--" }}</p>
+                </div>
+                <div>
+                    <span class="text-sm font-medium text-gray-500">Estado:</span>
+                    <p class="text-gray-800">
+                        {% if cliente.estado %}
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                Activo
+                            </span>
+                        {% else %}
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                Inactivo
+                            </span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección de información comercial -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">Información comercial</h2>
+            <div class="space-y-3">
+                <div>
+                    <span class="text-sm font-medium text-gray-500">Cupo:</span>
+                    <p class="text-gray-800">${{ cliente.cupo|default:"0.00" }}</p>
+                </div>
+                <div>
+                    <span class="text-sm font-medium text-gray-500">Tasa de descuento:</span>
+                    <p class="text-gray-800">{{ cliente.tasa_descuento|default:"0" }}%</p>
+                </div>
+                <div>
+                    <span class="text-sm font-medium text-gray-500">Tasa de recargo:</span>
+                    <p class="text-gray-800">{{ cliente.tasa_recargo|default:"0" }}%</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sección de comentarios -->
+    <div class="mt-6 bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">Comentarios</h2>
+        <div>
+            <p class="text-gray-800 whitespace-pre-line">{{ cliente.comentarios|default:"Sin comentarios" }}</p>
+        </div>
+    </div>
+
+    <!-- Sección de historial de compras -->
+    <div class="mt-6 bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">Historial de compras</h2>
+        {% if ventas %}
+            <!-- Tabla para mostrar las compras del cliente -->
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Método de pago</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for venta in ventas %}
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ venta.fecha_hora|date:"d/m/Y H:i" }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${{ venta.total }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {% if venta.metodo_pago == 'cash' %}Efectivo{% else %}Tarjeta{% endif %}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <a href="{% url 'ventas:venta_completa' venta.id %}" class="text-emerald-600 hover:text-emerald-900">Ver detalle</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <!-- Mensaje cuando no hay compras registradas -->
+            <p class="text-gray-500">Este cliente no tiene compras registradas.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

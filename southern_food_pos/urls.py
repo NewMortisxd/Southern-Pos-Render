@@ -8,6 +8,7 @@ from django.contrib.auth import logout
 from django.shortcuts import redirect
 from django.views.static import serve
 from core import views
+from apps.usuarios import views as usuarios_views  # Importar vistas de usuarios
 import os
 
 def custom_logout(request):
@@ -23,11 +24,13 @@ urlpatterns = [
     path('configuraciones/', include(('apps.configuraciones.urls', 'configuraciones'), namespace='configuraciones')),
     path('clients/', include(('apps.clients.urls', 'clients'), namespace='clients')),
     path('transacciones/', include(('apps.transacciones.urls', 'transacciones'), namespace='transacciones')),
+    path('kds/', include(('apps.ventas.urls_kds', 'kds'), namespace='kds')),
+    path('electronic/', include(('apps.electronic_billing.urls', 'electronic_billing'), namespace='electronic_billing')),
     path('', TemplateView.as_view(template_name='landing.html'), name='landing_page'),
     # Make sure you have this in your URL patterns
     path('login/', views.login_view, name='login'),
     path('logout/', custom_logout, name='logout'),
-    path('register/', views.register, name='register'),
+    path('register/', usuarios_views.register_view, name='register'),  # Usar vista de usuarios
     path('dashboard/', views.dashboard, name='dashboard'),
     # Favicon
     path('favicon.ico', RedirectView.as_view(url=settings.STATIC_URL + 'img/logo.png', permanent=True)),

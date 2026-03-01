@@ -22,4 +22,14 @@ urlpatterns = [
     # Ruta para buscar productos
     path('buscar/', views.buscar_productos, name='buscar'),
     path('api/buscar-por-codigo/', views.buscar_producto_por_codigo, name='buscar_por_codigo'),
+    # Rutas para configuración de visualización
+    path('configuracion/', views.config_productos, name='configuracion'),
+    path('api/actualizar-config/', views.actualizar_config_vista, name='actualizar_config'),
+    path('api/guardar-filtro/', views.guardar_filtro, name='guardar_filtro'),
+    path('vistas/', views.gestionar_vistas, name='gestionar_vistas'),
+    path('filtro/<int:filtro_id>/aplicar/', views.aplicar_filtro_guardado, name='aplicar_filtro'),
+    path('filtro/<int:filtro_id>/editar/', views.editar_filtro_guardado, name='editar_filtro'),
+    path('filtro/<int:filtro_id>/eliminar/', views.eliminar_filtro_guardado, name='eliminar_filtro'),
+    path('filtro/<int:filtro_id>/favorito/', views.toggle_favorito_filtro, name='toggle_favorito'),
+    path('preset/<str:preset>/', views.aplicar_preset, name='aplicar_preset'),
 ]

@@ -47,6 +47,17 @@
                         <p class="text-lg font-semibold dark:text-white">#{{ transaccion.transaction_id }}</p>
                     </div>
                     
+                    {% if venta.order %}
+                    <div class="mb-4">
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Número de Orden</p>
+                        <p class="text-lg font-semibold">
+                            <span class="bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-200 px-3 py-1 rounded-full">
+                                Orden #{{ venta.order.order_number }}
+                            </span>
+                        </p>
+                    </div>
+                    {% endif %}
+                    
                     <div class="mb-4">
                         <p class="text-sm text-gray-500 dark:text-gray-400">Fecha y Hora</p>
                         <p class="text-lg dark:text-gray-200">{{ venta.fecha_hora|date:"d/m/Y H:i:s" }}</p>
@@ -88,14 +99,18 @@
                     </div>
                     
                     <div class="mb-4">
-                        <p class="text-sm text-gray-500 dark:text-gray-400">Subtotal</p>
-                        <p class="text-lg dark:text-gray-200">${{ venta.subtotal|divide_by_iva|floatformat:2 }}</p>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Subtotal (sin IVA)</p>
+                        <p class="text-lg dark:text-gray-200">${{ venta.subtotal|floatformat:2 }}</p>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <p class="text-sm text-gray-500 dark:text-gray-400">IVA ({{ request.user.business.iva_porcentaje|default:"15" }}%)</p>
+                        <p class="text-lg dark:text-gray-200">${{ venta.iva|floatformat:2 }}</p>
                     </div>
                     
                     <div class="mb-4">
                         <p class="text-sm text-gray-500 dark:text-gray-400">Total</p>
                         <p class="text-2xl font-bold text-emerald-600 dark:text-emerald-400">${{ venta.total|floatformat:2 }}</p>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">(Precio incluye IVA)</p>
                     </div>
                     
                     {% if venta.metodo_pago == 'cash' %}
@@ -129,6 +144,9 @@
             <hr class="my-4">
             <h3 class="text-xl font-bold">FACTURA</h3>
             <p class="font-bold mb-1">No. 001-001-{{ transaccion.factuID|stringformat:"08d" }}</p>
+            {% if venta.order %}
+            <p class="font-bold mb-1">Orden #{{ venta.order.order_number }}</p>
+            {% endif %}
             <p>Fecha: {{ venta.fecha_hora|date:"d/m/Y H:i:s" }}</p>
         </div>
         
@@ -175,9 +193,9 @@
                     <td class="py-2 px-4">{{ detalle.producto.nombre }}</td>
                     <td class="py-2 px-4">{{ detalle.cantidad }}</td>
                     <td class="py-2 px-4">
-                        ${{ detalle.precio_unitario|divide_by_iva|floatformat:2 }}
+                        ${{ detalle.precio_unitario|floatformat:2 }}
                     </td>
-                    <td class="py-2 px-4">${{ detalle.subtotal|divide_by_iva|floatformat:2 }}</td>
+                    <td class="py-2 px-4">${{ detalle.subtotal|floatformat:2 }}</td>
                 </tr>
                 {% empty %}
                 <tr>
@@ -191,20 +209,12 @@
             <div class="w-1/2 ml-auto">
                 <table class="w-full border-collapse">
                     <tr class="border-b">
-                        <th class="py-2 px-4 text-left bg-gray-50">Subtotal 15%:</th>
-                        <td class="py-2 px-4">${{ venta.subtotal|divide_by_iva|floatformat:2 }}</td>
+                        <th class="py-2 px-4 text-left bg-gray-50">Subtotal (sin IVA):</th>
+                        <td class="py-2 px-4">${{ venta.subtotal|floatformat:2 }}</td>
                     </tr>
                     <tr class="border-b">
-                        <th class="py-2 px-4 text-left bg-gray-50">Subtotal 0%:</th>
-                        <td class="py-2 px-4">$0.00</td>
-                    </tr>
-                    <tr class="border-b">
-                        <th class="py-2 px-4 text-left bg-gray-50">Subtotal:</th>
-                        <td class="py-2 px-4">${{ venta.subtotal|divide_by_iva|floatformat:2 }}</td>
-                    </tr>
-                    <tr class="border-b">
-                        <th class="py-2 px-4 text-left bg-gray-50">IVA 15%:</th>
-                        <td class="py-2 px-4">${{ venta.subtotal|subtract_pretax|floatformat:2 }}</td>
+                        <th class="py-2 px-4 text-left bg-gray-50">IVA ({{ request.user.business.iva_porcentaje|default:"15" }}%):</th>
+                        <td class="py-2 px-4">${{ venta.iva|floatformat:2 }}</td>
                     </tr>
                     <tr class="border-b bg-emerald-50">
                         <th class="py-2 px-4 text-left">Total:</th>

@@ -1,0 +1,356 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Gestionar Vistas{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto p-6">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+        <!-- Header -->
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-800 dark:text-white flex items-center">
+                        <i data-lucide="bookmark" class="w-6 h-6 mr-2"></i>
+                        Gestionar Vistas Guardadas
+                    </h1>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                        Administra tus vistas personalizadas y predefinidas
+                    </p>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <a href="{% url 'productos:lista' %}" class="text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200">
+                        <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                    </a>
+                    <button onclick="mostrarModalGuardarVista()" class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors flex items-center">
+                        <i data-lucide="plus" class="w-4 h-4 mr-2"></i>
+                        Nueva Vista
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lista de vistas -->
+        <div class="p-6">
+            {% if vistas %}
+            <div class="space-y-3">
+                {% for vista in vistas %}
+                <div class="group relative bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 border border-gray-200 dark:border-gray-600 hover:shadow-md transition-all">
+                    <div class="flex items-start justify-between">
+                        <!-- Info de la vista -->
+                        <div class="flex items-start space-x-4 flex-1">
+                            <!-- Icono y color -->
+                            <div class="flex-shrink-0">
+                                <div class="w-12 h-12 rounded-lg flex items-center justify-center
+                                    {% if vista.color == 'emerald' %}bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400
+                                    {% elif vista.color == 'blue' %}bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400
+                                    {% elif vista.color == 'purple' %}bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400
+                                    {% elif vista.color == 'orange' %}bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400
+                                    {% elif vista.color == 'red' %}bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400
+                                    {% elif vista.color == 'yellow' %}bg-yellow-100 text-yellow-600 dark:bg-yellow-900/30 dark:text-yellow-400
+                                    {% endif %}">
+                                    <i data-lucide="{{ vista.icono }}" class="w-6 h-6"></i>
+                                </div>
+                            </div>
+
+                            <!-- Detalles -->
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center space-x-2 mb-1">
+                                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                                        {{ vista.nombre }}
+                                    </h3>
+                                    {% if vista.es_favorito %}
+                                    <i data-lucide="star" class="w-4 h-4 text-yellow-500 fill-current"></i>
+                                    {% endif %}
+                                </div>
+                                
+                                {% if vista.descripcion %}
+                                <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                                    {{ vista.descripcion }}
+                                </p>
+                                {% endif %}
+
+                                <!-- Estadísticas -->
+                                <div class="flex items-center space-x-4 text-xs text-gray-500 dark:text-gray-400">
+                                    <span class="flex items-center">
+                                        <i data-lucide="mouse-pointer-click" class="w-3 h-3 mr-1"></i>
+                                        Usado {{ vista.veces_usado }} veces
+                                    </span>
+                                    <span class="flex items-center">
+                                        <i data-lucide="calendar" class="w-3 h-3 mr-1"></i>
+                                        {{ vista.fecha_creacion|date:"d/m/Y" }}
+                                    </span>
+                                </div>
+
+                                <!-- Filtros aplicados -->
+                                <div class="mt-2 flex flex-wrap gap-1">
+                                    {% for key, value in vista.filtros.items %}
+                                    {% if value %}
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600">
+                                        {{ key }}: {{ value }}
+                                    </span>
+                                    {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Acciones -->
+                        <div class="flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <!-- Aplicar -->
+                            <a href="{% url 'productos:aplicar_filtro' vista.id %}" 
+                               class="p-2 bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400 rounded-lg hover:bg-emerald-200 dark:hover:bg-emerald-800/40 transition-colors"
+                               title="Aplicar vista">
+                                <i data-lucide="play" class="w-4 h-4"></i>
+                            </a>
+
+                            <!-- Favorito -->
+                            <button onclick="toggleFavorito({{ vista.id }}, this)" 
+                                    class="p-2 bg-yellow-100 text-yellow-600 dark:bg-yellow-900/30 dark:text-yellow-400 rounded-lg hover:bg-yellow-200 dark:hover:bg-yellow-800/40 transition-colors"
+                                    title="{% if vista.es_favorito %}Quitar de favoritos{% else %}Marcar como favorito{% endif %}">
+                                <i data-lucide="star" class="w-4 h-4 {% if vista.es_favorito %}fill-current{% endif %}"></i>
+                            </button>
+
+                            <!-- Editar -->
+                            <button onclick="editarVista({{ vista.id }}, '{{ vista.nombre }}', '{{ vista.descripcion }}', '{{ vista.icono }}', '{{ vista.color }}')" 
+                                    class="p-2 bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-800/40 transition-colors"
+                                    title="Editar">
+                                <i data-lucide="edit" class="w-4 h-4"></i>
+                            </button>
+
+                            <!-- Eliminar -->
+                            <button onclick="eliminarVista({{ vista.id }}, '{{ vista.nombre }}')" 
+                                    class="p-2 bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400 rounded-lg hover:bg-red-200 dark:hover:bg-red-800/40 transition-colors"
+                                    title="Eliminar">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <!-- Estado vacío -->
+            <div class="text-center py-12">
+                <div class="mx-auto w-20 h-20 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-700 mb-4">
+                    <i data-lucide="bookmark-x" class="w-10 h-10 text-gray-400 dark:text-gray-500"></i>
+                </div>
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">No tienes vistas guardadas</h3>
+                <p class="text-gray-500 dark:text-gray-400 mb-6">Crea tu primera vista personalizada para acceder rápidamente a tus filtros favoritos.</p>
+                <button onclick="mostrarModalGuardarVista()" class="inline-flex items-center px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors">
+                    <i data-lucide="plus-circle" class="w-5 h-5 mr-2"></i>
+                    Crear primera vista
+                </button>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Crear/Editar Vista -->
+<div id="modalVista" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full p-6">
+        <div class="flex items-center justify-between mb-4">
+            <h3 id="modalTitle" class="text-lg font-semibold text-gray-900 dark:text-white">Nueva Vista</h3>
+            <button onclick="cerrarModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+        </div>
+        
+        <form id="formVista" class="space-y-4">
+            {% csrf_token %}
+            <input type="hidden" id="vistaId" name="vista_id">
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nombre</label>
+                <input type="text" id="vistaNombre" name="nombre" required 
+                       placeholder="Ej: Vista Administrador"
+                       class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md focus:ring-emerald-500 focus:border-emerald-500">
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Descripción</label>
+                <input type="text" id="vistaDescripcion" name="descripcion" 
+                       placeholder="Breve descripción..."
+                       class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md focus:ring-emerald-500 focus:border-emerald-500">
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Icono</label>
+                    <select id="vistaIcono" name="icono" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md focus:ring-emerald-500 focus:border-emerald-500">
+                        <option value="filter">Filtro</option>
+                        <option value="user">Usuario</option>
+                        <option value="briefcase">Maletín</option>
+                        <option value="package">Paquete</option>
+                        <option value="shopping-cart">Carrito</option>
+                        <option value="eye">Ojo</option>
+                        <option value="star">Estrella</option>
+                        <option value="zap">Rayo</option>
+                        <option value="trending-up">Tendencia</option>
+                        <option value="alert-triangle">Alerta</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Color</label>
+                    <select id="vistaColor" name="color" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md focus:ring-emerald-500 focus:border-emerald-500">
+                        <option value="emerald">Verde</option>
+                        <option value="blue">Azul</option>
+                        <option value="purple">Morado</option>
+                        <option value="orange">Naranja</option>
+                        <option value="red">Rojo</option>
+                        <option value="yellow">Amarillo</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="flex justify-end space-x-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <button type="button" onclick="cerrarModal()" 
+                        class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors">
+                    Cancelar
+                </button>
+                <button type="submit" 
+                        class="px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 transition-colors">
+                    <i data-lucide="save" class="w-4 h-4 inline mr-1"></i>
+                    Guardar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function mostrarModalGuardarVista() {
+    document.getElementById('modalTitle').textContent = 'Nueva Vista';
+    document.getElementById('formVista').reset();
+    document.getElementById('vistaId').value = '';
+    document.getElementById('modalVista').classList.remove('hidden');
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+}
+
+function editarVista(id, nombre, descripcion, icono, color) {
+    document.getElementById('modalTitle').textContent = 'Editar Vista';
+    document.getElementById('vistaId').value = id;
+    document.getElementById('vistaNombre').value = nombre;
+    document.getElementById('vistaDescripcion').value = descripcion;
+    document.getElementById('vistaIcono').value = icono;
+    document.getElementById('vistaColor').value = color;
+    document.getElementById('modalVista').classList.remove('hidden');
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+}
+
+function cerrarModal() {
+    document.getElementById('modalVista').classList.add('hidden');
+}
+
+async function toggleFavorito(id, button) {
+    try {
+        const response = await fetch(`/productos/filtro/${id}/favorito/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+        
+        const data = await response.json();
+        if (data.success) {
+            const icon = button.querySelector('i');
+            if (data.es_favorito) {
+                icon.classList.add('fill-current');
+            } else {
+                icon.classList.remove('fill-current');
+            }
+            mostrarNotificacion(data.es_favorito ? 'Agregado a favoritos' : 'Quitado de favoritos', 'success');
+        }
+    } catch (error) {
+        mostrarNotificacion('Error al actualizar favorito', 'error');
+    }
+}
+
+async function eliminarVista(id, nombre) {
+    if (!confirm(`¿Estás seguro de eliminar la vista "${nombre}"?`)) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/productos/filtro/${id}/eliminar/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+        
+        const data = await response.json();
+        if (data.success) {
+            mostrarNotificacion(data.message, 'success');
+            setTimeout(() => window.location.reload(), 1000);
+        }
+    } catch (error) {
+        mostrarNotificacion('Error al eliminar vista', 'error');
+    }
+}
+
+// Manejar envío del formulario
+document.getElementById('formVista').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const vistaId = document.getElementById('vistaId').value;
+    const url = vistaId ? `/productos/filtro/${vistaId}/editar/` : '{% url "productos:guardar_filtro" %}';
+    
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': formData.get('csrfmiddlewaretoken'),
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+        
+        const data = await response.json();
+        if (data.success) {
+            mostrarNotificacion(data.message, 'success');
+            cerrarModal();
+            setTimeout(() => window.location.reload(), 1000);
+        } else {
+            mostrarNotificacion(data.message, 'error');
+        }
+    } catch (error) {
+        mostrarNotificacion('Error al guardar vista', 'error');
+    }
+});
+
+function mostrarNotificacion(mensaje, tipo) {
+    const notif = document.createElement('div');
+    notif.className = `fixed bottom-4 right-4 px-5 py-3 rounded-lg shadow-xl z-50 transition-all ${
+        tipo === 'success' ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white'
+    }`;
+    notif.innerHTML = `
+        <div class="flex items-center space-x-2">
+            <i data-lucide="${tipo === 'success' ? 'check-circle' : 'alert-circle'}" class="w-4 h-4"></i>
+            <span class="text-sm">${mensaje}</span>
+        </div>
+    `;
+    document.body.appendChild(notif);
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+    setTimeout(() => notif.remove(), 3000);
+}
+
+// Cerrar modal al hacer click fuera
+document.getElementById('modalVista').addEventListener('click', function(e) {
+    if (e.target === this) {
+        cerrarModal();
+    }
+});
+</script>
+{% endblock %}

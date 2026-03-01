@@ -4,94 +4,262 @@
 {% block section_title %}Dashboard{% endblock %}
 
 {% block content %}
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-    <div class="bg-white rounded-lg shadow-md p-6 dark:bg-gray-800 transition-colors duration-200">
-        <div class="flex items-center">
-            <div class="p-3 rounded-full bg-emerald-100 text-emerald-500 mr-4 dark:bg-emerald-900 dark:text-emerald-300">
-                <i data-lucide="dollar-sign" class="w-6 h-6"></i>
+
+<!-- Mensaje Motivacional Dinámico -->
+{% if mensaje_motivacional %}
+<div id="mensajeMotivacional" data-mensaje-id="{{ mensaje_motivacional.tipo }}-{{ mensaje_motivacional.texto|slugify }}" class="mb-6 {% if mensaje_motivacional.tipo == 'success' %}bg-gradient-to-r from-emerald-50 to-green-50 border-l-4 border-emerald-500 dark:from-emerald-900/20 dark:to-green-900/20 dark:border-emerald-600{% elif mensaje_motivacional.tipo == 'warning' %}bg-gradient-to-r from-amber-50 to-yellow-50 border-l-4 border-amber-500 dark:from-amber-900/20 dark:to-yellow-900/20 dark:border-amber-600{% else %}bg-gradient-to-r from-blue-50 to-cyan-50 border-l-4 border-blue-500 dark:from-blue-900/20 dark:to-cyan-900/20 dark:border-blue-600{% endif %} p-4 rounded-lg shadow-sm transition-all duration-300">
+    <div class="flex items-center justify-between">
+        <div class="flex items-center flex-1">
+            <div class="p-2 rounded-lg {% if mensaje_motivacional.tipo == 'success' %}bg-emerald-100 text-emerald-600 dark:bg-emerald-900 dark:text-emerald-300{% elif mensaje_motivacional.tipo == 'warning' %}bg-amber-100 text-amber-600 dark:bg-amber-900 dark:text-amber-300{% else %}bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-300{% endif %} mr-3">
+                <i data-lucide="{{ mensaje_motivacional.icono }}" class="w-5 h-5"></i>
             </div>
+            <p class="text-sm font-medium {% if mensaje_motivacional.tipo == 'success' %}text-emerald-800 dark:text-emerald-200{% elif mensaje_motivacional.tipo == 'warning' %}text-amber-800 dark:text-amber-200{% else %}text-blue-800 dark:text-blue-200{% endif %}">
+                {{ mensaje_motivacional.texto }}
+            </p>
+        </div>
+        <button onclick="cerrarMensajeMotivacional()" class="ml-4 p-1 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors duration-200 {% if mensaje_motivacional.tipo == 'success' %}text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300{% elif mensaje_motivacional.tipo == 'warning' %}text-amber-600 hover:text-amber-700 dark:text-amber-400 dark:hover:text-amber-300{% else %}text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300{% endif %}">
+            <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+    </div>
+</div>
+{% endif %}
+
+<!-- Alertas Inteligentes -->
+{% if alertas %}
+<div class="mb-6 space-y-3">
+    {% for alerta in alertas %}
+    <div class="alerta-item" data-alerta-id="{{ alerta.tipo }}-{{ alerta.mensaje|slugify }}" {% if alerta.tipo == 'danger' %}data-alerta-class="bg-gradient-to-r from-red-50 to-rose-50 border-l-4 border-red-500 dark:from-red-900/20 dark:to-rose-900/20 dark:border-red-600"{% elif alerta.tipo == 'warning' %}data-alerta-class="bg-gradient-to-r from-amber-50 to-yellow-50 border-l-4 border-amber-500 dark:from-amber-900/20 dark:to-yellow-900/20 dark:border-amber-600"{% else %}data-alerta-class="bg-gradient-to-r from-blue-50 to-cyan-50 border-l-4 border-blue-500 dark:from-blue-900/20 dark:to-cyan-900/20 dark:border-blue-600"{% endif %}>
+        <div class="{% if alerta.tipo == 'danger' %}bg-gradient-to-r from-red-50 to-rose-50 border-l-4 border-red-500 dark:from-red-900/20 dark:to-rose-900/20 dark:border-red-600{% elif alerta.tipo == 'warning' %}bg-gradient-to-r from-amber-50 to-yellow-50 border-l-4 border-amber-500 dark:from-amber-900/20 dark:to-yellow-900/20 dark:border-amber-600{% else %}bg-gradient-to-r from-blue-50 to-cyan-50 border-l-4 border-blue-500 dark:from-blue-900/20 dark:to-cyan-900/20 dark:border-blue-600{% endif %} p-4 rounded-lg shadow-sm transition-all duration-300">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center flex-1">
+                    <div class="p-2 rounded-lg {% if alerta.tipo == 'danger' %}bg-red-100 text-red-600 dark:bg-red-900 dark:text-red-300{% elif alerta.tipo == 'warning' %}bg-amber-100 text-amber-600 dark:bg-amber-900 dark:text-amber-300{% else %}bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-300{% endif %} mr-3">
+                        <i data-lucide="{% if alerta.tipo == 'danger' %}alert-circle{% elif alerta.tipo == 'warning' %}alert-triangle{% else %}info{% endif %}" class="w-5 h-5"></i>
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-sm font-semibold {% if alerta.tipo == 'danger' %}text-red-800 dark:text-red-200{% elif alerta.tipo == 'warning' %}text-amber-800 dark:text-amber-200{% else %}text-blue-800 dark:text-blue-200{% endif %} mb-0.5">
+                            {% if alerta.tipo == 'danger' %}Alerta Crítica{% elif alerta.tipo == 'warning' %}Atención Requerida{% else %}Información{% endif %}
+                        </p>
+                        <p class="text-sm {% if alerta.tipo == 'danger' %}text-red-700 dark:text-red-300{% elif alerta.tipo == 'warning' %}text-amber-700 dark:text-amber-300{% else %}text-blue-700 dark:text-blue-300{% endif %}">
+                            {{ alerta.mensaje }}
+                        </p>
+                    </div>
+                </div>
+                <button onclick="cerrarAlerta(this)" class="ml-4 p-1.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors duration-200 {% if alerta.tipo == 'danger' %}text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300{% elif alerta.tipo == 'warning' %}text-amber-600 hover:text-amber-700 dark:text-amber-400 dark:hover:text-amber-300{% else %}text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300{% endif %}">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<!-- 1. KPIs Inteligentes -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+    <!-- Ventas Hoy - DOMINANTE (2 columnas en lg) -->
+    <div class="lg:col-span-2 bg-gradient-to-br from-emerald-50 to-white dark:from-emerald-900/20 dark:to-gray-800 rounded-xl shadow-md p-6 transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 border border-emerald-200 dark:border-emerald-800">
+        <div class="flex items-start justify-between mb-3">
+            <div class="p-3 rounded-lg bg-emerald-100 text-emerald-600 dark:bg-emerald-900 dark:text-emerald-300">
+                <i data-lucide="dollar-sign" class="w-7 h-7"></i>
+            </div>
+            {% if cambio_ventas != 0 %}
+            <span class="text-sm font-semibold px-3 py-1 rounded-full {% if cambio_ventas > 0 %}bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300{% else %}bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300{% endif %}">
+                {% if cambio_ventas > 0 %}↑{% else %}↓{% endif %} {{ cambio_ventas|floatformat:0 }}%
+            </span>
+            {% endif %}
+        </div>
+        <p class="text-gray-500 text-xs uppercase tracking-wide mb-2 dark:text-gray-400">Ventas Hoy</p>
+        <p class="text-4xl font-bold {% if ventas_hoy_pagadas_total > 0 %}text-emerald-600 dark:text-emerald-400{% else %}text-gray-400 dark:text-gray-500{% endif %} mb-2">
+            {{ currency_symbol }}{{ ventas_hoy_pagadas_total|floatformat:2 }}
+        </p>
+        {% if ventas_hoy_pagadas_total == 0 and ultima_venta %}
+            <p class="text-xs text-gray-500 dark:text-gray-400 flex items-center">
+                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Última venta: {{ ultima_venta.fecha_hora|date:"d/m H:i" }}
+            </p>
+        {% elif ventas_hoy_pagadas_total == 0 %}
+            <p class="text-xs text-gray-500 dark:text-gray-400">
+                Promedio 7 días: {{ currency_symbol }}{{ promedio_7_dias|floatformat:2 }}
+            </p>
+        {% else %}
+            <p class="text-xs text-gray-400 dark:text-gray-500">vs ayer</p>
+        {% endif %}
+    </div>
+    
+    <!-- Facturas Emitidas -->
+    <div class="bg-white rounded-xl shadow-md p-6 dark:bg-gray-800 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border border-gray-100 dark:border-gray-700">
+        <div class="flex items-start justify-between mb-3">
+            <div class="p-3 rounded-lg bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-300">
+                <i data-lucide="file-text" class="w-6 h-6"></i>
+            </div>
+            {% if cambio_facturas != 0 %}
+            <span class="text-xs font-semibold px-2 py-1 rounded-full {% if cambio_facturas > 0 %}bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300{% else %}bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300{% endif %}">
+                {% if cambio_facturas > 0 %}↑{% else %}↓{% endif %} {{ cambio_facturas|floatformat:0 }}
+            </span>
+            {% endif %}
+        </div>
+        <p class="text-gray-500 text-xs uppercase tracking-wide mb-1 dark:text-gray-400">Facturas Hoy</p>
+        <p class="text-3xl font-bold dark:text-white mb-1">{{ facturas_hoy }}</p>
+        <p class="text-xs text-gray-400 dark:text-gray-500">vs ayer</p>
+    </div>
+    
+    <!-- Ticket Promedio -->
+    <div class="bg-white rounded-xl shadow-md p-6 dark:bg-gray-800 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border border-gray-100 dark:border-gray-700">
+        <div class="flex items-start justify-between mb-3">
+            <div class="p-3 rounded-lg bg-purple-100 text-purple-600 dark:bg-purple-900 dark:text-purple-300">
+                <i data-lucide="trending-up" class="w-6 h-6"></i>
+            </div>
+            {% if cambio_ticket != 0 %}
+            <span class="text-xs font-semibold px-2 py-1 rounded-full {% if cambio_ticket > 0 %}bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300{% else %}bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300{% endif %}">
+                {% if cambio_ticket > 0 %}↑{% else %}↓{% endif %} {{ cambio_ticket|floatformat:0 }}%
+            </span>
+            {% endif %}
+        </div>
+        <p class="text-gray-500 text-xs uppercase tracking-wide mb-1 dark:text-gray-400">Ticket Promedio</p>
+        <p class="text-3xl font-bold {% if ticket_promedio > 0 %}text-purple-600 dark:text-purple-400{% else %}text-gray-400 dark:text-gray-500{% endif %} mb-1">
+            {{ currency_symbol }}{{ ticket_promedio|floatformat:2 }}
+        </p>
+        <p class="text-xs text-gray-400 dark:text-gray-500">vs ayer</p>
+    </div>
+    
+    <!-- IVA Generado Hoy -->
+    <div class="bg-white rounded-xl shadow-md p-6 dark:bg-gray-800 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border border-gray-100 dark:border-gray-700">
+        <div class="flex items-start justify-between mb-3">
+            <div class="p-3 rounded-lg bg-amber-100 text-amber-600 dark:bg-amber-900 dark:text-amber-300">
+                <i data-lucide="receipt" class="w-6 h-6"></i>
+            </div>
+            {% if cambio_iva != 0 %}
+            <span class="text-xs font-semibold px-2 py-1 rounded-full {% if cambio_iva > 0 %}bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300{% else %}bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300{% endif %}">
+                {% if cambio_iva > 0 %}↑{% else %}↓{% endif %} {{ cambio_iva|floatformat:0 }}%
+            </span>
+            {% endif %}
+        </div>
+        <p class="text-gray-500 text-xs uppercase tracking-wide mb-1 dark:text-gray-400">IVA Hoy</p>
+        <p class="text-3xl font-bold dark:text-white mb-1">{{ currency_symbol }}{{ iva_hoy|floatformat:2 }}</p>
+        <p class="text-xs text-gray-400 dark:text-gray-500">Mes: {{ currency_symbol }}{{ iva_mes|floatformat:2 }}</p>
+    </div>
+</div>
+
+<!-- Fila secundaria: IVA Mes (destacado para Ecuador) -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+    <div class="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-xl shadow-md p-6 border-2 border-amber-200 dark:border-amber-800 transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
+        <div class="flex items-center justify-between">
             <div>
-                <p class="text-gray-500 text-sm dark:text-gray-400">Ventas de hoy</p>
-                <p class="text-2xl font-bold dark:text-white">{{ currency_symbol }}{{ ventas_hoy_pagadas_total|floatformat:2 }}</p>
+                <p class="text-amber-700 dark:text-amber-300 text-sm font-medium mb-1">IVA Acumulado del Mes</p>
+                <p class="text-3xl font-bold text-amber-900 dark:text-amber-100">{{ currency_symbol }}{{ iva_mes|floatformat:2 }}</p>
+                <p class="text-xs text-amber-600 dark:text-amber-400 mt-1">Para declaración SRI</p>
+            </div>
+            <div class="p-4 rounded-full bg-amber-100 dark:bg-amber-900">
+                <i data-lucide="file-check" class="w-8 h-8 text-amber-600 dark:text-amber-300"></i>
             </div>
         </div>
     </div>
     
-    <div class="bg-white rounded-lg shadow-md p-6 dark:bg-gray-800 transition-colors duration-200">
-        <div class="flex items-center">
-            <div class="p-3 rounded-full bg-blue-100 text-blue-500 mr-4 dark:bg-blue-900 dark:text-blue-300">
-                <i data-lucide="shopping-cart" class="w-6 h-6"></i>
-            </div>
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 border border-gray-100 dark:border-gray-700 transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
+        <div class="flex items-center justify-between">
             <div>
-                <p class="text-gray-500 text-sm dark:text-gray-400">Órdenes de hoy</p>
-                <p class="text-2xl font-bold dark:text-white">{{ ordenes_hoy_pagadas_count }}</p>
+                <p class="text-gray-600 dark:text-gray-400 text-sm font-medium mb-1">Productos Vendidos Hoy</p>
+                <p class="text-3xl font-bold text-gray-900 dark:text-white">{{ productos_vendidos_hoy }}</p>
+                {% if cambio_productos != 0 %}
+                <p class="text-xs {% if cambio_productos > 0 %}text-green-600 dark:text-green-400{% else %}text-red-600 dark:text-red-400{% endif %} mt-1">
+                    {% if cambio_productos > 0 %}↑{% else %}↓{% endif %} {{ cambio_productos|floatformat:0 }} vs ayer
+                </p>
+                {% endif %}
+            </div>
+            <div class="p-4 rounded-full bg-gray-100 dark:bg-gray-700">
+                <i data-lucide="package" class="w-8 h-8 text-gray-600 dark:text-gray-300"></i>
             </div>
         </div>
     </div>
     
-    <div class="bg-white rounded-lg shadow-md p-6 dark:bg-gray-800 transition-colors duration-200">
-        <div class="flex items-center">
-            <div class="p-3 rounded-full bg-purple-100 text-purple-500 mr-4 dark:bg-purple-900 dark:text-purple-300">
-                <i data-lucide="users" class="w-6 h-6"></i>
-            </div>
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 border border-gray-100 dark:border-gray-700 transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
+        <div class="flex items-center justify-between">
             <div>
-                <p class="text-gray-500 text-sm dark:text-gray-400">Clientes nuevos</p>
-                <p class="text-2xl font-bold dark:text-white">{{ clientes_nuevos_count }}</p>
+                <p class="text-gray-600 dark:text-gray-400 text-sm font-medium mb-1">Nuevos Clientes</p>
+                <p class="text-3xl font-bold text-gray-900 dark:text-white">{{ clientes_nuevos_count }}</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">registrados hoy</p>
             </div>
-        </div>
-    </div>
-    
-    <div class="bg-white rounded-lg shadow-md p-6 dark:bg-gray-800 transition-colors duration-200">
-        <div class="flex items-center">
-            <div class="p-3 rounded-full bg-yellow-100 text-yellow-500 mr-4 dark:bg-yellow-900 dark:text-yellow-300">
-                <i data-lucide="package" class="w-6 h-6"></i>
-            </div>
-            <div>
-                <p class="text-gray-500 text-sm dark:text-gray-400">Productos vendidos</p>
-                <p class="text-2xl font-bold dark:text-white">{{ productos_nuevos_count }}</p>
+            <div class="p-4 rounded-full bg-gray-100 dark:bg-gray-700">
+                <i data-lucide="users" class="w-8 h-8 text-gray-600 dark:text-gray-300"></i>
             </div>
         </div>
     </div>
 </div>
 
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-    <div class="bg-white rounded-lg shadow-md p-6 dark:bg-gray-800 transition-colors duration-200">
-        <h3 class="text-lg font-semibold mb-4 dark:text-white">Ventas recientes</h3>
+<!-- 2. Gráfico Principal - Ventas últimos 7 días -->
+<div class="bg-white rounded-xl shadow-lg p-6 mb-6 dark:bg-gray-800 border border-gray-100 dark:border-gray-700">
+    <div class="flex items-center justify-between mb-6">
+        <div>
+            <h3 class="text-lg font-semibold dark:text-white">Ventas últimos 7 días</h3>
+            {% if mejor_dia.total > 0 %}
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                Mejor día: <span class="font-semibold text-emerald-600 dark:text-emerald-400">{{ mejor_dia.fecha }}</span> 
+                ({{ currency_symbol }}{{ mejor_dia.total|floatformat:2 }})
+            </p>
+            {% endif %}
+        </div>
+        <div class="flex items-center space-x-2">
+            <span class="text-sm text-gray-500 dark:text-gray-400">Tendencia semanal</span>
+        </div>
+    </div>
+    <div class="h-64">
+        <canvas id="ventasChart"></canvas>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+    <!-- 3. Productos más vendidos (Mejorado) -->
+    <div class="lg:col-span-2 bg-white rounded-xl shadow-lg p-6 dark:bg-gray-800 border border-gray-100 dark:border-gray-700">
+        <h3 class="text-lg font-semibold mb-4 dark:text-white flex items-center">
+            <i data-lucide="trending-up" class="w-5 h-5 mr-2"></i>
+            Productos más vendidos (últimos 7 días)
+        </h3>
         <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <table class="min-w-full">
                 <thead>
-                    <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">ID</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">Cliente</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">Total</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">Estado</th>
+                    <tr class="border-b border-gray-200 dark:border-gray-700">
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">#</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">Producto</th>
+                        <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">Vendidos</th>
+                        <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">Ingresos</th>
+                        <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">% Participación</th>
                     </tr>
                 </thead>
-                <tbody class="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
-                    {% for venta in ventas_recientes_pagadas %}
+                <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                    {% for producto in productos_mas_vendidos_pagados %}
                     <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150">
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                            {% if venta.transaccion_set.first.transaction_id %}
-                                #{{ venta.transaccion_set.first.transaction_id }}
-                            {% else %}
-                                #{{ venta.id }}
-                            {% endif %}
+                        <td class="px-4 py-4 whitespace-nowrap">
+                            <span class="inline-flex items-center justify-center w-8 h-8 rounded-full text-sm font-bold {% if producto.ranking == 1 %}bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300{% elif producto.ranking == 2 %}bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300{% elif producto.ranking == 3 %}bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300{% else %}bg-gray-50 text-gray-600 dark:bg-gray-800 dark:text-gray-400{% endif %}">
+                                {{ producto.ranking }}
+                            </span>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
-                            {% if venta.cliente %}
-                                {{ venta.cliente.nombre }}
-                            {% else %}
-                                Consumidor Final
-                            {% endif %}
+                        <td class="px-4 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <div class="text-sm font-medium text-gray-900 dark:text-gray-300">{{ producto.producto__nombre }}</div>
+                            </div>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">{{ currency_symbol }}{{ venta.total|floatformat:2 }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">Pagado</span>
+                        <td class="px-4 py-4 whitespace-nowrap text-center">
+                            <span class="text-sm text-gray-900 dark:text-gray-300">{{ producto.cantidad }}</span>
+                        </td>
+                        <td class="px-4 py-4 whitespace-nowrap text-right">
+                            <span class="text-sm font-semibold text-gray-900 dark:text-gray-300">{{ currency_symbol }}{{ producto.ingresos|floatformat:2 }}</span>
+                        </td>
+                        <td class="px-4 py-4 whitespace-nowrap text-right">
+                            <div class="flex items-center justify-end">
+                                <div class="w-16 bg-gray-200 rounded-full h-2 mr-2 dark:bg-gray-600">
+                                    <div class="{% if producto.ranking == 1 %}bg-yellow-500{% elif producto.ranking == 2 %}bg-gray-400{% elif producto.ranking == 3 %}bg-orange-500{% else %}bg-emerald-500{% endif %} h-2 rounded-full" style="width: {{ producto.participacion|floatformat:0 }}%"></div>
+                                </div>
+                                <span class="text-sm text-gray-600 dark:text-gray-400">{{ producto.participacion|floatformat:1 }}%</span>
+                            </div>
                         </td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="4" class="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400">No hay ventas recientes pagadas</td>
+                        <td colspan="4" class="px-4 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
+                            No hay datos de productos vendidos en los últimos 7 días
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -99,34 +267,370 @@
         </div>
     </div>
     
-    <div class="bg-white rounded-lg shadow-md p-6 dark:bg-gray-800 transition-colors duration-200">
-        <h3 class="text-lg font-semibold mb-4 dark:text-white">Productos más vendidos</h3>
-        <div class="space-y-4">
-            {% for producto in productos_mas_vendidos_pagados %}
-            <div class="flex items-center hover:bg-gray-50 dark:hover:bg-gray-700 p-2 rounded-lg transition-colors duration-150">
-                <div class="w-12 h-12 bg-gray-200 rounded-lg mr-4 dark:bg-gray-600 overflow-hidden flex items-center justify-center">
-                    {% if producto.imagen %}
-                        <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}" class="w-12 h-12 rounded-lg object-cover">
-                    {% else %}
-                        <div class="w-12 h-12 flex items-center justify-center bg-gray-200 rounded-lg dark:bg-gray-600">
-                            <i data-lucide="utensils" class="w-6 h-6 text-gray-400 dark:text-gray-300"></i>
-                        </div>
-                    {% endif %}
+    <!-- 4. Métodos de pago -->
+    <div class="bg-white rounded-xl shadow-lg p-6 dark:bg-gray-800 border border-gray-100 dark:border-gray-700">
+        <h3 class="text-lg font-semibold mb-4 dark:text-white flex items-center">
+            <i data-lucide="credit-card" class="w-5 h-5 mr-2"></i>
+            Métodos de pago
+        </h3>
+        <div class="h-48 flex items-center justify-center mb-4">
+            <canvas id="metodosChart"></canvas>
+        </div>
+        <div class="space-y-3">
+            {% for metodo in metodos_pago %}
+            <div class="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                <div class="flex items-center">
+                    <div class="w-3 h-3 rounded-full mr-2 {% if metodo.metodo_pago == 'cash' %}bg-emerald-500{% elif metodo.metodo_pago == 'card' %}bg-blue-500{% else %}bg-purple-500{% endif %}"></div>
+                    <span class="text-sm text-gray-700 dark:text-gray-300">
+                        {% if metodo.metodo_pago == 'cash' %}Efectivo{% elif metodo.metodo_pago == 'card' %}Tarjeta{% else %}Transferencia{% endif %}
+                    </span>
                 </div>
-                <div class="flex-1">
-                    <h4 class="text-sm font-medium dark:text-white">{{ producto.nombre }}</h4>
-                    <div class="flex items-center justify-between mt-1">
-                        <div class="text-sm text-gray-500 dark:text-gray-400">
-                            {{ producto.cantidad_vendida_pagada|default:0 }} vendidos
-                        </div>
-                        <div class="text-sm font-medium dark:text-gray-300">{{ currency_symbol }}{{ producto.precio|floatformat:2 }}</div>
-                    </div>
+                <div class="text-right">
+                    <p class="text-sm font-semibold text-gray-900 dark:text-gray-300">
+                        {{ currency_symbol }}{{ metodo.total|floatformat:2 }}
+                        <span class="text-xs font-normal text-gray-500 dark:text-gray-400">({{ metodo.porcentaje|floatformat:0 }}%)</span>
+                    </p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ metodo.cantidad }} transacciones</p>
                 </div>
             </div>
             {% empty %}
-            <div class="text-center text-gray-500 dark:text-gray-400 py-4">No hay datos de productos vendidos pagados</div>
+            <p class="text-center text-sm text-gray-500 dark:text-gray-400 py-4">Sin datos de métodos de pago</p>
             {% endfor %}
         </div>
     </div>
 </div>
+
+<!-- 5. Ventas recientes con contexto temporal -->
+<div class="bg-white rounded-xl shadow-lg p-6 dark:bg-gray-800 border border-gray-100 dark:border-gray-700">
+    <div class="flex items-center justify-between mb-6">
+        <div>
+            <h3 class="text-lg font-semibold dark:text-white">Historial de Ventas</h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Últimas transacciones completadas</p>
+        </div>
+        {% if ultima_venta %}
+        <div class="text-right">
+            <p class="text-xs text-gray-500 dark:text-gray-400">Última venta</p>
+            <p class="text-sm font-semibold text-gray-700 dark:text-gray-300">{{ ultima_venta.fecha_hora|date:"d/m/Y H:i" }}</p>
+        </div>
+        {% endif %}
+    </div>
+    
+    {% if ventas_agrupadas %}
+        {% for grupo, datos in ventas_agrupadas.items %}
+        <div class="mb-6 last:mb-0">
+            <!-- Encabezado del grupo -->
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center space-x-3">
+                    <!-- Badge con fecha y contador -->
+                    <div class="flex items-center {% if grupo == 'Hoy' %}bg-emerald-100 border-2 border-emerald-500 dark:bg-emerald-900/30 dark:border-emerald-600{% elif grupo == 'Ayer' %}bg-blue-100 border-2 border-blue-500 dark:bg-blue-900/30 dark:border-blue-600{% else %}bg-gray-100 border-2 border-gray-400 dark:bg-gray-700/30 dark:border-gray-500{% endif %} rounded-full px-4 py-2 shadow-sm">
+                        <span class="text-base font-bold {% if grupo == 'Hoy' %}text-emerald-700 dark:text-emerald-300{% elif grupo == 'Ayer' %}text-blue-700 dark:text-blue-300{% else %}text-gray-700 dark:text-gray-300{% endif %}">
+                            {{ grupo }}
+                        </span>
+                        <div class="ml-3 pl-3 border-l-2 {% if grupo == 'Hoy' %}border-emerald-400 dark:border-emerald-600{% elif grupo == 'Ayer' %}border-blue-400 dark:border-blue-600{% else %}border-gray-400 dark:border-gray-500{% endif %}">
+                            <span class="text-sm font-semibold {% if grupo == 'Hoy' %}text-emerald-600 dark:text-emerald-400{% elif grupo == 'Ayer' %}text-blue-600 dark:text-blue-400{% else %}text-gray-600 dark:text-gray-400{% endif %}">
+                                {{ datos.cantidad }} venta{{ datos.cantidad|pluralize }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Total del día con badge -->
+                <div class="{% if grupo == 'Hoy' %}bg-emerald-50 border border-emerald-200 dark:bg-emerald-900/20 dark:border-emerald-800{% else %}bg-gray-50 border border-gray-200 dark:bg-gray-800/50 dark:border-gray-700{% endif %} rounded-lg px-4 py-2">
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-0.5">Total</p>
+                    <p class="text-lg font-bold {% if grupo == 'Hoy' %}text-emerald-600 dark:text-emerald-400{% else %}text-gray-700 dark:text-gray-300{% endif %}">
+                        {{ currency_symbol }}{{ datos.total|floatformat:2 }}
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Lista de ventas -->
+            <div class="space-y-3">
+                {% for venta in datos.ventas %}
+                <div class="bg-gray-50 dark:bg-gray-700/30 rounded-lg p-4 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-all duration-150">
+                    <div class="flex items-center justify-between">
+                        <!-- Columna izquierda: Info de venta -->
+                        <div class="flex items-center space-x-4 flex-1">
+                            <!-- Hora -->
+                            <div class="text-center min-w-[60px]">
+                                <div class="text-xs text-gray-500 dark:text-gray-400 uppercase">Hora</div>
+                                <div class="text-lg font-bold text-gray-900 dark:text-white">{{ venta.fecha_hora|date:"H:i" }}</div>
+                            </div>
+                            
+                            <!-- Separador vertical -->
+                            <div class="h-12 w-px bg-gray-300 dark:bg-gray-600"></div>
+                            
+                            <!-- Detalles -->
+                            <div class="flex-1">
+                                <div class="flex items-center space-x-2 mb-1">
+                                    {% with venta.transaccion_set.first as transaccion %}
+                                        <span class="text-sm font-bold text-gray-900 dark:text-white">
+                                            Venta #{{ transaccion.transaction_id|default:venta.id }}
+                                        </span>
+                                    {% endwith %}
+                                    <span class="px-2 py-0.5 text-xs font-medium rounded bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-300">
+                                        Pagado
+                                    </span>
+                                </div>
+                                <div class="flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-400">
+                                    <div class="flex items-center">
+                                        <span class="font-medium mr-1">Cliente:</span>
+                                        {% if venta.cliente %}
+                                            <span>{{ venta.cliente.nombre }}</span>
+                                        {% else %}
+                                            <span class="italic">Consumidor Final</span>
+                                        {% endif %}
+                                    </div>
+                                    <div class="h-4 w-px bg-gray-300 dark:bg-gray-600"></div>
+                                    <div class="flex items-center">
+                                        <span class="font-medium mr-1">Pago:</span>
+                                        <span>{% if venta.metodo_pago == 'cash' %}Efectivo{% elif venta.metodo_pago == 'card' %}Tarjeta{% else %}Transferencia{% endif %}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Columna derecha: Monto -->
+                        <div class="text-right ml-6 min-w-[120px]">
+                            <div class="text-xs text-gray-500 dark:text-gray-400 mb-1">Monto</div>
+                            <div class="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
+                                {{ currency_symbol }}{{ venta.total|floatformat:2 }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <!-- Estado vacío -->
+        <div class="text-center py-16">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-700 mb-4">
+                <svg class="w-8 h-8 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+                </svg>
+            </div>
+            <h4 class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">Sin ventas registradas</h4>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Las transacciones aparecerán aquí cuando se completen</p>
+            {% if ultima_venta %}
+            <div class="mt-4 inline-flex items-center px-4 py-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                <svg class="w-4 h-4 text-blue-600 dark:text-blue-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <span class="text-sm text-blue-700 dark:text-blue-300">
+                    Última venta: {{ ultima_venta.fecha_hora|date:"d/m/Y H:i" }}
+                </span>
+            </div>
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+// Sistema de gestión de alertas con localStorage
+const AlertasManager = {
+    storageKey: 'dashboard_alertas_cerradas',
+    
+    // Obtener alertas cerradas del localStorage
+    getAlertasCerradas() {
+        const stored = localStorage.getItem(this.storageKey);
+        return stored ? JSON.parse(stored) : {};
+    },
+    
+    // Guardar alerta cerrada
+    guardarAlertaCerrada(alertaId) {
+        const alertas = this.getAlertasCerradas();
+        alertas[alertaId] = Date.now();
+        localStorage.setItem(this.storageKey, JSON.stringify(alertas));
+    },
+    
+    // Verificar si una alerta debe mostrarse
+    debeOcultarAlerta(alertaId) {
+        const alertas = this.getAlertasCerradas();
+        return alertas.hasOwnProperty(alertaId);
+    },
+    
+    // Limpiar alertas antiguas (más de 24 horas)
+    limpiarAlertasAntiguas() {
+        const alertas = this.getAlertasCerradas();
+        const ahora = Date.now();
+        const unDia = 24 * 60 * 60 * 1000;
+        
+        Object.keys(alertas).forEach(key => {
+            if (ahora - alertas[key] > unDia) {
+                delete alertas[key];
+            }
+        });
+        
+        localStorage.setItem(this.storageKey, JSON.stringify(alertas));
+    }
+};
+
+// Función para cerrar el mensaje motivacional
+function cerrarMensajeMotivacional() {
+    const mensaje = document.getElementById('mensajeMotivacional');
+    if (mensaje) {
+        const mensajeId = mensaje.getAttribute('data-mensaje-id');
+        
+        // Guardar en localStorage
+        AlertasManager.guardarAlertaCerrada(mensajeId);
+        
+        // Animar y ocultar
+        mensaje.style.opacity = '0';
+        mensaje.style.transform = 'translateY(-10px)';
+        setTimeout(() => {
+            mensaje.style.display = 'none';
+        }, 300);
+    }
+}
+
+// Función para cerrar alertas individuales
+function cerrarAlerta(button) {
+    const alerta = button.closest('.alerta-item');
+    if (alerta) {
+        const alertaId = alerta.getAttribute('data-alerta-id');
+        
+        // Guardar en localStorage
+        AlertasManager.guardarAlertaCerrada(alertaId);
+        
+        // Animar y ocultar
+        alerta.style.opacity = '0';
+        alerta.style.transform = 'translateX(20px)';
+        setTimeout(() => {
+            alerta.style.display = 'none';
+        }, 300);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Limpiar alertas antiguas al cargar
+    AlertasManager.limpiarAlertasAntiguas();
+    
+    // Ocultar mensaje motivacional si ya fue cerrado
+    const mensajeMotivacional = document.getElementById('mensajeMotivacional');
+    if (mensajeMotivacional) {
+        const mensajeId = mensajeMotivacional.getAttribute('data-mensaje-id');
+        if (AlertasManager.debeOcultarAlerta(mensajeId)) {
+            mensajeMotivacional.style.display = 'none';
+        }
+    }
+    
+    // Ocultar alertas que ya fueron cerradas
+    document.querySelectorAll('.alerta-item').forEach(alerta => {
+        const alertaId = alerta.getAttribute('data-alerta-id');
+        if (AlertasManager.debeOcultarAlerta(alertaId)) {
+            alerta.style.display = 'none';
+        }
+    });
+    // Gráfico de ventas últimos 7 días
+    const ventasCtx = document.getElementById('ventasChart');
+    if (ventasCtx) {
+        const ventasData = {{ ventas_7_dias|safe }};
+        new Chart(ventasCtx, {
+            type: 'line',
+            data: {
+                labels: ventasData.map(d => d.fecha),
+                datasets: [{
+                    label: 'Ventas',
+                    data: ventasData.map(d => d.total),
+                    borderColor: 'rgb(16, 185, 129)',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    tension: 0.4,
+                    fill: true,
+                    pointRadius: 5,
+                    pointHoverRadius: 7,
+                    pointBackgroundColor: 'rgb(16, 185, 129)',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        padding: 12,
+                        titleColor: '#fff',
+                        bodyColor: '#fff',
+                        borderColor: 'rgb(16, 185, 129)',
+                        borderWidth: 1,
+                        displayColors: false,
+                        callbacks: {
+                            title: function(context) {
+                                return 'Fecha: ' + context[0].label;
+                            },
+                            label: function(context) {
+                                return 'Total: {{ currency_symbol }}' + context.parsed.y.toFixed(2);
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '{{ currency_symbol }}' + value.toFixed(2);
+                            }
+                        },
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+    }
+    
+    // Gráfico de métodos de pago
+    const metodosCtx = document.getElementById('metodosChart');
+    if (metodosCtx) {
+        const metodosData = [
+            {% for metodo in metodos_pago %}
+            {
+                label: '{% if metodo.metodo_pago == "cash" %}Efectivo{% elif metodo.metodo_pago == "card" %}Tarjeta{% else %}Transferencia{% endif %}',
+                value: {{ metodo.total|floatformat:2 }},
+                color: '{% if metodo.metodo_pago == "cash" %}rgb(16, 185, 129){% elif metodo.metodo_pago == "card" %}rgb(59, 130, 246){% else %}rgb(168, 85, 247){% endif %}'
+            }{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ];
+        
+        if (metodosData.length > 0) {
+            new Chart(metodosCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: metodosData.map(d => d.label),
+                    datasets: [{
+                        data: metodosData.map(d => d.value),
+                        backgroundColor: metodosData.map(d => d.color),
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+    }
+});
+</script>
 {% endblock %}

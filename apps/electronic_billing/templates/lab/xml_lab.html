@@ -1,0 +1,457 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laboratorio XML - Facturación Electrónica SRI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        h1 {
+            font-size: 2.5em;
+            color: #00d4ff;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+        }
+
+        .subtitle {
+            color: #a0a0a0;
+            font-size: 1.1em;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #00d4ff;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+
+        select {
+            width: 100%;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(0, 212, 255, 0.3);
+            border-radius: 10px;
+            color: #e0e0e0;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #00d4ff;
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+        }
+
+        select option {
+            background: #1a1a2e;
+            color: #e0e0e0;
+        }
+
+        .btn {
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 212, 255, 0.4);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 212, 255, 0.6);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 1.1em;
+            margin-bottom: 20px;
+        }
+
+        .status-valid {
+            background: linear-gradient(135deg, #00ff88 0%, #00cc66 100%);
+            color: #003322;
+            box-shadow: 0 4px 15px rgba(0, 255, 136, 0.4);
+        }
+
+        .status-invalid {
+            background: linear-gradient(135deg, #ff4444 0%, #cc0000 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 68, 68, 0.4);
+        }
+
+        .xml-container {
+            position: relative;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 500px;
+            padding: 20px;
+            background: #0a0a0a;
+            border: 2px solid rgba(0, 212, 255, 0.3);
+            border-radius: 10px;
+            color: #00ff88;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.6;
+            resize: vertical;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #00d4ff;
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            padding: 10px 20px;
+            background: rgba(0, 212, 255, 0.2);
+            border: 1px solid #00d4ff;
+            border-radius: 8px;
+            color: #00d4ff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+        }
+
+        .copy-btn:hover {
+            background: rgba(0, 212, 255, 0.3);
+        }
+
+        .errors-list {
+            list-style: none;
+            margin-top: 20px;
+        }
+
+        .error-item {
+            background: rgba(255, 68, 68, 0.1);
+            border-left: 4px solid #ff4444;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+        }
+
+        .error-location {
+            color: #00d4ff;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .error-message {
+            color: #ffaaaa;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .alert-error {
+            background: rgba(255, 68, 68, 0.2);
+            border: 1px solid #ff4444;
+            color: #ffaaaa;
+        }
+
+        .sale-info {
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .sale-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .sale-info-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sale-info-label {
+            color: #00d4ff;
+            font-size: 0.85em;
+            margin-bottom: 5px;
+        }
+
+        .sale-info-value {
+            color: #e0e0e0;
+            font-weight: 600;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #00d4ff;
+            text-decoration: none;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+        }
+
+        .back-link:hover {
+            color: #00ff88;
+            transform: translateX(-5px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="{% url 'dashboard' %}" class="back-link">← Volver al Dashboard</a>
+        
+        <header>
+            <h1>🧪 Laboratorio XML</h1>
+            <p class="subtitle">Generador y Validador de Facturas Electrónicas SRI Ecuador</p>
+        </header>
+
+        {% if error %}
+        <div class="alert alert-error fade-in">
+            <strong>Error:</strong> {{ error }}
+        </div>
+        {% endif %}
+
+        <div class="card fade-in">
+            <form method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="sale_id">Seleccionar Venta:</label>
+                    <select name="sale_id" id="sale_id" required>
+                        <option value="">-- Seleccione una venta --</option>
+                        {% for sale in sales %}
+                        <option value="{{ sale.id }}" {% if selected_sale_id == sale.id %}selected{% endif %}>
+                            #{{ sale.id }} - 
+                            {% if sale.cliente %}{{ sale.cliente.nombre }}{% else %}Consumidor Final{% endif %} - 
+                            ${{ sale.total }} - 
+                            {{ sale.fecha_hora|date:"d/m/Y H:i" }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="btn">🚀 Generar y Validar XML</button>
+            </form>
+        </div>
+
+        {% if sale %}
+        <div class="card fade-in">
+            <h2 style="color: #00d4ff; margin-bottom: 20px;">📋 Información de la Venta</h2>
+            <div class="sale-info">
+                <div class="sale-info-grid">
+                    <div class="sale-info-item">
+                        <span class="sale-info-label">ID Venta</span>
+                        <span class="sale-info-value">#{{ sale.id }}</span>
+                    </div>
+                    <div class="sale-info-item">
+                        <span class="sale-info-label">Cliente</span>
+                        <span class="sale-info-value">
+                            {% if sale.cliente %}{{ sale.cliente.nombre }}{% else %}Consumidor Final{% endif %}
+                        </span>
+                    </div>
+                    <div class="sale-info-item">
+                        <span class="sale-info-label">Identificación</span>
+                        <span class="sale-info-value">
+                            {% if sale.cliente %}{{ sale.cliente.identificacion }}{% else %}9999999999999{% endif %}
+                        </span>
+                    </div>
+                    <div class="sale-info-item">
+                        <span class="sale-info-label">Fecha</span>
+                        <span class="sale-info-value">{{ sale.fecha_hora|date:"d/m/Y H:i" }}</span>
+                    </div>
+                    <div class="sale-info-item">
+                        <span class="sale-info-label">Subtotal</span>
+                        <span class="sale-info-value">${{ sale.subtotal }}</span>
+                    </div>
+                    <div class="sale-info-item">
+                        <span class="sale-info-label">IVA</span>
+                        <span class="sale-info-value">${{ sale.iva }}</span>
+                    </div>
+                    <div class="sale-info-item">
+                        <span class="sale-info-label">Total</span>
+                        <span class="sale-info-value">${{ sale.total }}</span>
+                    </div>
+                    <div class="sale-info-item">
+                        <span class="sale-info-label">Método de Pago</span>
+                        <span class="sale-info-value">{{ sale.get_metodo_pago_display }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if xml %}
+        <div class="card fade-in">
+            <h2 style="color: #00d4ff; margin-bottom: 20px;">📄 XML Generado</h2>
+            
+            {% if is_valid %}
+            <div class="status-badge status-valid">
+                ✅ XML Válido - Cumple con el XSD del SRI
+            </div>
+            {% else %}
+            <div class="status-badge status-invalid">
+                ❌ XML Inválido - Errores de Estructura
+            </div>
+            {% endif %}
+
+            <div class="xml-container">
+                <button class="copy-btn" onclick="copyXML()">📋 Copiar XML</button>
+                <button class="copy-btn" onclick="downloadXML()" style="right: 140px;">💾 Descargar XML</button>
+                <textarea id="xmlContent" readonly>{{ xml }}</textarea>
+            </div>
+
+            {% if errors %}
+            <div style="margin-top: 30px;">
+                <h3 style="color: #ff4444; margin-bottom: 15px;">⚠️ Errores de Validación ({{ errors|length }})</h3>
+                <ul class="errors-list">
+                    {% for error in errors %}
+                    <li class="error-item">
+                        <div class="error-location">
+                            📍 Línea {{ error.linea }}{% if error.columna %}, Columna {{ error.columna }}{% endif %}
+                        </div>
+                        <div class="error-message">{{ error.mensaje }}</div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        function copyXML() {
+            const textarea = document.getElementById('xmlContent');
+            textarea.select();
+            document.execCommand('copy');
+            
+            const btn = document.querySelector('.copy-btn');
+            const originalText = btn.textContent;
+            btn.textContent = '✅ Copiado!';
+            btn.style.background = 'rgba(0, 255, 136, 0.3)';
+            btn.style.borderColor = '#00ff88';
+            btn.style.color = '#00ff88';
+            
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.style.background = 'rgba(0, 212, 255, 0.2)';
+                btn.style.borderColor = '#00d4ff';
+                btn.style.color = '#00d4ff';
+            }, 2000);
+        }
+
+        function downloadXML() {
+            const textarea = document.getElementById('xmlContent');
+            const xmlContent = textarea.value;
+            
+            // Obtener el ID de la venta para el nombre del archivo
+            const saleId = '{{ selected_sale_id|default:"" }}';
+            const fileName = `factura_${saleId || 'export'}.xml`;
+            
+            // Crear un blob con el contenido XML
+            const blob = new Blob([xmlContent], { type: 'application/xml' });
+            
+            // Crear un enlace temporal para descargar
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = fileName;
+            
+            // Simular click en el enlace
+            document.body.appendChild(link);
+            link.click();
+            
+            // Limpiar
+            document.body.removeChild(link);
+            URL.revokeObjectURL(link.href);
+            
+            // Feedback visual
+            const btn = document.querySelectorAll('.copy-btn')[1]; // Segundo botón
+            const originalText = btn.textContent;
+            btn.textContent = '✅ Descargado!';
+            btn.style.background = 'rgba(0, 255, 136, 0.3)';
+            btn.style.borderColor = '#00ff88';
+            btn.style.color = '#00ff88';
+            
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.style.background = 'rgba(0, 212, 255, 0.2)';
+                btn.style.borderColor = '#00d4ff';
+                btn.style.color = '#00d4ff';
+            }, 2000);
+        }
+    </script>
+</body>
+</html>

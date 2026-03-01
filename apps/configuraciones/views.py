@@ -56,6 +56,35 @@ def business_config(request):
         if form.is_valid():
             business = form.save(commit=False)
             business.user = request.user
+            
+            # Procesar checkbox de sistema de órdenes
+            business.enable_orders = request.POST.get('enable_orders') == 'on'
+            
+            # Procesar checkboxes de pantallas (solo si enable_orders está activo)
+            if business.enable_orders:
+                business.enable_kds = request.POST.get('enable_kds') == 'on'
+                business.enable_public_display = request.POST.get('enable_public_display') == 'on'
+            else:
+                # Si se desactiva el sistema de órdenes, desactivar también las pantallas
+                business.enable_kds = False
+                business.enable_public_display = False
+            
+            # Guardar campos fiscales de facturación electrónica SRI
+            business.razon_social_legal = request.POST.get('razon_social_legal', '').strip() or None
+            business.ambiente_sri = request.POST.get('ambiente_sri', '1')
+            business.tipo_emision = request.POST.get('tipo_emision', '1')
+            business.obligado_contabilidad = request.POST.get('obligado_contabilidad', 'NO')
+            business.regimen_rimpe = request.POST.get('regimen_rimpe', '') or None
+            business.establecimiento = request.POST.get('establecimiento', '').strip() or None
+            business.punto_emision = request.POST.get('punto_emision', '').strip() or None
+            
+            # Guardar ciudad
+            business.ciudad = request.POST.get('ciudad', '').strip() or None
+            
+            # Guardar logo de empresa (para facturas/documentos)
+            if 'logo' in request.FILES:
+                business.company_logo = request.FILES['logo']
+            
             business.save()
             messages.success(request, "Configuración actualizada exitosamente.")
             return redirect('configuraciones:business_config')

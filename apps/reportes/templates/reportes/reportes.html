@@ -7,187 +7,449 @@
 
 {% block content %}
 <div class="container mx-auto px-4 py-6">
-    <div class="max-w-6xl mx-auto">
-        <!-- Introducción a Reportes -->
-        <div class="bg-white dark:bg-gray-900 rounded-lg shadow-md overflow-hidden mb-6">
-            <div class="text-white px-6 py-4" style="background-color: var(--primary-color);">
-                <h3 class="text-2xl font-bold flex items-center">
-                    <i data-lucide="bar-chart-2" class="w-6 h-6 mr-2"></i>Panel de Reportes
-                </h3>
-            </div>
-            
-            <div class="p-6 bg-white dark:bg-gray-900">
-                
-                <!-- Categorías de Reportes con Tarjetas Mejoradas -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    
-                    <!-- Reportes Financieros y Fiscales -->
-                    <div class="bg-gradient-to-br from-emerald-50 to-white dark:from-gray-800 dark:to-gray-800 p-6 rounded-lg border border-emerald-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-1">
-                        <div class="flex items-center mb-4">
-                            <div class="bg-emerald-100 dark:bg-emerald-800/40 p-3 rounded-full mr-3">
-                                <i data-lucide="dollar-sign" class="w-6 h-6 text-emerald-600 dark:text-emerald-400"></i>
-                            </div>
-                            <h4 class="text-xl font-bold text-gray-800 dark:text-white">Financieros y Fiscales</h4>
+    <div class="max-w-7xl mx-auto">
+
+        <!-- Header Empresarial con Info Multi-tenant -->
+        <div
+            class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden mb-6 border border-gray-200 dark:border-gray-700">
+            <div class="px-6 py-5">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center">
+                        <div class="bg-blue-100 dark:bg-blue-900/40 p-3 rounded-lg mr-4">
+                            <i data-lucide="layout-dashboard" class="w-7 h-7 text-blue-600 dark:text-blue-400"></i>
                         </div>
-                        <p class="text-gray-600 dark:text-gray-300 mb-4 text-sm">Información sobre ventas, impuestos y documentos fiscales para cumplimiento tributario.</p>
-                        <ul class="space-y-2 border-t border-emerald-100 dark:border-emerald-800/50 pt-4">
-                            <li>
-                                <a href="{% url 'reportes:ventas' %}" class="flex items-center text-gray-700 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 p-2 rounded-md transition-colors">
-                                    <i data-lucide="trending-up" class="w-4 h-4 mr-2"></i>
-                                    <span>Ventas</span>
-                                    <i data-lucide="chevron-right" class="w-4 h-4 ml-auto"></i>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{% url 'reportes:iva' %}" class="flex items-center text-gray-700 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 p-2 rounded-md transition-colors">
-                                    <i data-lucide="percent" class="w-4 h-4 mr-2"></i>
-                                    <span>Reportes de IVA</span>
-                                    <i data-lucide="chevron-right" class="w-4 h-4 ml-auto"></i>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{% url 'reportes:facturas' %}" class="flex items-center text-gray-700 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 p-2 rounded-md transition-colors">
-                                    <i data-lucide="file-text" class="w-4 h-4 mr-2"></i>
-                                    <span>Facturas y Comprobantes</span>
-                                    <i data-lucide="chevron-right" class="w-4 h-4 ml-auto"></i>
-                                </a>
-                            </li>
-                        </ul>
+                        <div>
+                            <h3 class="text-2xl font-bold text-gray-800 dark:text-white">Centro de Control Empresarial
+                            </h3>
+                            <p class="text-gray-600 dark:text-gray-400 text-sm mt-1">Gestión integral de operaciones y
+                                cumplimiento</p>
+                        </div>
                     </div>
-                    
-                    <!-- Reportes Operativos -->
-                    <div class="bg-gradient-to-br from-blue-50 to-white dark:from-blue-900/20 dark:to-gray-800 p-6 rounded-lg border border-blue-100 dark:border-blue-800 shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-1">
-                        <div class="flex items-center mb-4">
-                            <div class="bg-blue-100 dark:bg-blue-800/40 p-3 rounded-full mr-3">
-                                <i data-lucide="activity" class="w-6 h-6 text-blue-600 dark:text-blue-400"></i>
-                            </div>
-                            <h4 class="text-xl font-bold text-gray-800 dark:text-white">Operativos</h4>
+                    <div class="hidden md:flex items-center space-x-3">
+                        <div class="flex items-center bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 px-3 py-2 rounded-lg"
+                            title="Estado del servicio SRI">
+                            <div class="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></div>
+                            <span class="text-xs font-semibold text-green-700 dark:text-green-400">SRI Operativo</span>
                         </div>
-                        <p class="text-gray-600 dark:text-gray-300 mb-4 text-sm">Análisis del funcionamiento diario del negocio, inventario y comportamiento de clientes.</p>
-                        <ul class="space-y-2 border-t border-blue-100 dark:border-blue-800/50 pt-4">
-                            <li>
-                                <a href="{% url 'reportes:inventario' %}" class="flex items-center text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 p-2 rounded-md transition-colors">
-                                    <i data-lucide="package" class="w-4 h-4 mr-2"></i>
-                                    <span>Inventario</span>
-                                    <i data-lucide="chevron-right" class="w-4 h-4 ml-auto"></i>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{% url 'reportes:analisis_ventas' %}" class="flex items-center text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 p-2 rounded-md transition-colors">
-                                    <i data-lucide="pie-chart" class="w-4 h-4 mr-2"></i>
-                                    <span>Análisis de Ventas</span>
-                                    <i data-lucide="chevron-right" class="w-4 h-4 ml-auto"></i>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{% url 'reportes:clientes' %}" class="flex items-center text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 p-2 rounded-md transition-colors">
-                                    <i data-lucide="users" class="w-4 h-4 mr-2"></i>
-                                    <span>Clientes</span>
-                                    <i data-lucide="chevron-right" class="w-4 h-4 ml-auto"></i>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                    
-                    <!-- Reportes para el SRI -->
-                    <div class="bg-gradient-to-br from-amber-50 to-white dark:from-amber-900/20 dark:to-gray-800 p-6 rounded-lg border border-amber-100 dark:border-amber-800 shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-1">
-                        <div class="flex items-center mb-4">
-                            <div class="bg-amber-100 dark:bg-amber-800/40 p-3 rounded-full mr-3">
-                                <i data-lucide="file" class="w-6 h-6 text-amber-600 dark:text-amber-400"></i>
-                            </div>
-                            <h4 class="text-xl font-bold text-gray-800 dark:text-white">SRI</h4>
+                        <div class="flex items-center bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 px-3 py-2 rounded-lg"
+                            title="Ambiente de facturación electrónica">
+                            <i data-lucide="shield-check" class="w-4 h-4 text-green-600 dark:text-green-400 mr-2"></i>
+                            <span class="text-xs font-semibold text-green-700 dark:text-green-400">Producción</span>
                         </div>
-                        <p class="text-gray-600 dark:text-gray-300 mb-4 text-sm">Documentos y reportes requeridos por el Servicio de Rentas Internas para cumplimiento legal.</p>
-                        <ul class="space-y-2 border-t border-amber-100 dark:border-amber-800/50 pt-4">
-                            <li>
-                                <a href="{% url 'reportes:ats' %}" class="flex items-center text-gray-700 dark:text-gray-300 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/30 p-2 rounded-md transition-colors">
-                                    <i data-lucide="file-plus" class="w-4 h-4 mr-2"></i>
-                                    <span>Anexo Transaccional (ATS)</span>
-                                    <i data-lucide="chevron-right" class="w-4 h-4 ml-auto"></i>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{% url 'reportes:iva_declaracion' %}" class="flex items-center text-gray-700 dark:text-gray-300 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/30 p-2 rounded-md transition-colors">
-                                    <i data-lucide="clipboard" class="w-4 h-4 mr-2"></i>
-                                    <span>Declaración del IVA</span>
-                                    <i data-lucide="chevron-right" class="w-4 h-4 ml-auto"></i>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{% url 'reportes:renta' %}" class="flex items-center text-gray-700 dark:text-gray-300 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/30 p-2 rounded-md transition-colors">
-                                    <i data-lucide="briefcase" class="w-4 h-4 mr-2"></i>
-                                    <span>Impuesto a la Renta</span>
-                                    <i data-lucide="chevron-right" class="w-4 h-4 ml-auto"></i>
-                                </a>
-                            </li>
-                        </ul>
                     </div>
                 </div>
-                
-                <!-- Reportes Rápidos con Indicadores -->
-                <div class="mt-10">
-                    <div class="flex items-center justify-between mb-6">
-                        <h4 class="text-xl font-bold text-gray-800 dark:text-white flex items-center">
-                            <i data-lucide="zap" class="w-5 h-5 mr-2 text-purple-600 dark:text-purple-400"></i>Acceso Rápido
-                        </h4>
-                        <span class="text-sm text-gray-500 dark:text-gray-400">Informes de uso frecuente</span>
+                <!-- Info Multi-tenant -->
+                <div
+                    class="flex items-center space-x-6 text-sm text-gray-600 dark:text-gray-400 pt-3 border-t border-gray-200 dark:border-gray-700">
+                    <div class="flex items-center">
+                        <i data-lucide="building-2" class="w-4 h-4 mr-2"></i>
+                        <span class="font-medium">Empresa:</span>
+                        <span class="ml-1 text-gray-800 dark:text-white">Restaurante La Costa</span>
                     </div>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <a href="{% url 'reportes:ventas_diarias' %}" class="bg-white dark:bg-gray-700 p-5 rounded-lg border border-gray-200 dark:border-gray-600 shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col items-center group">
-                            <div class="bg-purple-100 dark:bg-purple-800/40 p-3 rounded-full mb-3 group-hover:bg-purple-200 dark:group-hover:bg-purple-700/60 transition-colors">
-                                <i data-lucide="calendar" class="w-8 h-8 text-purple-600 dark:text-purple-400"></i>
-                            </div>
-                            <span class="text-gray-800 dark:text-white font-medium mb-2">Ventas del Día</span>
-                            <p class="text-gray-500 dark:text-gray-400 text-xs text-center">Resumen de transacciones de hoy</p>
-                        </a>
-                        
-                        <a href="{% url 'reportes:productos_top' %}" class="bg-white dark:bg-gray-700 p-5 rounded-lg border border-gray-200 dark:border-gray-600 shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col items-center group">
-                            <div class="bg-green-100 dark:bg-green-800/40 p-3 rounded-full mb-3 group-hover:bg-green-200 dark:group-hover:bg-green-700/60 transition-colors">
-                                <i data-lucide="award" class="w-8 h-8 text-green-600 dark:text-green-400"></i>
-                            </div>
-                            <span class="text-gray-800 dark:text-white font-medium mb-2">Productos Top</span>
-                            <p class="text-gray-500 dark:text-gray-400 text-xs text-center">Los productos más vendidos</p>
-                        </a>
-                        
-                        <a href="{% url 'reportes:stock_bajo' %}" class="bg-white dark:bg-gray-700 p-5 rounded-lg border border-gray-200 dark:border-gray-600 shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col items-center group">
-                            <div class="bg-red-100 dark:bg-red-800/40 p-3 rounded-full mb-3 group-hover:bg-red-200 dark:group-hover:bg-red-700/60 transition-colors">
-                                <i data-lucide="alert-triangle" class="w-8 h-8 text-red-600 dark:text-red-400"></i>
-                            </div>
-                            <span class="text-gray-800 dark:text-white font-medium mb-2">Stock Bajo</span>
-                            <p class="text-gray-500 dark:text-gray-400 text-xs text-center">Productos que necesitan reposición</p>
-                        </a>
-                        
-                        <a href="{% url 'reportes:generar_xml' %}" class="bg-white dark:bg-gray-700 p-5 rounded-lg border border-gray-200 dark:border-gray-600 shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col items-center group">
-                            <div class="bg-blue-100 dark:bg-blue-800/40 p-3 rounded-full mb-3 group-hover:bg-blue-200 dark:group-hover:bg-blue-700/60 transition-colors">
-                                <i data-lucide="file-text" class="w-8 h-8 text-blue-600 dark:text-blue-400"></i>
-                            </div>
-                            <span class="text-gray-800 dark:text-white font-medium mb-2">Generar XML</span>
-                            <p class="text-gray-500 dark:text-gray-400 text-xs text-center">Archivos para declaraciones SRI</p>
-                        </a>
+                    <div class="flex items-center">
+                        <i data-lucide="file-text" class="w-4 h-4 mr-2"></i>
+                        <span class="font-medium">RUC:</span>
+                        <span class="ml-1 text-gray-800 dark:text-white">1792xxxxxxx001</span>
                     </div>
-                </div>
-                
-                <!-- Ayuda Rápida -->
-                <div class="mt-10 bg-gray-50 dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
-                    <h4 class="text-lg font-bold text-gray-800 dark:text-white mb-3 flex items-center">
-                        <i data-lucide="help-circle" class="w-5 h-5 mr-2 text-gray-600 dark:text-gray-300"></i>¿Necesitas ayuda?
-                    </h4>
-                    <p class="text-gray-600 dark:text-gray-300 text-sm mb-4">
-                        Los reportes te permiten visualizar datos importantes de tu negocio. Selecciona una categoría para ver información detallada 
-                        o usa el acceso rápido para los informes más comunes.
-                    </p>
-                    <div class="flex flex-wrap gap-2">
-                        <a href="#" class="text-sm text-emerald-600 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 flex items-center">
-                            <i data-lucide="book-open" class="w-4 h-4 mr-1"></i>Ver tutorial
-                        </a>
-                        <a href="#" class="text-sm text-emerald-600 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 flex items-center ml-4">
-                            <i data-lucide="download" class="w-4 h-4 mr-1"></i>Descargar guía de reportes
-                        </a>
+                    <div class="flex items-center">
+                        <i data-lucide="map-pin" class="w-4 h-4 mr-2"></i>
+                        <span class="font-medium">Sucursal:</span>
+                        <span class="ml-1 text-gray-800 dark:text-white">Matriz</span>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- Grid principal adaptativo -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+
+            <!-- FACTURACIÓN ELECTRÓNICA - Destacada (2 columnas en desktop) -->
+            <div class="lg:col-span-2">
+                <div
+                    class="bg-white dark:bg-gray-800 rounded-xl shadow-md border-2 border-green-200 dark:border-green-700 overflow-hidden h-full">
+                    <div style="background-color: #10b981;" class="px-5 py-4">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <i data-lucide="file-check" class="w-6 h-6 text-white mr-3"></i>
+                                <h4 class="text-lg font-bold text-white">Facturación Electrónica</h4>
+                            </div>
+                            <span class="text-xs text-white bg-white/20 px-3 py-1 rounded-full font-medium">Control en
+                                tiempo real</span>
+                        </div>
+                    </div>
+
+                    <div class="p-5">
+                        <!-- Última sincronización -->
+                        <div
+                            class="flex items-center justify-between mb-4 pb-3 border-b border-gray-200 dark:border-gray-700">
+                            <div class="flex items-center text-sm text-gray-600 dark:text-gray-400">
+                                <i data-lucide="refresh-cw" class="w-4 h-4 mr-2"></i>
+                                <span>Última validación: <span class="font-semibold text-gray-800 dark:text-white">hace
+                                        2 minutos</span></span>
+                            </div>
+                            <button
+                                class="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium flex items-center">
+                                <i data-lucide="rotate-cw" class="w-3 h-3 mr-1"></i>
+                                Actualizar
+                            </button>
+                        </div>
+
+                        <!-- Contadores en grid compacto -->
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
+                            <div
+                                class="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/30 dark:to-green-800/30 rounded-lg p-4 border border-green-200 dark:border-green-700 hover:shadow-lg transition-all cursor-pointer group">
+                                <div class="flex items-center justify-between mb-3">
+                                    <i data-lucide="check-circle"
+                                        class="w-6 h-6 text-green-600 dark:text-green-400 group-hover:scale-110 transition-transform"></i>
+                                    <span
+                                        class="text-xs font-bold text-green-600 dark:text-green-400 bg-green-200 dark:bg-green-800 px-2 py-0.5 rounded">HOY</span>
+                                </div>
+                                <div class="text-4xl font-bold text-green-700 dark:text-green-300 mb-1">120</div>
+                                <div
+                                    class="text-xs text-green-600 dark:text-green-500 font-semibold uppercase tracking-wide">
+                                    Autorizados</div>
+                            </div>
+
+                            <div
+                                class="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30 rounded-lg p-4 border border-blue-200 dark:border-blue-700 hover:shadow-lg transition-all cursor-pointer group">
+                                <div class="flex items-center justify-between mb-3">
+                                    <i data-lucide="loader"
+                                        class="w-6 h-6 text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform"></i>
+                                    <span
+                                        class="text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-200 dark:bg-blue-800 px-2 py-0.5 rounded">PROCESO</span>
+                                </div>
+                                <div class="text-4xl font-bold text-blue-700 dark:text-blue-300 mb-1">5</div>
+                                <div
+                                    class="text-xs text-blue-600 dark:text-blue-500 font-semibold uppercase tracking-wide">
+                                    En Proceso SRI</div>
+                            </div>
+
+                            <div
+                                class="bg-gradient-to-br from-yellow-50 to-yellow-100 dark:from-yellow-900/30 dark:to-yellow-800/30 rounded-lg p-4 border border-yellow-200 dark:border-yellow-700 hover:shadow-lg transition-all cursor-pointer group">
+                                <div class="flex items-center justify-between mb-3">
+                                    <i data-lucide="clock"
+                                        class="w-6 h-6 text-yellow-600 dark:text-yellow-400 group-hover:scale-110 transition-transform"></i>
+                                    <span
+                                        class="text-xs font-bold text-yellow-600 dark:text-yellow-400 bg-yellow-200 dark:bg-yellow-800 px-2 py-0.5 rounded">COLA</span>
+                                </div>
+                                <div class="text-4xl font-bold text-yellow-700 dark:text-yellow-300 mb-1">3</div>
+                                <div
+                                    class="text-xs text-yellow-600 dark:text-yellow-500 font-semibold uppercase tracking-wide">
+                                    Pendientes</div>
+                            </div>
+
+                            <div
+                                class="bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/30 dark:to-red-800/30 rounded-lg p-4 border border-red-200 dark:border-red-700 hover:shadow-lg transition-all cursor-pointer group">
+                                <div class="flex items-center justify-between mb-3">
+                                    <i data-lucide="x-circle"
+                                        class="w-6 h-6 text-red-600 dark:text-red-400 group-hover:scale-110 transition-transform"></i>
+                                    <span
+                                        class="text-xs font-bold text-red-600 dark:text-red-400 bg-red-200 dark:bg-red-800 px-2 py-0.5 rounded">ERROR</span>
+                                </div>
+                                <div class="text-4xl font-bold text-red-700 dark:text-red-300 mb-1">1</div>
+                                <div
+                                    class="text-xs text-red-600 dark:text-red-500 font-semibold uppercase tracking-wide">
+                                    Rechazados</div>
+                            </div>
+                        </div>
+
+                        <!-- Accesos rápidos compactos -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <a href="#"
+                                class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-yellow-50 dark:hover:bg-yellow-900/20 border border-transparent hover:border-yellow-300 dark:hover:border-yellow-700 transition-all group">
+                                <div class="flex items-center">
+                                    <div
+                                        class="bg-yellow-100 dark:bg-yellow-900/40 p-2 rounded-lg mr-3 group-hover:scale-110 transition-transform">
+                                        <i data-lucide="clock" class="w-4 h-4 text-yellow-600 dark:text-yellow-400"></i>
+                                    </div>
+                                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Pendientes de
+                                        Envío</span>
+                                </div>
+                                <span class="bg-yellow-500 text-white text-xs font-bold px-2 py-1 rounded-full">3</span>
+                            </a>
+
+                            <a href="#"
+                                class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 border border-transparent hover:border-blue-300 dark:hover:border-blue-700 transition-all group">
+                                <div class="flex items-center">
+                                    <div
+                                        class="bg-blue-100 dark:bg-blue-900/40 p-2 rounded-lg mr-3 group-hover:scale-110 transition-transform">
+                                        <i data-lucide="loader" class="w-4 h-4 text-blue-600 dark:text-blue-400"></i>
+                                    </div>
+                                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">En Proceso
+                                        SRI</span>
+                                </div>
+                                <span class="bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded-full">5</span>
+                            </a>
+
+                            <a href="{% url 'reportes:facturas' %}"
+                                class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-green-50 dark:hover:bg-green-900/20 border border-transparent hover:border-green-300 dark:hover:border-green-700 transition-all group">
+                                <div class="flex items-center">
+                                    <div
+                                        class="bg-green-100 dark:bg-green-900/40 p-2 rounded-lg mr-3 group-hover:scale-110 transition-transform">
+                                        <i data-lucide="check-circle"
+                                            class="w-4 h-4 text-green-600 dark:text-green-400"></i>
+                                    </div>
+                                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Ver
+                                        Autorizados</span>
+                                </div>
+                                <i data-lucide="chevron-right" class="w-4 h-4 text-gray-400"></i>
+                            </a>
+
+                            <a href="#"
+                                class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 border border-transparent hover:border-red-300 dark:hover:border-red-700 transition-all group">
+                                <div class="flex items-center">
+                                    <div
+                                        class="bg-red-100 dark:bg-red-900/40 p-2 rounded-lg mr-3 group-hover:scale-110 transition-transform">
+                                        <i data-lucide="alert-circle"
+                                            class="w-4 h-4 text-red-600 dark:text-red-400"></i>
+                                    </div>
+                                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Historial de
+                                        Errores</span>
+                                </div>
+                                <i data-lucide="chevron-right" class="w-4 h-4 text-gray-400"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- FIN lg:col-span-2 -->
+
+            <!-- OPERACIÓN - columna derecha -->
+            <div class="lg:col-span-1">
+                <div
+                    class="bg-white dark:bg-gray-800 rounded-xl shadow-md border border-blue-200 dark:border-blue-700 overflow-hidden h-full">
+                    <div class="bg-blue-500 dark:bg-blue-600 px-5 py-4">
+                        <div class="flex items-center">
+                            <i data-lucide="activity" class="w-5 h-5 text-white mr-2"></i>
+                            <h4 class="text-lg font-bold text-white">Operación</h4>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <div class="space-y-1">
+                            <a href="{% url 'reportes:ventas' %}"
+                                class="flex items-center justify-between p-3 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all group">
+                                <div class="flex items-center">
+                                    <i data-lucide="trending-up"
+                                        class="w-4 h-4 text-blue-600 dark:text-blue-400 mr-3"></i>
+                                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Ventas</span>
+                                </div>
+                                <i data-lucide="chevron-right"
+                                    class="w-4 h-4 text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400"></i>
+                            </a>
+                            <a href="{% url 'reportes:inventario' %}"
+                                class="flex items-center justify-between p-3 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all group">
+                                <div class="flex items-center">
+                                    <i data-lucide="package" class="w-4 h-4 text-blue-600 dark:text-blue-400 mr-3"></i>
+                                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Inventario</span>
+                                </div>
+                                <i data-lucide="chevron-right"
+                                    class="w-4 h-4 text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400"></i>
+                            </a>
+                            <a href="{% url 'reportes:clientes' %}"
+                                class="flex items-center justify-between p-3 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all group">
+                                <div class="flex items-center">
+                                    <i data-lucide="users" class="w-4 h-4 text-blue-600 dark:text-blue-400 mr-3"></i>
+                                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Clientes</span>
+                                </div>
+                                <i data-lucide="chevron-right"
+                                    class="w-4 h-4 text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400"></i>
+                            </a>
+                            <a href="{% url 'reportes:productos_top' %}"
+                                class="flex items-center justify-between p-3 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all group">
+                                <div class="flex items-center">
+                                    <i data-lucide="award" class="w-4 h-4 text-blue-600 dark:text-blue-400 mr-3"></i>
+                                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Productos
+                                        Top</span>
+                                </div>
+                                <i data-lucide="chevron-right"
+                                    class="w-4 h-4 text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400"></i>
+                            </a>
+                            <a href="{% url 'reportes:stock_bajo' %}"
+                                class="flex items-center justify-between p-3 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-all group">
+                                <div class="flex items-center">
+                                    <i data-lucide="alert-triangle"
+                                        class="w-4 h-4 text-red-600 dark:text-red-400 mr-3"></i>
+                                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Stock Bajo</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <span
+                                        class="bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 text-xs font-bold px-2 py-1 rounded-full mr-2">!</span>
+                                    <i data-lucide="chevron-right"
+                                        class="w-4 h-4 text-gray-400 group-hover:text-red-600 dark:group-hover:text-red-400"></i>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- FIN columna derecha -->
+
+        </div>
+        <!-- FIN grid principal -->
+
+        <!-- Segunda fila: Cumplimiento y Analíticos -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+
+            <!-- CUMPLIMIENTO TRIBUTARIO -->
+            <div
+                class="bg-white dark:bg-gray-800 rounded-xl shadow-md border border-amber-200 dark:border-amber-700 overflow-hidden">
+                <div class="bg-amber-500 dark:bg-amber-600 px-5 py-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <i data-lucide="shield-check" class="w-5 h-5 text-white mr-2"></i>
+                            <h4 class="text-lg font-bold text-white">Cumplimiento Tributario</h4>
+                        </div>
+                        <span
+                            class="text-xs text-white bg-amber-600 dark:bg-amber-700 px-2 py-1 rounded-full font-medium">SRI</span>
+                    </div>
+                </div>
+                <div class="p-4">
+                    <div class="space-y-1">
+                        <a href="{% url 'reportes:ats' %}"
+                            class="flex items-center justify-between p-3 rounded-lg hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-all group">
+                            <div class="flex items-center">
+                                <i data-lucide="file-plus" class="w-4 h-4 text-amber-600 dark:text-amber-400 mr-3"></i>
+                                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Generar ATS</span>
+                            </div>
+                            <i data-lucide="chevron-right"
+                                class="w-4 h-4 text-gray-400 group-hover:text-amber-600 dark:group-hover:text-amber-400"></i>
+                        </a>
+                        <a href="{% url 'reportes:iva' %}"
+                            class="flex items-center justify-between p-3 rounded-lg hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-all group">
+                            <div class="flex items-center">
+                                <i data-lucide="trending-up"
+                                    class="w-4 h-4 text-amber-600 dark:text-amber-400 mr-3"></i>
+                                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">IVA Ventas</span>
+                            </div>
+                            <i data-lucide="chevron-right"
+                                class="w-4 h-4 text-gray-400 group-hover:text-amber-600 dark:group-hover:text-amber-400"></i>
+                        </a>
+                        <a href="#"
+                            class="flex items-center justify-between p-3 rounded-lg hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-all group">
+                            <div class="flex items-center">
+                                <i data-lucide="trending-down"
+                                    class="w-4 h-4 text-amber-600 dark:text-amber-400 mr-3"></i>
+                                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">IVA Compras</span>
+                            </div>
+                            <i data-lucide="chevron-right"
+                                class="w-4 h-4 text-gray-400 group-hover:text-amber-600 dark:group-hover:text-amber-400"></i>
+                        </a>
+                        <a href="#"
+                            class="flex items-center justify-between p-3 rounded-lg hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-all group">
+                            <div class="flex items-center">
+                                <i data-lucide="receipt" class="w-4 h-4 text-amber-600 dark:text-amber-400 mr-3"></i>
+                                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Retenciones</span>
+                            </div>
+                            <i data-lucide="chevron-right"
+                                class="w-4 h-4 text-gray-400 group-hover:text-amber-600 dark:group-hover:text-amber-400"></i>
+                        </a>
+                        <a href="{% url 'reportes:generar_xml' %}"
+                            class="flex items-center justify-between p-3 rounded-lg hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-all group border-t border-gray-200 dark:border-gray-700 mt-2 pt-3">
+                            <div class="flex items-center">
+                                <i data-lucide="download" class="w-4 h-4 text-amber-600 dark:text-amber-400 mr-3"></i>
+                                <span class="text-sm font-semibold text-gray-700 dark:text-gray-300">Exportar XML</span>
+                            </div>
+                            <i data-lucide="chevron-right"
+                                class="w-4 h-4 text-gray-400 group-hover:text-amber-600 dark:group-hover:text-amber-400"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- REPORTES ANALÍTICOS -->
+            <div
+                class="bg-white dark:bg-gray-800 rounded-xl shadow-md border border-purple-200 dark:border-purple-700 overflow-hidden">
+                <div class="bg-purple-500 dark:bg-purple-600 px-5 py-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <i data-lucide="line-chart" class="w-5 h-5 text-white mr-2"></i>
+                            <h4 class="text-lg font-bold text-white">Reportes Analíticos</h4>
+                        </div>
+                        <span
+                            class="text-xs text-white bg-purple-600 dark:bg-purple-700 px-2 py-1 rounded-full font-medium">Insights</span>
+                    </div>
+                </div>
+                <div class="p-4">
+                    <div class="space-y-1">
+                        <a href="{% url 'reportes:analisis_ventas' %}"
+                            class="flex items-center justify-between p-3 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all group">
+                            <div class="flex items-center">
+                                <i data-lucide="pie-chart"
+                                    class="w-4 h-4 text-purple-600 dark:text-purple-400 mr-3"></i>
+                                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Ventas por
+                                    Producto</span>
+                            </div>
+                            <i data-lucide="chevron-right"
+                                class="w-4 h-4 text-gray-400 group-hover:text-purple-600 dark:group-hover:text-purple-400"></i>
+                        </a>
+                        <a href="{% url 'reportes:ventas_diarias' %}"
+                            class="flex items-center justify-between p-3 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all group">
+                            <div class="flex items-center">
+                                <i data-lucide="calendar" class="w-4 h-4 text-purple-600 dark:text-purple-400 mr-3"></i>
+                                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Ventas por
+                                    Fecha</span>
+                            </div>
+                            <i data-lucide="chevron-right"
+                                class="w-4 h-4 text-gray-400 group-hover:text-purple-600 dark:group-hover:text-purple-400"></i>
+                        </a>
+                        <a href="{% url 'reportes:clientes' %}"
+                            class="flex items-center justify-between p-3 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all group">
+                            <div class="flex items-center">
+                                <i data-lucide="user-check"
+                                    class="w-4 h-4 text-purple-600 dark:text-purple-400 mr-3"></i>
+                                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Clientes
+                                    Frecuentes</span>
+                            </div>
+                            <i data-lucide="chevron-right"
+                                class="w-4 h-4 text-gray-400 group-hover:text-purple-600 dark:group-hover:text-purple-400"></i>
+                        </a>
+                        <a href="#"
+                            class="flex items-center justify-between p-3 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all group">
+                            <div class="flex items-center">
+                                <i data-lucide="bar-chart-2"
+                                    class="w-4 h-4 text-purple-600 dark:text-purple-400 mr-3"></i>
+                                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Comparativo
+                                    Mensual</span>
+                            </div>
+                            <i data-lucide="chevron-right"
+                                class="w-4 h-4 text-gray-400 group-hover:text-purple-600 dark:group-hover:text-purple-400"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <!-- FIN segunda fila -->
+
+        <!-- Footer con ayuda -->
+        <div class="bg-blue-50 dark:bg-gray-800 rounded-xl p-5 border border-blue-200 dark:border-gray-700">
+            <div class="flex items-start justify-between">
+                <div class="flex items-start">
+                    <div class="bg-blue-100 dark:bg-blue-900/40 p-2 rounded-lg mr-3">
+                        <i data-lucide="info" class="w-5 h-5 text-blue-600 dark:text-blue-400"></i>
+                    </div>
+                    <div>
+                        <h5 class="font-semibold text-gray-800 dark:text-white mb-1">Centro de Control</h5>
+                        <p class="text-sm text-gray-600 dark:text-gray-300">Gestiona operaciones, facturación
+                            electrónica y cumplimiento tributario desde un solo lugar. Los datos mostrados son ejemplos.
+                        </p>
+                    </div>
+                </div>
+                <div class="hidden lg:flex items-center space-x-3 ml-4">
+                    <a href="#"
+                        class="flex items-center text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors">
+                        <i data-lucide="book-open" class="w-4 h-4 mr-1"></i>
+                        Tutorial
+                    </a>
+                    <a href="#"
+                        class="flex items-center text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors">
+                        <i data-lucide="download" class="w-4 h-4 mr-1"></i>
+                        Guía PDF
+                    </a>
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>
 {% endblock %}

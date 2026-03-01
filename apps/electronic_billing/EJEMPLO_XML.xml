@@ -1,0 +1,67 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<factura xmlns="http://www.sri.gob.ec/schemas/factura" id="comprobante" version="1.1.0">
+  <infoTributaria>
+    <ambiente>1</ambiente>
+    <tipoEmision>1</tipoEmision>
+    <razonSocial>EMPRESA DE PRUEBA S.A.</razonSocial>
+    <nombreComercial>EMPRESA PRUEBA</nombreComercial>
+    <ruc>1234567890001</ruc>
+    <claveAcceso>2702202601123456789000110010010000000011234567811</claveAcceso>
+    <codDoc>01</codDoc>
+    <estab>001</estab>
+    <ptoEmi>001</ptoEmi>
+    <secuencial>000000001</secuencial>
+    <dirMatriz>AV. PRINCIPAL 123 Y SECUNDARIA</dirMatriz>
+  </infoTributaria>
+  <infoFactura>
+    <fechaEmision>27/02/2026</fechaEmision>
+    <dirEstablecimiento>AV. PRINCIPAL 123 Y SECUNDARIA</dirEstablecimiento>
+    <obligadoContabilidad>SI</obligadoContabilidad>
+    <tipoIdentificacionComprador>05</tipoIdentificacionComprador>
+    <razonSocialComprador>JUAN PEREZ</razonSocialComprador>
+    <identificacionComprador>1234567890</identificacionComprador>
+    <direccionComprador>CALLE SECUNDARIA 456</direccionComprador>
+    <totalSinImpuestos>100.00</totalSinImpuestos>
+    <totalDescuento>0.00</totalDescuento>
+    <totalConImpuestos>
+      <totalImpuesto>
+        <codigo>2</codigo>
+        <codigoPorcentaje>2</codigoPorcentaje>
+        <baseImponible>100.00</baseImponible>
+        <valor>12.00</valor>
+      </totalImpuesto>
+    </totalConImpuestos>
+    <propina>0.00</propina>
+    <importeTotal>112.00</importeTotal>
+    <moneda>DOLAR</moneda>
+    <pagos>
+      <pago>
+        <formaPago>01</formaPago>
+        <total>112.00</total>
+      </pago>
+    </pagos>
+  </infoFactura>
+  <detalles>
+    <detalle>
+      <codigoPrincipal>PROD001</codigoPrincipal>
+      <descripcion>PRODUCTO DE EJEMPLO</descripcion>
+      <cantidad>2</cantidad>
+      <precioUnitario>50.00</precioUnitario>
+      <descuento>0.00</descuento>
+      <precioTotalSinImpuesto>100.00</precioTotalSinImpuesto>
+      <impuestos>
+        <impuesto>
+          <codigo>2</codigo>
+          <codigoPorcentaje>2</codigoPorcentaje>
+          <tarifa>12</tarifa>
+          <baseImponible>100.00</baseImponible>
+          <valor>12.00</valor>
+        </impuesto>
+      </impuestos>
+    </detalle>
+  </detalles>
+  <infoAdicional>
+    <campoAdicional nombre="Email">[email]</campoAdicional>
+    <campoAdicional nombre="Teléfono">[phone_number]</campoAdicional>
+  </infoAdicional>
+</factura>

@@ -43,12 +43,15 @@ AUTH_USER_MODEL = 'usuarios.Usuario'
 
 # And update your INSTALLED_APPS to use the full path:
 INSTALLED_APPS = [
+    'daphne',  # Debe estar primero para Channels
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # Channels
+    'channels',
     # Cloudinary (solo cloudinary, sin cloudinary_storage que causa problemas)
     'cloudinary',
     # Add your apps here
@@ -60,6 +63,7 @@ INSTALLED_APPS = [
     'apps.transacciones',
     'apps.ventas',
     'apps.core',  # Just the app name, not the middleware path
+    'apps.electronic_billing',  # Facturación electrónica SRI
     # Remove 'dashboard.apps.DashboardConfig'
 ]
 
@@ -114,6 +118,7 @@ DATABASES = {
         'OPTIONS': {
             'sslmode': 'require',
         },
+        'CONN_MAX_AGE': 600,  # Mantener conexiones abiertas por 10 minutos
     }
 }
 
@@ -205,7 +210,14 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:8000',
     'http://127.0.0.1:8000',
+    'http://0.0.0.0:8000',
 ]
+
+# Permitir cualquier origen en desarrollo (para red local)
+if DEBUG:
+    # Esto permite conexiones desde cualquier IP en tu red local
+    CSRF_TRUSTED_ORIGINS.append('http://*')
+    CSRF_TRUSTED_ORIGINS.append('https://*')
 
 # Add Render domain to CSRF trusted origins
 if RENDER_EXTERNAL_HOSTNAME:
@@ -279,3 +291,21 @@ if CLOUDINARY_URL:
         # Si hay algún error, continuar sin Cloudinary
         import sys
         print(f"Warning: Could not configure Cloudinary: {e}", file=sys.stderr)
+
+
+# ============================================
+# CHANNELS CONFIGURATION (WebSockets)
+# ============================================
+ASGI_APPLICATION = 'southern_food_pos.asgi.application'
+
+# Channel layers configuration
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer'  # Para desarrollo
+        # Para producción usar Redis:
+        # 'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        # 'CONFIG': {
+        #     "hosts": [config('REDIS_URL', default='redis://localhost:6379')],
+        # },
+    },
+}

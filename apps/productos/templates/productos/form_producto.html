@@ -110,28 +110,72 @@
             
             <!-- Imagen con checkbox alineado a la derecha -->
             <div class="mb-4">
-                <div class="flex justify-between items-center mb-1">
-                    <label for="{{ form.imagen.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                <div class="flex justify-between items-center mb-2">
+                    <label class="block text-sm font-medium text-gray-700">
                         Imagen del producto
                     </label>
                     <div class="flex items-center">
                         <input type="checkbox" name="no_imagen" id="no_imagen" class="mr-1" 
-                               {% if not form.imagen.value and not object.imagen %}checked{% endif %}>
+                               {% if modo_operacion == 'retail' %}
+                                   {% if not form.imagen.value and not object.imagen %}checked{% endif %}
+                               {% endif %}>
                         <label for="no_imagen" class="text-sm text-gray-600">
                             No tiene imagen
                         </label>
                     </div>
                 </div>
-                <input type="file" name="{{ form.imagen.name }}" id="{{ form.imagen.id_for_label }}" 
-                       class="w-full border border-gray-300 rounded-md px-3 py-2"
-                       {% if not form.imagen.value and not object.imagen %}disabled{% endif %}>
+                
+                <!-- Zona de carga de imagen mejorada -->
+                <div id="image-upload-area" class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center transition-all duration-200 hover:border-emerald-500 hover:bg-emerald-50 cursor-pointer"
+                     {% if modo_operacion == 'retail' and not form.imagen.value and not object.imagen %}style="opacity: 0.5; pointer-events: none;"{% endif %}>
+                    <input type="file" name="{{ form.imagen.name }}" id="{{ form.imagen.id_for_label }}" 
+                           class="hidden" accept="image/*"
+                           {% if modo_operacion == 'retail' and not form.imagen.value and not object.imagen %}disabled{% endif %}>
+                    
+                    <div id="upload-placeholder">
+                        <i data-lucide="image" class="w-12 h-12 mx-auto text-gray-400 mb-2"></i>
+                        <p class="text-sm text-gray-600 mb-1">
+                            <span class="text-emerald-600 font-medium">Haz clic para seleccionar</span> o arrastra una imagen aquí
+                        </p>
+                        <p class="text-xs text-gray-500">PNG, JPG, JPEG hasta 10MB</p>
+                    </div>
+                    
+                    <div id="image-preview" class="hidden">
+                        <img id="preview-img" src="" alt="Vista previa" class="max-h-48 mx-auto rounded-lg shadow-md mb-3">
+                        <p id="file-name" class="text-sm text-gray-700 font-medium mb-2"></p>
+                        <button type="button" id="remove-image" class="text-sm text-red-600 hover:text-red-700 font-medium">
+                            <i data-lucide="x-circle" class="w-4 h-4 inline mr-1"></i>
+                            Eliminar imagen
+                        </button>
+                    </div>
+                </div>
+                
                 {% if form.imagen.errors %}
                     <p class="text-red-500 text-xs mt-1">{{ form.imagen.errors.0 }}</p>
                 {% endif %}
+                
                 {% if object and object.imagen %}
-                    <div class="mt-2">
-                        <p class="text-sm text-gray-600">Imagen actual:</p>
-                        <img src="{{ object.imagen.url }}" alt="{{ object.nombre }}" class="h-24 mt-1 border rounded">
+                    <div id="current-image-container" class="mt-3 p-3 bg-blue-50 rounded-lg border-2 border-blue-200">
+                        <div class="flex justify-between items-center mb-2">
+                            <p class="text-sm text-blue-700 font-medium flex items-center">
+                                <i data-lucide="info" class="w-4 h-4 mr-1"></i>
+                                Imagen actual del producto
+                            </p>
+                            <button type="button" id="change-image-btn" class="text-xs text-emerald-600 hover:text-emerald-700 font-medium flex items-center">
+                                <i data-lucide="refresh-cw" class="w-3 h-3 mr-1"></i>
+                                Cambiar imagen
+                            </button>
+                        </div>
+                        <img src="{{ object.imagen.url }}" alt="{{ object.nombre }}" class="h-32 rounded-lg shadow-sm border border-blue-300">
+                        <p class="text-xs text-blue-600 mt-2">Esta imagen se mantendrá si no subes una nueva</p>
+                    </div>
+                    
+                    <!-- Mensaje de nueva imagen seleccionada -->
+                    <div id="new-image-alert" class="hidden mt-3 p-3 bg-emerald-50 rounded-lg border-2 border-emerald-500 animate-pulse">
+                        <p class="text-sm text-emerald-700 font-medium flex items-center">
+                            <i data-lucide="check-circle" class="w-4 h-4 mr-1"></i>
+                            Nueva imagen seleccionada - Se reemplazará al guardar
+                        </p>
                     </div>
                 {% endif %}
             </div>
@@ -144,7 +188,9 @@
                     </label>
                     <div class="flex items-center">
                         <input type="checkbox" name="no_codigo" id="no_codigo" class="mr-1" 
-                               {% if not form.codigo_barras.value and not object.codigo_barras %}checked{% endif %}>
+                               {% if modo_operacion == 'restaurante' %}
+                                   {% if not form.codigo_barras.value and not object.codigo_barras %}checked{% endif %}
+                               {% endif %}>
                         <label for="no_codigo" class="text-sm text-gray-600">
                             No tiene código
                         </label>
@@ -153,7 +199,7 @@
                 <input type="text" name="{{ form.codigo_barras.name }}" id="{{ form.codigo_barras.id_for_label }}" 
                        value="{{ form.codigo_barras.value|default_if_none:'' }}"
                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-emerald-500"
-                       {% if not form.codigo_barras.value and not object.codigo_barras %}disabled{% endif %}>
+                       {% if modo_operacion == 'restaurante' and not form.codigo_barras.value and not object.codigo_barras %}disabled{% endif %}>
                 {% if form.codigo_barras.errors %}
                     <p class="text-red-500 text-xs mt-1">{{ form.codigo_barras.errors.0 }}</p>
                 {% endif %}
@@ -174,17 +220,195 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Para la imagen
+        // Obtener el modo de operación desde el template
+        const modoOperacion = '{{ modo_operacion|default:"restaurante" }}';
+        
+        // Elementos del DOM
         const noImagenCheckbox = document.getElementById('no_imagen');
         const imagenInput = document.getElementById('{{ form.imagen.id_for_label }}');
+        const imageUploadArea = document.getElementById('image-upload-area');
+        const uploadPlaceholder = document.getElementById('upload-placeholder');
+        const imagePreview = document.getElementById('image-preview');
+        const previewImg = document.getElementById('preview-img');
+        const fileName = document.getElementById('file-name');
+        const removeImageBtn = document.getElementById('remove-image');
+        const currentImageContainer = document.getElementById('current-image-container');
+        const newImageAlert = document.getElementById('new-image-alert');
+        const changeImageBtn = document.getElementById('change-image-btn');
         
+        // Variable para rastrear si hay una nueva imagen
+        let hasNewImage = false;
+        
+        // Función para mostrar notificación temporal
+        function showFeedback(message, type = 'success') {
+            const feedbackDiv = document.createElement('div');
+            feedbackDiv.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transition-all duration-300 ${
+                type === 'success' ? 'bg-emerald-500' : 
+                type === 'info' ? 'bg-blue-500' : 'bg-red-500'
+            } text-white flex items-center space-x-2`;
+            feedbackDiv.innerHTML = `
+                <i data-lucide="${type === 'success' ? 'check-circle' : type === 'info' ? 'info' : 'alert-circle'}" class="w-5 h-5"></i>
+                <span class="font-medium">${message}</span>
+            `;
+            document.body.appendChild(feedbackDiv);
+            
+            // Inicializar icono
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+            
+            // Animar entrada
+            setTimeout(() => feedbackDiv.style.transform = 'translateX(0)', 10);
+            
+            // Remover después de 3 segundos
+            setTimeout(() => {
+                feedbackDiv.style.opacity = '0';
+                feedbackDiv.style.transform = 'translateX(100%)';
+                setTimeout(() => feedbackDiv.remove(), 300);
+            }, 3000);
+        }
+        
+        // Función para mostrar vista previa de imagen
+        function showImagePreview(file) {
+            if (file && file.type.startsWith('image/')) {
+                // Validar tamaño (10MB)
+                if (file.size > 10 * 1024 * 1024) {
+                    showFeedback('La imagen es muy grande. Máximo 10MB', 'error');
+                    imagenInput.value = '';
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImg.src = e.target.result;
+                    fileName.textContent = file.name;
+                    uploadPlaceholder.classList.add('hidden');
+                    imagePreview.classList.remove('hidden');
+                    hasNewImage = true;
+                    
+                    // Mostrar feedback
+                    showFeedback('✓ Imagen cargada correctamente', 'success');
+                    
+                    // Si estamos editando, mostrar alerta de nueva imagen
+                    if (currentImageContainer && newImageAlert) {
+                        currentImageContainer.classList.add('opacity-50');
+                        newImageAlert.classList.remove('hidden');
+                        setTimeout(() => {
+                            newImageAlert.classList.remove('animate-pulse');
+                        }, 2000);
+                    }
+                    
+                    // Animar el área de preview
+                    imagePreview.style.opacity = '0';
+                    imagePreview.style.transform = 'scale(0.9)';
+                    setTimeout(() => {
+                        imagePreview.style.transition = 'all 0.3s ease';
+                        imagePreview.style.opacity = '1';
+                        imagePreview.style.transform = 'scale(1)';
+                    }, 10);
+                };
+                reader.readAsDataURL(file);
+            } else {
+                showFeedback('Por favor selecciona un archivo de imagen válido', 'error');
+                imagenInput.value = '';
+            }
+        }
+        
+        // Función para limpiar vista previa
+        function clearImagePreview() {
+            previewImg.src = '';
+            fileName.textContent = '';
+            uploadPlaceholder.classList.remove('hidden');
+            imagePreview.classList.add('hidden');
+            imagenInput.value = '';
+            hasNewImage = false;
+            
+            // Restaurar estado original si estamos editando
+            if (currentImageContainer && newImageAlert) {
+                currentImageContainer.classList.remove('opacity-50');
+                newImageAlert.classList.add('hidden');
+                newImageAlert.classList.add('animate-pulse');
+            }
+            
+            showFeedback('Imagen removida', 'info');
+        }
+        
+        // Click en el área de carga
+        imageUploadArea.addEventListener('click', function(e) {
+            if (!noImagenCheckbox.checked && e.target.id !== 'remove-image') {
+                imagenInput.click();
+            }
+        });
+        
+        // Botón "Cambiar imagen" en modo edición
+        if (changeImageBtn) {
+            changeImageBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                imagenInput.click();
+            });
+        }
+        
+        // Cambio en el input de archivo
+        imagenInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                showImagePreview(file);
+            }
+        });
+        
+        // Botón para eliminar imagen
+        removeImageBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            clearImagePreview();
+        });
+        
+        // Drag and drop
+        imageUploadArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            if (!noImagenCheckbox.checked) {
+                this.classList.add('border-emerald-500', 'bg-emerald-50', 'scale-105');
+                this.style.transition = 'all 0.2s ease';
+            }
+        });
+        
+        imageUploadArea.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            this.classList.remove('border-emerald-500', 'bg-emerald-50', 'scale-105');
+        });
+        
+        imageUploadArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            this.classList.remove('border-emerald-500', 'bg-emerald-50', 'scale-105');
+            
+            if (!noImagenCheckbox.checked) {
+                const file = e.dataTransfer.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    // Crear un nuevo DataTransfer para asignar el archivo al input
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(file);
+                    imagenInput.files = dataTransfer.files;
+                    showImagePreview(file);
+                    showFeedback('Imagen arrastrada correctamente', 'success');
+                } else {
+                    showFeedback('Por favor arrastra un archivo de imagen', 'error');
+                }
+            }
+        });
+        
+        // Checkbox "No tiene imagen"
         noImagenCheckbox.addEventListener('change', function() {
             imagenInput.disabled = this.checked;
             imagenInput.required = !this.checked;
+            
             if(this.checked) {
-                imagenInput.classList.add('opacity-50', 'bg-gray-100');
+                imageUploadArea.style.opacity = '0.5';
+                imageUploadArea.style.pointerEvents = 'none';
+                clearImagePreview();
+                showFeedback('Campo de imagen deshabilitado', 'info');
             } else {
-                imagenInput.classList.remove('opacity-50', 'bg-gray-100');
+                imageUploadArea.style.opacity = '1';
+                imageUploadArea.style.pointerEvents = 'auto';
+                showFeedback('Campo de imagen habilitado', 'info');
             }
         });
         
@@ -196,18 +420,33 @@
             codigoInput.disabled = this.checked;
             if(this.checked) {
                 codigoInput.classList.add('opacity-50', 'bg-gray-100');
+                codigoInput.value = '';
+                showFeedback('Campo de código deshabilitado', 'info');
             } else {
                 codigoInput.classList.remove('opacity-50', 'bg-gray-100');
+                showFeedback('Campo de código habilitado', 'info');
             }
         });
 
-        // Set initial state of inputs
-        if(noImagenCheckbox.checked) {
-            imagenInput.classList.add('opacity-50', 'bg-gray-100');
-        }
-        
-        if(noCodigoCheckbox.checked) {
-            codigoInput.classList.add('opacity-50', 'bg-gray-100');
+        // Configurar estado inicial según el modo de operación
+        if (modoOperacion === 'retail') {
+            // Modo Retail: código habilitado por defecto, imagen deshabilitada por defecto
+            if (noImagenCheckbox.checked) {
+                imageUploadArea.style.opacity = '0.5';
+                imageUploadArea.style.pointerEvents = 'none';
+            }
+            if (noCodigoCheckbox.checked) {
+                codigoInput.classList.add('opacity-50', 'bg-gray-100');
+            }
+        } else {
+            // Modo Restaurante: imagen habilitada por defecto, código deshabilitado por defecto
+            if (noImagenCheckbox.checked) {
+                imageUploadArea.style.opacity = '0.5';
+                imageUploadArea.style.pointerEvents = 'none';
+            }
+            if (noCodigoCheckbox.checked) {
+                codigoInput.classList.add('opacity-50', 'bg-gray-100');
+            }
         }
 
         // Make notifications disappear after 3 seconds
@@ -215,9 +454,14 @@
         notifications.forEach(notification => {
             setTimeout(() => {
                 notification.style.opacity = '0';
-                setTimeout(() => notification.remove(), 300); // Remove after transition
+                setTimeout(() => notification.remove(), 300);
             }, 3000);
         });
+        
+        // Inicializar iconos de Lucide
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
     });
 </script>
 {% endblock %}

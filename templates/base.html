@@ -472,11 +472,32 @@
             z-index: 30;
             width: 100%;
             transition: all 0.3s ease;
+            display: block !important; /* Asegurar que siempre sea visible */
         }
         
         /* Ajustes del contenedor principal */
         #mainContentWrapper {
             transition: none;
+            width: 100%;
+        }
+        
+        /* En móvil, asegurar que el contenedor ocupe todo el ancho */
+        @media (max-width: 767px) {
+            #mainContentWrapper {
+                margin-left: 0 !important;
+                width: 100% !important;
+            }
+            
+            nav {
+                display: block !important;
+                position: sticky !important;
+                top: 0 !important;
+            }
+            
+            /* Asegurar que el botón del menú sea visible */
+            #sidebarToggle {
+                display: flex !important;
+            }
         }
         
         /* Media query para pantallas medianas y grandes */
@@ -523,10 +544,17 @@
     <!-- Scripts para manejar la interactividad -->
     <script>
         // Inicializar iconos de Lucide
-        lucide.createIcons();
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
         
         // Script para manejar el toggle de la sidebar
         document.addEventListener('DOMContentLoaded', function() {
+            // Reinicializar iconos después de que el DOM esté listo
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+            
             const desktopSidebar = document.getElementById('desktopSidebar');
             const mainContentWrapper = document.getElementById('mainContentWrapper');
             const collapseSidebar = document.getElementById('collapseSidebar');
@@ -539,14 +567,22 @@
             if (window.innerWidth >= 768) {  // 768px es el breakpoint para md: en Tailwind
                 if (sidebarCollapsed) {
                     document.body.classList.add('sidebar-collapsed');
-                    expandSidebar.classList.remove('hidden');
+                    if (expandSidebar) {
+                        expandSidebar.classList.remove('hidden');
+                    }
                 }
                 
                 // Evento para colapsar la sidebar
                 if (collapseSidebar) {
                     collapseSidebar.addEventListener('click', function() {
                         document.body.classList.add('sidebar-collapsed');
-                        expandSidebar.classList.remove('hidden');
+                        if (expandSidebar) {
+                            expandSidebar.classList.remove('hidden');
+                            // Reinicializar iconos
+                            if (typeof lucide !== 'undefined') {
+                                lucide.createIcons();
+                            }
+                        }
                         localStorage.setItem('sidebarCollapsed', 'true');
                     });
                 }
@@ -579,6 +615,15 @@
             window.addEventListener('resize', adjustForScreenSize);
         });
     </script>
+    
+    <!-- Inicializar Lucide Icons -->
+    <script>
+        // Inicializar iconos de Lucide cuando el DOM esté listo
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    </script>
+    
     {% block extra_js %}{% endblock %}
 </body>
 </html>

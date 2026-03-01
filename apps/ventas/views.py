@@ -25,39 +25,56 @@ def ventas(request):
     except Business.DoesNotExist:
         modo_ventas = 'restaurante'  # Valor por defecto si no existe el negocio
     
-    print(f"Modo de operación configurado en Business: {modo_ventas}")
-    
     # Si hay una solicitud para cambiar el modo temporalmente (sesión)
     if request.GET.get('modo'):
         modo_ventas = request.GET.get('modo')
         request.session['modo_ventas'] = modo_ventas
         request.session.modified = True
-        print(f"Modo temporalmente cambiado a: {modo_ventas} (solo para esta sesión)")
     
     # Si hay un modo en sesión, usarlo (temporal)
     modo_sesion = request.session.get('modo_ventas')
     if modo_sesion:
         modo_ventas = modo_sesion
-        print(f"Usando modo temporal de sesión: {modo_ventas}")
     
-    # Preparar contexto común para ambos modos
-    if request.user.is_authenticated:
-        productos = Producto.objects.filter(usuario_creador=request.user)
-    else:
-        productos = Producto.objects.all()
+    # Optimizar consultas con select_related y only
+    productos = Producto.objects.filter(
+        usuario_creador=request.user
+    ).select_related('categoria').only(
+        'id', 'nombre', 'precio', 'imagen', 'categoria__nombre', 'stock'
+    )
     
-    categorias = Categoria.objects.filter(usuario_creador=request.user)
+    categorias = Categoria.objects.filter(
+        usuario_creador=request.user
+    ).only('id', 'nombre')
     
-    # Get today's sales data for the dashboard
+    # Get today's sales data for the dashboard - optimizado
     today = timezone.now().date()
-    ventas_hoy = Venta.objects.filter(fecha_hora__date=today, usuario_creador=request.user)
     
-    total_ventas_hoy = ventas_hoy.aggregate(total=Sum('total'))['total'] or 0
-    num_ordenes_hoy = ventas_hoy.count()
+    # Usar una sola consulta agregada
+    stats_hoy = Venta.objects.filter(
+        fecha_hora__date=today, 
+        usuario_creador=request.user
+    ).aggregate(
+        total=Sum('total'),
+        num_ordenes=Count('id')
+    )
+    
+    total_ventas_hoy = stats_hoy['total'] or 0
+    num_ordenes_hoy = stats_hoy['num_ordenes'] or 0
+    
+    # Productos vendidos hoy
     productos_vendidos_hoy = DetalleVenta.objects.filter(
         venta__fecha_hora__date=today,
         venta__usuario_creador=request.user
     ).aggregate(total=Sum('cantidad'))['total'] or 0
+    
+    # Ventas recientes - optimizado con select_related
+    ventas_recientes = Venta.objects.filter(
+        fecha_hora__date=today,
+        usuario_creador=request.user
+    ).select_related('cliente').only(
+        'id', 'total', 'fecha_hora', 'cliente__nombre'
+    ).order_by('-fecha_hora')[:5]
     
     context = {
         'productos': productos,
@@ -66,14 +83,14 @@ def ventas(request):
         'total_ventas_hoy': total_ventas_hoy,
         'num_ordenes_hoy': num_ordenes_hoy,
         'productos_vendidos_hoy': productos_vendidos_hoy,
-        'ventas_recientes': ventas_hoy.order_by('-fecha_hora')[:5],
+        'ventas_recientes': ventas_recientes,
         'modo_actual': modo_ventas,
     }
     
     # Para el modo Retail, añadir clientes al contexto
     if modo_ventas == 'retail':
         from apps.clients.models import Cliente
-        clientes = Cliente.objects.all().order_by('nombre')
+        clientes = Cliente.objects.all().only('id', 'nombre').order_by('nombre')
         context['clientes'] = clientes
         context['title'] = 'Punto de Venta - Cajero'
         return render(request, 'ventas/ventas_cajero.html', context)
@@ -138,6 +155,12 @@ def completar_venta(request):
                 messages.error(request, 'El carrito está vacío. No se puede completar la venta.')
                 return redirect('ventas:ventas')
             
+            # Obtener el negocio del usuario
+            try:
+                business = Business.objects.get(user=request.user)
+            except Business.DoesNotExist:
+                business = None
+            
             # Create a new sale - in pending state
             nueva_venta = Venta.objects.create(
                 usuario_creador=request.user,
@@ -191,16 +214,30 @@ def completar_venta(request):
                     continue
             
             # Calculate tax and total
-            # Calculate total (no separate IVA calculation since prices already include IVA)
+            # Prices include IVA, we need to break it down
             from decimal import Decimal
-            # Total is simply the sum of all product subtotals
-            total = subtotal_venta
-            iva = Decimal('0')  # Set IVA to 0 since it's already included in prices
+            
+            # Get IVA rate from business settings (default 15% for Ecuador)
+            try:
+                business = Business.objects.get(user=request.user)
+                tax_rate = business.iva_porcentaje / Decimal('100')  # Convert percentage to decimal
+            except Business.DoesNotExist:
+                tax_rate = Decimal('0.15')  # Default 15% IVA for Ecuador (vigente desde abril 2024)
+            
+            # Calculate base (subtotal without IVA) and IVA
+            # Since prices include IVA: base = total_with_iva / (1 + tax_rate)
+            total_con_iva = subtotal_venta
+            base_sin_iva = total_con_iva / (Decimal('1') + tax_rate)
+            iva_calculado = total_con_iva - base_sin_iva
+            
+            # Round to 2 decimals
+            base_sin_iva = base_sin_iva.quantize(Decimal('0.01'))
+            iva_calculado = iva_calculado.quantize(Decimal('0.01'))
             
             # Update the sale with calculated values
-            nueva_venta.subtotal = subtotal_venta
-            nueva_venta.iva = iva
-            nueva_venta.total = total
+            nueva_venta.subtotal = base_sin_iva  # Base without IVA
+            nueva_venta.iva = iva_calculado      # IVA amount
+            nueva_venta.total = total_con_iva    # Total with IVA (what customer pays)
             nueva_venta.save()
             
             # Get active clients for the client selection
@@ -211,9 +248,9 @@ def completar_venta(request):
             context = {
                 'venta': nueva_venta,
                 'cart_items': cart_items_with_details,
-                'subtotal': subtotal_venta,
-                'iva': iva,
-                'total': total,
+                'subtotal': base_sin_iva,
+                'iva': iva_calculado,
+                'total': total_con_iva,
                 'clientes_activos': clientes_activos
             }
             
@@ -239,6 +276,7 @@ def procesar_pago(request):
     """
     from decimal import Decimal
     from apps.transacciones.models import Transaccion
+    from .services import OrderService
     
     if request.method == 'POST':
         venta_id = request.POST.get('venta_id')
@@ -260,6 +298,12 @@ def procesar_pago(request):
         
         try:
             venta = Venta.objects.get(id=venta_id, usuario_creador=request.user)
+            
+            # Obtener el negocio del usuario
+            try:
+                business = Business.objects.get(user=request.user)
+            except Business.DoesNotExist:
+                business = None
             
             # Ensure all required fields have default values
             if venta.total is None:
@@ -296,6 +340,15 @@ def procesar_pago(request):
                     producto.save()
                     # Log the issue
                     print(f"Warning: Product {producto.nombre} (ID: {producto.id}) had insufficient stock. Requested: {detalle.cantidad}, Available: {producto.stock}")
+            
+            # Crear orden si el negocio está en modo restaurante
+            if business and OrderService.should_create_order(business):
+                try:
+                    order = OrderService.create_order_for_sale(venta, business)
+                    print(f"Orden #{order.order_number} creada para venta #{venta.id}")
+                except Exception as e:
+                    print(f"Error al crear orden: {str(e)}")
+                    # No fallar la venta si falla la creación de la orden
             
             venta.save()
             

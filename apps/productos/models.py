@@ -4,6 +4,9 @@ import os
 from django.utils.text import slugify
 from cloudinary.models import CloudinaryField
 
+# Importar modelos de configuración
+from .models_config import ProductDisplayConfig, SavedProductFilter
+
 def producto_imagen_path(instance, filename):
     """
     Genera una ruta de archivo personalizada para las imágenes de productos,
@@ -78,3 +81,7 @@ class Producto(models.Model):
     def __str__(self):
         return self.nombre
 
+
+
+# Exportar todos los modelos
+__all__ = ['Producto', 'Categoria', 'ProductDisplayConfig', 'SavedProductFilter']

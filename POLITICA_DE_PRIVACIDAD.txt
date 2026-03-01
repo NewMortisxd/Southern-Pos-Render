@@ -1,0 +1,198 @@
+================================================================================
+                        POLÍTICA DE PRIVACIDAD
+                          Southern Food POS
+                    Última actualización: 22/11/2025
+================================================================================
+
+1. INTRODUCCIÓN
+
+Bienvenido a Southern Food POS. Esta Política de Privacidad describe cómo 
+recopilamos, usamos, almacenamos y protegemos su información personal cuando 
+utiliza nuestro sistema de punto de venta (POS).
+
+Al utilizar Southern Food POS, usted acepta las prácticas descritas en esta 
+política.
+
+
+2. INFORMACIÓN QUE RECOPILAMOS
+
+2.1 DATOS DE CUENTA Y AUTENTICACIÓN
+- Credenciales de usuario (nombre de usuario y contraseña)
+- Información de sesión y tokens CSRF
+- Preferencias de usuario (modo de operación: restaurante/retail)
+
+2.2 DATOS DE NEGOCIO
+Según lo detectado en views.py (líneas 18-46):
+- Nombre del negocio
+- Dirección del negocio
+- Teléfono del negocio
+- Logo de la empresa (almacenado en Cloudinary)
+
+2.3 DATOS DE CLIENTES
+Según lo detectado en views.py (líneas 8-37):
+- Nombre del cliente
+- Número de identificación
+- Código de cliente
+- Dirección
+- Ciudad
+- Estado (activo/inactivo)
+
+2.4 DATOS DE PRODUCTOS Y VENTAS
+Según lo detectado en views.py y pos.js:
+- Información de productos (nombre, código de barras, categorías)
+- Transacciones de venta
+- Historial de búsquedas de productos
+
+2.5 DATOS TÉCNICOS
+- Dirección IP
+- Información de sesión
+- Logs del servidor (gunicorn)
+- Información del navegador
+
+
+3. CÓMO USAMOS SU INFORMACIÓN
+
+Utilizamos la información recopilada para:
+
+- Proporcionar y mantener el servicio de POS
+- Autenticar usuarios y gestionar sesiones (urls.py, líneas 12-14)
+- Procesar transacciones de venta
+- Gestionar inventario de productos
+- Buscar y filtrar clientes, productos y transacciones
+- Generar reportes de negocio
+- Mejorar la experiencia del usuario
+- Mantener la seguridad del sistema
+
+
+4. ALMACENAMIENTO Y SEGURIDAD DE DATOS
+
+4.1 BASE DE DATOS
+- Utilizamos PostgreSQL para almacenar datos (requirements.txt, línea 5)
+- Base de datos alojada en Render.com
+- Retención de datos: 90 días en plan gratuito
+
+4.2 ALMACENAMIENTO DE ARCHIVOS
+- Imágenes y logos: Cloudinary (requirements.txt, líneas 24-25)
+- Archivos estáticos: WhiteNoise (requirements.txt, línea 13)
+- NOTA: Los archivos en /media/ no persisten en despliegues (MEDIA_FILES_INFO.md)
+
+4.3 MEDIDAS DE SEGURIDAD
+- Autenticación de usuarios mediante Django Auth
+- Protección CSRF en formularios
+- Filtrado de datos por usuario (views.py, línea 18)
+- Conexiones HTTPS en producción
+- Variables de entorno para datos sensibles (python-decouple)
+- Sesiones seguras de Django
+
+
+5. COOKIES Y TECNOLOGÍAS SIMILARES
+
+Utilizamos las siguientes cookies:
+
+5.1 COOKIES ESENCIALES
+- sessionid: Cookie de sesión de Django (necesaria para autenticación)
+- csrftoken: Token de protección contra ataques CSRF
+- modo_ventas: Preferencia de modo de operación (views.py, línea 96)
+
+5.2 DURACIÓN
+- Las cookies de sesión expiran al cerrar el navegador
+- Las preferencias persisten según configuración de Django
+
+
+6. COMPARTIR INFORMACIÓN CON TERCEROS
+
+6.1 PROVEEDORES DE SERVICIOS
+- Render.com: Hosting de aplicación y base de datos
+- Cloudinary: Almacenamiento de imágenes
+
+6.2 NO COMPARTIMOS
+- No vendemos su información personal a terceros
+- No compartimos datos con fines publicitarios
+- No utilizamos servicios de analytics externos (no detectados en el código)
+- No hay integración con redes sociales
+
+
+7. RETENCIÓN DE DATOS
+
+- Datos de usuario: Mientras la cuenta esté activa
+- Datos de transacciones: Según requerimientos legales y del negocio
+- Backups de base de datos: 90 días (plan gratuito de Render)
+- Imágenes en Cloudinary: Según configuración del servicio
+
+
+8. SUS DERECHOS
+
+Usted tiene derecho a:
+
+- Acceder a sus datos personales
+- Corregir información inexacta
+- Solicitar la eliminación de sus datos
+- Exportar sus datos
+- Revocar el consentimiento
+- Presentar una queja ante autoridades de protección de datos
+
+
+9. SEGURIDAD DE DATOS
+
+Implementamos medidas técnicas y organizativas:
+
+- Encriptación de contraseñas
+- Acceso restringido a datos por usuario
+- Filtros de seguridad en consultas (views.py, línea 18: usuario_creador)
+- Validación de entrada de datos
+- Monitoreo de logs
+- Actualizaciones regulares de seguridad
+
+
+10. TRANSFERENCIAS INTERNACIONALES
+
+Los datos pueden ser procesados en servidores ubicados fuera de su país:
+- Render.com opera en múltiples regiones
+- Cloudinary tiene servidores globales
+- Se aplican medidas de protección adecuadas
+
+
+11. CAMBIOS EN ESTA POLÍTICA
+
+Nos reservamos el derecho de actualizar esta política. Los cambios serán 
+notificados mediante:
+- Actualización de la fecha en este documento
+- Notificación en el sistema (si aplica)
+
+
+12. MENORES DE EDAD
+
+Este servicio no está dirigido a menores de 18 años. No recopilamos 
+intencionalmente información de menores.
+
+
+13. LIMITACIONES DEL SERVICIO
+
+IMPORTANTE (según DEPLOYMENT_SUMMARY.md y MEDIA_FILES_INFO.md):
+
+- Plan gratuito: La aplicación se "duerme" tras 15 min de inactividad
+- Los archivos en /media/ no persisten entre despliegues
+- Para producción, se recomienda usar Cloudinary o S3
+
+
+14. CONTACTO
+
+Para consultas sobre privacidad o ejercer sus derechos:
+
+Email: [TU_EMAIL_DE_CONTACTO]
+Dirección: [TU_DIRECCIÓN]
+Teléfono: [TU_TELÉFONO]
+
+Tiempo de respuesta: 30 días hábiles
+
+
+15. JURISDICCIÓN
+
+Esta política se rige por las leyes de [TU_PAÍS/REGIÓN] y regulaciones 
+aplicables de protección de datos.
+
+
+================================================================================
+                    © 2025 Southern Food POS
+              Todos los derechos reservados
+================================================================================

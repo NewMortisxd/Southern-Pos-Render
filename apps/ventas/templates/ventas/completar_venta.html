@@ -40,15 +40,21 @@
             </div>
         </div>
 
-        <!-- Total sin mostrar IVA por separado -->
-        <!-- Total sin mostrar IVA por separado -->
+        <!-- Totales con desglose de IVA -->
         <div class="bg-emerald-50 p-4 rounded-xl mb-6">
-            <div class="flex justify-between font-bold text-xl">
-                <span class="text-gray-800">Total:</span>
-                <span class="text-emerald-600">${{ total|floatformat:2 }}</span>
+            <div class="flex justify-between text-gray-700 mb-2">
+                <span>Subtotal (sin IVA):</span>
+                <span class="font-semibold">${{ subtotal|floatformat:2 }}</span>
             </div>
-            <div class="flex justify-between text-sm text-gray-600 mt-1">
-                <span>(Precio incluye IVA)</span>
+            <div class="flex justify-between text-gray-700 mb-3">
+                <span>IVA ({{ request.user.business.iva_porcentaje|default:"15" }}%):</span>
+                <span class="font-semibold">${{ iva|floatformat:2 }}</span>
+            </div>
+            <div class="border-t border-emerald-200 pt-2">
+                <div class="flex justify-between font-bold text-xl">
+                    <span class="text-gray-800">Total:</span>
+                    <span class="text-emerald-600">${{ total|floatformat:2 }}</span>
+                </div>
             </div>
         </div>
 

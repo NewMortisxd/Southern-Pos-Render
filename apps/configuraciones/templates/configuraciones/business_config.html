@@ -6,271 +6,1016 @@
 {% block back_url %}{% url 'configuraciones:index' %}{% endblock %}
 
 {% block content %}
-<!-- Contenedor principal con márgenes automáticos y padding -->
-<div class="container mx-auto px-4 py-6">
-    <!-- Contenedor centrado con ancho máximo -->
-    <div class="max-w-4xl mx-auto">
-        <!-- Tarjeta para el formulario de configuración del negocio -->
-        <div class="bg-white rounded-lg shadow-md overflow-hidden">
-            <!-- Encabezado de la tarjeta con título -->
-            <div class="bg-emerald-600 text-white px-6 py-4">
-                <h3 class="text-2xl font-bold flex items-center">
-                    <i data-lucide="settings" class="w-6 h-6 mr-2"></i>Configuración del Negocio
-                </h3>
-            </div>
-            
-            <!-- Cuerpo del formulario -->
-            <div class="p-6">
-                <!-- Sección para mostrar notificaciones/mensajes -->
-                {% if messages %}
+<!-- Contenedor principal sin padding en móvil -->
+<div class="container mx-auto px-0 sm:px-4 py-0 sm:py-6">
+    <!-- Layout responsive: columna única en móvil, dos columnas en desktop -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-0 sm:gap-6">
+
+        <!-- Columna izquierda: Formulario (8 columnas en desktop) -->
+        <div class="lg:col-span-8">
+            <!-- Tarjeta para el formulario de configuración del negocio -->
+            <div class="sm:bg-white sm:rounded-lg sm:shadow-md overflow-hidden">
+                <!-- Encabezado de la tarjeta con título (oculto en móvil) -->
+                <div class="hidden sm:block bg-emerald-600 text-white px-6 py-4">
+                    <h3 class="text-2xl font-bold flex items-center">
+                        <i data-lucide="settings" class="w-6 h-6 mr-2"></i>Configuración del Negocio
+                    </h3>
+                </div>
+
+                <!-- Cuerpo del formulario -->
+                <div class="px-2 py-2 sm:p-6">
+                    <!-- Sección para mostrar notificaciones/mensajes -->
+                    {% if messages %}
                     {% for message in messages %}
-                        <!-- Notificación dinámica según tipo (éxito, error, info) -->
-                        <div id="notification-{{ forloop.counter }}" class="{% if message.tags == 'success' %}bg-emerald-50 border-l-4 border-emerald-500{% elif message.tags == 'error' %}bg-red-50 border-l-4 border-red-500{% else %}bg-blue-50 border-l-4 border-blue-500{% endif %} p-4 mb-6 transition-opacity duration-300">
-                            <p class="{% if message.tags == 'success' %}text-emerald-700{% elif message.tags == 'error' %}text-red-700{% else %}text-blue-700{% endif %} font-medium flex items-center">
-                                <i data-lucide="{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}alert-circle{% else %}info{% endif %}" class="w-5 h-5 mr-2"></i>
-                                {{ message }}
-                            </p>
-                        </div>
+                    <!-- Notificación dinámica según tipo (éxito, error, info) -->
+                    <div id="notification-{{ forloop.counter }}"
+                        class="{% if message.tags == 'success' %}bg-emerald-50 border-l-4 border-emerald-500{% elif message.tags == 'error' %}bg-red-50 border-l-4 border-red-500{% else %}bg-blue-50 border-l-4 border-blue-500{% endif %} p-4 mb-6 transition-opacity duration-300">
+                        <p
+                            class="{% if message.tags == 'success' %}text-emerald-700{% elif message.tags == 'error' %}text-red-700{% else %}text-blue-700{% endif %} font-medium flex items-center">
+                            <i data-lucide="{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}alert-circle{% else %}info{% endif %}"
+                                class="w-5 h-5 mr-2"></i>
+                            {{ message }}
+                        </p>
+                    </div>
                     {% endfor %}
-                {% endif %}
-                
-                <!-- Formulario para enviar datos -->
-                <form method="post" enctype="multipart/form-data" class="space-y-6">
-                    <!-- Token de seguridad para formularios Django -->
-                    {% csrf_token %}
-                    
-                    <!-- Sección de información del negocio -->
-                    <div class="bg-gray-50 p-6 rounded-lg border border-gray-200 mb-6 shadow-sm hover:shadow-md transition-shadow duration-300">
-                        <!-- Título de la sección -->
-                        <h4 class="text-xl font-bold text-gray-800 mb-4 border-b border-gray-200 pb-2 flex items-center">
-                            <i data-lucide="store" class="w-5 h-5 mr-2 text-emerald-600"></i>Información del Negocio
-                        </h4>
-                        
-                        <!-- Cuadrícula de dos columnas para campos -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <!-- Campo: Nombre del negocio -->
-                            <div>
-                                <label for="{{ form.nombre_negocio.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
-                                    Nombre del Negocio*
-                                </label>
-                                {{ form.nombre_negocio }}
-                                <!-- Valor actual del campo -->
-                                <p class="text-xs text-gray-500 mt-1">Valor actual: {{ business.nombre_negocio|default:"No configurado" }}</p>
-                                <!-- Mensaje de error si aplica -->
-                                {% if form.nombre_negocio.errors %}
+                    {% endif %}
+
+                    <!-- Formulario para enviar datos -->
+                    <form method="post" enctype="multipart/form-data" class="space-y-6">
+                        <!-- Token de seguridad para formularios Django -->
+                        {% csrf_token %}
+
+                        <!-- Sección de información del negocio -->
+                        <div
+                            class="bg-gray-50 p-2 sm:p-6 rounded-lg border border-gray-200 mb-3 sm:mb-6 shadow-sm hover:shadow-md transition-shadow duration-300">
+                            <!-- Título de la sección -->
+                            <h4
+                                class="text-base sm:text-xl font-bold text-gray-800 mb-2 sm:mb-4 border-b border-gray-200 pb-2 flex items-center">
+                                <i data-lucide="store"
+                                    class="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-emerald-600"></i>Información del Negocio
+                            </h4>
+
+                            <!-- Cuadrícula de dos columnas para campos -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-6">
+                                <!-- Campo: Nombre del negocio -->
+                                <div>
+                                    <label for="{{ form.nombre_negocio.id_for_label }}"
+                                        class="block text-sm font-medium text-gray-700 mb-1">
+                                        Nombre del Negocio*
+                                    </label>
+                                    {{ form.nombre_negocio }}
+                                    <p class="text-xs text-gray-500 mt-1">Valor actual: {{ business.nombre_negocio|default:"No configurado" }}</p>
+                                    {% if form.nombre_negocio.errors %}
                                     <p class="text-red-500 text-xs mt-1">{{ form.nombre_negocio.errors.0 }}</p>
-                                {% endif %}
-                            </div>
-                            
-                            <!-- Campo: RUC/NIT -->
-                            <div>
-                                <label for="{{ form.ruc_negocio.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
-                                    RUC/NIT
-                                </label>
-                                {{ form.ruc_negocio }}
-                                <!-- Valor actual del campo -->
-                                <p class="text-xs text-gray-500 mt-1">Valor actual: {{ business.ruc_negocio|default:"No configurado" }}</p>
-                                <!-- Mensaje de error si aplica -->
-                                {% if form.ruc_negocio.errors %}
+                                    {% endif %}
+                                </div>
+
+                                <!-- Campo: RUC/NIT -->
+                                <div>
+                                    <label for="{{ form.ruc_negocio.id_for_label }}"
+                                        class="block text-sm font-medium text-gray-700 mb-1">
+                                        RUC/NIT
+                                    </label>
+                                    {{ form.ruc_negocio }}
+                                    <p class="text-xs text-gray-500 mt-1">Valor actual: {{ business.ruc_negocio|default:"No configurado" }}</p>
+                                    {% if form.ruc_negocio.errors %}
                                     <p class="text-red-500 text-xs mt-1">{{ form.ruc_negocio.errors.0 }}</p>
-                                {% endif %}
-                            </div>
-                            
-                            <!-- Campo: Dirección (ocupa dos columnas en pantallas grandes) -->
-                            <div class="md:col-span-2">
-                                <label for="{{ form.direccion_negocio.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
-                                    Dirección
-                                </label>
-                                {{ form.direccion_negocio }}
-                                <!-- Mensaje de error si aplica -->
-                                {% if form.direccion_negocio.errors %}
+                                    {% endif %}
+                                </div>
+
+                                <!-- Campo: Dirección (ocupa dos columnas en pantallas grandes) -->
+                                <div class="md:col-span-2">
+                                    <label for="{{ form.direccion_negocio.id_for_label }}"
+                                        class="block text-sm font-medium text-gray-700 mb-1">
+                                        Dirección
+                                    </label>
+                                    {{ form.direccion_negocio }}
+                                    <!-- Mensaje de error si aplica -->
+                                    {% if form.direccion_negocio.errors %}
                                     <p class="text-red-500 text-xs mt-1">{{ form.direccion_negocio.errors.0 }}</p>
-                                {% endif %}
-                            </div>
-                            
-                            <!-- Campo: Ciudad (entrada manual) -->
-                            <div>
-                                <label for="ciudad" class="block text-sm font-medium text-gray-700 mb-1">
-                                    Ciudad
-                                </label>
-                                <input type="text" name="ciudad" id="id_ciudad" class="w-full rounded-lg border-2 border-gray-400 bg-white p-2 focus:border-emerald-500 focus:ring focus:ring-emerald-200 focus:ring-opacity-50" placeholder="Ciudad del negocio">
-                            </div>
-                            
-                            <!-- Campo: Teléfono -->
-                            <div>
-                                <label for="{{ form.telefono_negocio.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
-                                    Teléfono
-                                </label>
-                                {{ form.telefono_negocio }}
-                                <!-- Mensaje de error si aplica -->
-                                {% if form.telefono_negocio.errors %}
+                                    {% endif %}
+                                </div>
+
+                                <!-- Campo: Ciudad (entrada manual) -->
+                                <div>
+                                    <label for="ciudad" class="block text-sm font-medium text-gray-700 mb-1">
+                                        Ciudad
+                                    </label>
+                                    <input type="text" name="ciudad" id="id_ciudad"
+                                        value="{{ business.ciudad|default:'' }}"
+                                        class="w-full rounded-lg border-2 border-gray-400 bg-white p-2 focus:border-emerald-500 focus:ring focus:ring-emerald-200 focus:ring-opacity-50"
+                                        placeholder="Ciudad del negocio">
+                                </div>
+
+                                <!-- Campo: Teléfono -->
+                                <div>
+                                    <label for="{{ form.telefono_negocio.id_for_label }}"
+                                        class="block text-sm font-medium text-gray-700 mb-1">
+                                        Teléfono
+                                    </label>
+                                    {{ form.telefono_negocio }}
+                                    <!-- Mensaje de error si aplica -->
+                                    {% if form.telefono_negocio.errors %}
                                     <p class="text-red-500 text-xs mt-1">{{ form.telefono_negocio.errors.0 }}</p>
-                                {% endif %}
-                            </div>
-                            
-                            <!-- Campo: Email -->
-                            <div>
-                                <label for="{{ form.email_negocio.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
-                                    Email
-                                </label>
-                                {{ form.email_negocio }}
-                                <!-- Mensaje de error si aplica -->
-                                {% if form.email_negocio.errors %}
+                                    {% endif %}
+                                </div>
+
+                                <!-- Campo: Email -->
+                                <div>
+                                    <label for="{{ form.email_negocio.id_for_label }}"
+                                        class="block text-sm font-medium text-gray-700 mb-1">
+                                        Email
+                                    </label>
+                                    {{ form.email_negocio }}
+                                    <!-- Mensaje de error si aplica -->
+                                    {% if form.email_negocio.errors %}
                                     <p class="text-red-500 text-xs mt-1">{{ form.email_negocio.errors.0 }}</p>
-                                {% endif %}
-                            </div>
-                            
-                            <!-- Campo: Logo (carga de archivo) -->
-                            <div>
-                                <label for="logo" class="block text-sm font-medium text-gray-700 mb-1">
-                                    Logo
-                                </label>
-                                <input type="file" name="logo" id="id_logo" class="w-full rounded-lg border-gray-300 focus:border-emerald-500 focus:ring focus:ring-emerald-200 focus:ring-opacity-50">
+                                    {% endif %}
+                                </div>
+
+                                <!-- Campo: Logo (carga de archivo) -->
+                                <div>
+                                    <label for="logo" class="block text-sm font-medium text-gray-700 mb-1">
+                                        Logo
+                                    </label>
+                                    <div class="relative">
+                                        <input type="file" name="logo" id="id_logo" class="hidden" accept="image/*"
+                                            onchange="updateLogoFilename(this)">
+                                        <label for="id_logo"
+                                            class="flex items-center justify-center w-full px-4 py-2 bg-white border-2 border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 hover:border-emerald-500 transition-all duration-200">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2 text-gray-600"
+                                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                            </svg>
+                                            <span id="logo-filename" class="text-sm text-gray-600">
+                                                {% if business.logo %}{{ business.logo.name|slice:"14:" }}{% else %}Seleccionar imagen{% endif %}
+                                            </span>
+                                        </label>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    
-                    <!-- Sección de configuración de facturas -->
-                    <div class="bg-gray-50 p-6 rounded-lg border border-gray-200 mb-6 shadow-sm hover:shadow-md transition-shadow duration-300">
-                        <!-- Título de la sección -->
-                        <h4 class="text-xl font-bold text-gray-800 mb-4 border-b border-gray-200 pb-2 flex items-center">
-                            <i data-lucide="receipt" class="w-5 h-5 mr-2 text-emerald-600"></i>Configuración de Factura
-                        </h4>
-                        
-                        <!-- Cuadrícula de dos columnas para campos -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <!-- Campo: Porcentaje de IVA -->
-                            <div>
-                                <label for="{{ form.iva_porcentaje.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
-                                    Porcentaje de IVA (%)
-                                </label>
-                                {{ form.iva_porcentaje }}
-                                <!-- Mensaje de error si aplica -->
-                                {% if form.iva_porcentaje.errors %}
+
+                        <!-- Sección de configuración de facturas -->
+                        <div
+                            class="bg-gray-50 p-2 sm:p-6 rounded-lg border border-gray-200 mb-3 sm:mb-6 shadow-sm hover:shadow-md transition-shadow duration-300">
+                            <!-- Título de la sección -->
+                            <h4
+                                class="text-base sm:text-xl font-bold text-gray-800 mb-2 sm:mb-4 border-b border-gray-200 pb-2 flex items-center">
+                                <i data-lucide="receipt"
+                                    class="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-emerald-600"></i>Configuración de
+                                Factura
+                            </h4>
+
+                            <!-- Cuadrícula de dos columnas para campos -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-6">
+                                <!-- Campo: Porcentaje de IVA -->
+                                <div>
+                                    <label for="{{ form.iva_porcentaje.id_for_label }}"
+                                        class="block text-sm font-medium text-gray-700 mb-1">
+                                        Porcentaje de IVA (%)
+                                    </label>
+                                    {{ form.iva_porcentaje }}
+                                    <!-- Mensaje de error si aplica -->
+                                    {% if form.iva_porcentaje.errors %}
                                     <p class="text-red-500 text-xs mt-1">{{ form.iva_porcentaje.errors.0 }}</p>
-                                {% endif %}
-                            </div>
-                            
-                            <!-- Campo: Símbolo de moneda -->
-                            <div>
-                                <label for="{{ form.moneda.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
-                                    Símbolo de Moneda
-                                </label>
-                                {{ form.moneda }}
-                                <!-- Valor actual del campo -->
-                                <p class="text-xs text-gray-500 mt-1">Valor actual: {{ business.moneda|default:"$" }}</p>
-                                <!-- Mensaje de error si aplica -->
-                                {% if form.moneda.errors %}
+                                    {% endif %}
+                                </div>
+
+                                <!-- Campo: Símbolo de moneda -->
+                                <div>
+                                    <label for="{{ form.moneda.id_for_label }}"
+                                        class="block text-sm font-medium text-gray-700 mb-1">
+                                        Símbolo de Moneda
+                                    </label>
+                                    {{ form.moneda }}
+                                    <!-- Valor actual del campo -->
+                                    <p class="text-xs text-gray-500 mt-1">Valor actual: {{ business.moneda|default:"$" }}</p>
+                                    <!-- Mensaje de error si aplica -->
+                                    {% if form.moneda.errors %}
                                     <p class="text-red-500 text-xs mt-1">{{ form.moneda.errors.0 }}</p>
-                                {% endif %}
-                            </div>
-                            
-                            <!-- Campo: Mostrar logo en factura (checkbox) -->
-                            <div>
-                                <label for="{{ form.mostrar_logo_en_factura.id_for_label }}" class="flex items-center text-sm font-medium text-gray-700 mb-1">
-                                    {{ form.mostrar_logo_en_factura }}
-                                    <span class="ml-2">Mostrar Logo en Factura</span>
-                                </label>
-                                <!-- Mensaje de error si aplica -->
-                                {% if form.mostrar_logo_en_factura.errors %}
+                                    {% endif %}
+                                </div>
+
+                                <!-- Campo: Mostrar logo en factura (checkbox) -->
+                                <div>
+                                    <label for="{{ form.mostrar_logo_en_factura.id_for_label }}"
+                                        class="flex items-center text-sm font-medium text-gray-700 mb-1">
+                                        {{ form.mostrar_logo_en_factura }}
+                                        <span class="ml-2">Mostrar Logo en Factura</span>
+                                    </label>
+                                    <!-- Mensaje de error si aplica -->
+                                    {% if form.mostrar_logo_en_factura.errors %}
                                     <p class="text-red-500 text-xs mt-1">{{ form.mostrar_logo_en_factura.errors.0 }}</p>
-                                {% endif %}
-                            </div>
-                            
-                            <!-- Campo: Formato de fecha -->
-                            <div>
-                                <label for="{{ form.formato_fecha.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
-                                    Formato de Fecha
-                                </label>
-                                {{ form.formato_fecha }}
-                                <!-- Ejemplo de formato de fecha -->
-                                <p class="text-xs text-gray-500 mt-1">Ejemplo: d/m/Y = 31/12/2023, Y-m-d = 2023-12-31</p>
-                                <!-- Mensaje de error si aplica -->
-                                {% if form.formato_fecha.errors %}
+                                    {% endif %}
+                                </div>
+
+                                <!-- Campo: Formato de fecha -->
+                                <div>
+                                    <label for="{{ form.formato_fecha.id_for_label }}"
+                                        class="block text-sm font-medium text-gray-700 mb-1">
+                                        Formato de Fecha
+                                    </label>
+                                    {{ form.formato_fecha }}
+                                    <!-- Ejemplo de formato de fecha -->
+                                    <p class="text-xs text-gray-500 mt-1">Ejemplo: d/m/Y = 31/12/2023, Y-m-d =
+                                        2023-12-31</p>
+                                    <!-- Mensaje de error si aplica -->
+                                    {% if form.formato_fecha.errors %}
                                     <p class="text-red-500 text-xs mt-1">{{ form.formato_fecha.errors.0 }}</p>
-                                {% endif %}
-                            </div>
-                            
-                            <!-- Campo: Mensaje en factura (ocupa dos columnas) -->
-                            <div class="md:col-span-2">
-                                <label for="{{ form.mensaje_factura.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
-                                    Mensaje en Factura
-                                </label>
-                                {{ form.mensaje_factura }}
-                                <!-- Mensaje de error si aplica -->
-                                {% if form.mensaje_factura.errors %}
+                                    {% endif %}
+                                </div>
+
+                                <!-- Campo: Mensaje en factura (ocupa dos columnas) -->
+                                <div class="md:col-span-2">
+                                    <label for="{{ form.mensaje_factura.id_for_label }}"
+                                        class="block text-sm font-medium text-gray-700 mb-1">
+                                        Mensaje en Factura
+                                    </label>
+                                    {{ form.mensaje_factura }}
+                                    <!-- Mensaje de error si aplica -->
+                                    {% if form.mensaje_factura.errors %}
                                     <p class="text-red-500 text-xs mt-1">{{ form.mensaje_factura.errors.0 }}</p>
-                                {% endif %}
-                            </div>
-                            
-                            <!-- Campo: Política de devolución (ocupa dos columnas) -->
-                            <div class="md:col-span-2">
-                                <label for="{{ form.politica_devolucion.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
-                                    Política de Devolución
-                                </label>
-                                {{ form.politica_devolucion }}
-                                <!-- Mensaje de error si aplica -->
-                                {% if form.politica_devolucion.errors %}
+                                    {% endif %}
+                                </div>
+
+                                <!-- Campo: Política de devolución (ocupa dos columnas) -->
+                                <div class="md:col-span-2">
+                                    <label for="{{ form.politica_devolucion.id_for_label }}"
+                                        class="block text-sm font-medium text-gray-700 mb-1">
+                                        Política de Devolución
+                                    </label>
+                                    {{ form.politica_devolucion }}
+                                    <!-- Mensaje de error si aplica -->
+                                    {% if form.politica_devolucion.errors %}
                                     <p class="text-red-500 text-xs mt-1">{{ form.politica_devolucion.errors.0 }}</p>
-                                {% endif %}
+                                    {% endif %}
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    
-                    <!-- Sección de modo de operación -->
-                    <div class="bg-gray-50 p-6 rounded-lg border border-gray-200 mb-6 shadow-sm hover:shadow-md transition-shadow duration-300">
-                        <!-- Título de la sección -->
-                        <h4 class="text-xl font-bold text-gray-800 mb-4 border-b border-gray-200 pb-2 flex items-center">
-                            <i data-lucide="layout" class="w-5 h-5 mr-2 text-emerald-600"></i>Modo de Operación
-                        </h4>
-                        
-                        <!-- Opciones de modo -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <!-- Modo Restaurante -->
-                            <div class="p-4 rounded-lg border-2 {% if form.modo_operacion.value == 'restaurante' %}border-emerald-500 bg-emerald-50{% else %}border-gray-200 bg-white{% endif %}">
-                                <label class="flex items-center space-x-4 cursor-pointer">
-                                    <input type="radio" name="modo_operacion" value="restaurante" class="form-radio h-5 w-5 text-emerald-600" 
-                                        {% if form.modo_operacion.value == 'restaurante' %}checked{% endif %}>
-                                    <div>
-                                        <div class="flex items-center">
-                                            <i data-lucide="utensils" class="w-6 h-6 mr-2 text-emerald-600"></i>
-                                            <h5 class="text-lg font-semibold text-gray-800">Modo Restaurante</h5>
-                                        </div>
-                                        <p class="text-sm text-gray-600 mt-1">Interfaz orientada a restaurantes.</p>
-                                    </div>
-                                </label>
+
+                        <!-- Sección de Facturación Electrónica SRI -->
+                        <div
+                            class="bg-gradient-to-br from-blue-50 to-indigo-50 p-2 sm:p-6 rounded-xl border-2 border-blue-200 mb-3 sm:mb-6 shadow-lg hover:shadow-xl transition-all duration-300">
+                            <!-- Título de la sección -->
+                            <div class="flex items-center mb-6 pb-4 border-b-2 border-blue-300">
+                                <div class="bg-blue-600 p-3 rounded-lg mr-3">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-white" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h4 class="text-2xl font-bold text-gray-800">Facturación Electrónica SRI</h4>
+                                    <p class="text-sm text-gray-600 mt-1">Configuración para emisión de comprobantes
+                                        electrónicos en Ecuador</p>
+                                </div>
                             </div>
-                            
-                            <!-- Modo Retail/Supermercado -->
-                            <div class="p-4 rounded-lg border-2 {% if form.modo_operacion.value == 'retail' %}border-emerald-500 bg-emerald-50{% else %}border-gray-200 bg-white{% endif %}">
-                                <label class="flex items-center space-x-4 cursor-pointer">
-                                    <input type="radio" name="modo_operacion" value="retail" class="form-radio h-5 w-5 text-emerald-600" 
-                                        {% if form.modo_operacion.value == 'retail' %}checked{% endif %}>
-                                    <div>
-                                        <div class="flex items-center">
-                                            <i data-lucide="shopping-cart" class="w-6 h-6 mr-2 text-emerald-600"></i>
-                                            <h5 class="text-lg font-semibold text-gray-800">Modo Retail / Supermercado</h5>
-                                        </div>
-                                        <p class="text-sm text-gray-600 mt-1">Interfaz optimizada para escaneo rápido de productos con código de barras.</p>
+
+                            <!-- Información Tributaria -->
+                            <div class="mb-3 sm:mb-6 p-2 sm:p-5 bg-white rounded-xl border-2 border-blue-200 shadow-md">
+                                <h5 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2 text-blue-600"
+                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                    </svg>
+                                    Información Tributaria
+                                </h5>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <!-- Razón Social Legal -->
+                                    <div class="md:col-span-2">
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                                            Razón Social Legal*
+                                            <span class="text-xs text-gray-500 font-normal">(Exactamente como aparece en
+                                                el RUC)</span>
+                                        </label>
+                                        <input type="text" name="razon_social_legal"
+                                            value="{{ business.razon_social_legal|default:'' }}"
+                                            class="w-full rounded-lg border-2 border-gray-300 bg-white p-2 focus:border-blue-500 focus:ring focus:ring-blue-200"
+                                            placeholder="EMPRESA EJEMPLO S.A.">
+                                        <p class="text-xs text-gray-500 mt-1">Este nombre aparecerá en los comprobantes
+                                            electrónicos</p>
                                     </div>
-                                </label>
+
+                                    <!-- Ambiente -->
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                                            Ambiente SRI*
+                                        </label>
+                                        <select name="ambiente_sri"
+                                            class="w-full rounded-lg border-2 border-gray-300 bg-white p-2 focus:border-blue-500 focus:ring focus:ring-blue-200">
+                                            <option value="1" {% if business.ambiente_sri == '1' %}selected{% endif %}>1 -
+                                                Pruebas</option>
+                                            <option value="2" {% if business.ambiente_sri == '2' %}selected{% endif %}>2 -
+                                                Producción</option>
+                                        </select>
+                                        <p class="text-xs text-gray-500 mt-1">Usar "Pruebas" hasta obtener autorización
+                                            del SRI</p>
+                                    </div>
+
+                                    <!-- Tipo de Emisión -->
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                                            Tipo de Emisión*
+                                        </label>
+                                        <select name="tipo_emision"
+                                            class="w-full rounded-lg border-2 border-gray-300 bg-white p-2 focus:border-blue-500 focus:ring focus:ring-blue-200">
+                                            <option value="1" {% if business.tipo_emision == '1' %}selected{% endif %}>1 -
+                                                Emisión Normal</option>
+                                            <option value="2" {% if business.tipo_emision == '2' %}selected{% endif %}>2 -
+                                                Emisión por Indisponibilidad</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- Obligado a llevar contabilidad -->
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                                            Obligado a llevar contabilidad*
+                                        </label>
+                                        <select name="obligado_contabilidad"
+                                            class="w-full rounded-lg border-2 border-gray-300 bg-white p-2 focus:border-blue-500 focus:ring focus:ring-blue-200">
+                                            <option value="SI" {% if business.obligado_contabilidad == 'SI' %}selected{% endif %}>SI</option>
+                                            <option value="NO" {% if business.obligado_contabilidad == 'NO' %}selected{% endif %}>NO</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- Régimen RIMPE -->
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                                            Régimen RIMPE
+                                        </label>
+                                        <select name="regimen_rimpe"
+                                            class="w-full rounded-lg border-2 border-gray-300 bg-white p-2 focus:border-blue-500 focus:ring focus:ring-blue-200">
+                                            <option value="" {% if not business.regimen_rimpe %}selected{% endif %}>No
+                                                aplica</option>
+                                            <option value="RIMPE" {% if business.regimen_rimpe == 'RIMPE' %}selected{%
+                                                endif %}>RIMPE</option>
+                                            <option value="RIMPE_EMPRENDEDOR" {% if
+                                                business.regimen_rimpe == 'RIMPE_EMPRENDEDOR' %}selected{% endif %}>RIMPE
+                                                - Emprendedor</option>
+                                            <option value="NO" {% if business.regimen_rimpe == 'NO' %}selected{% endif %}>
+                                                NO</option>
+                                        </select>
+                                        <p class="text-xs text-gray-500 mt-1">Régimen Simplificado para Emprendedores y
+                                            Negocios Populares</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Establecimientos y Puntos de Emisión -->
+                            <div class="mb-3 sm:mb-6 p-2 sm:p-5 bg-white rounded-xl border-2 border-blue-200 shadow-md">
+                                <h5 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2 text-blue-600"
+                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                    Establecimientos y Puntos de Emisión
+                                </h5>
+
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <!-- Establecimiento -->
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                                            Establecimiento*
+                                        </label>
+                                        <input type="text" name="establecimiento" maxlength="3" pattern="[0-9]{3}"
+                                            value="{{ business.establecimiento|default:'' }}"
+                                            class="w-full rounded-lg border-2 border-gray-300 bg-white p-2 focus:border-blue-500 focus:ring focus:ring-blue-200"
+                                            placeholder="001">
+                                        <p class="text-xs text-gray-500 mt-1">3 dígitos (ej: 001)</p>
+                                    </div>
+
+                                    <!-- Punto de Emisión -->
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                                            Punto de Emisión*
+                                        </label>
+                                        <input type="text" name="punto_emision" maxlength="3" pattern="[0-9]{3}"
+                                            value="{{ business.punto_emision|default:'' }}"
+                                            class="w-full rounded-lg border-2 border-gray-300 bg-white p-2 focus:border-blue-500 focus:ring focus:ring-blue-200"
+                                            placeholder="001">
+                                        <p class="text-xs text-gray-500 mt-1">3 dígitos (ej: 001)</p>
+                                    </div>
+
+                                    <!-- Secuencial Actual -->
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                                            Secuencial Actual*
+                                        </label>
+                                        <input type="number" name="secuencial_actual" min="1"
+                                            class="w-full rounded-lg border-2 border-gray-300 bg-white p-2 focus:border-blue-500 focus:ring focus:ring-blue-200"
+                                            placeholder="1">
+                                        <p class="text-xs text-gray-500 mt-1">Se autoincrementa con cada factura</p>
+                                    </div>
+                                </div>
+
+                                <div class="mt-4 p-3 bg-blue-50 border-l-4 border-blue-500 rounded">
+                                    <p class="text-sm text-blue-800">
+                                        <strong>Formato de factura:</strong> 001-001-000000001
+                                        <br>
+                                        <span class="text-xs">(Establecimiento-PuntoEmisión-Secuencial)</span>
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Certificado Digital -->
+                            <div class="mb-3 sm:mb-6 p-2 sm:p-5 bg-white rounded-xl border-2 border-red-200 shadow-md">
+                                <h5 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2 text-red-600"
+                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                    </svg>
+                                    Certificado Digital (Firma Electrónica)
+                                    <span class="ml-2 px-2 py-1 bg-red-100 text-red-700 text-xs rounded-full">Requerido
+                                        para producción</span>
+                                </h5>
+
+                                <div class="space-y-4">
+                                    <!-- Archivo .p12 -->
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                                            Archivo de Certificado (.p12)*
+                                        </label>
+                                        <div class="relative">
+                                            <input type="file" name="certificado_digital" id="certificado_digital"
+                                                class="hidden" accept=".p12"
+                                                onchange="updateFileName(this, 'cert-filename')">
+                                            <label for="certificado_digital"
+                                                class="flex items-center justify-center w-full px-4 py-2 bg-white border-2 border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 hover:border-blue-500 transition-all duration-200">
+                                                <svg xmlns="http://www.w3.org/2000/svg"
+                                                    class="w-5 h-5 mr-2 text-gray-600" fill="none" viewBox="0 0 24 24"
+                                                    stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                </svg>
+                                                <span id="cert-filename" class="text-sm text-gray-600">Seleccionar
+                                                    archivo .p12</span>
+                                            </label>
+                                        </div>
+                                        <p class="text-xs text-gray-500 mt-1">Archivo .p12 proporcionado por el Banco
+                                            Central o entidad certificadora</p>
+                                    </div>
+
+                                    <!-- Contraseña del certificado -->
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                                            Contraseña del Certificado*
+                                        </label>
+                                        <input type="password" name="contrasena_certificado"
+                                            class="w-full rounded-lg border-2 border-gray-300 bg-white p-2 focus:border-blue-500 focus:ring focus:ring-blue-200"
+                                            placeholder="••••••••">
+                                        <p class="text-xs text-gray-500 mt-1">Contraseña asignada al momento de obtener
+                                            el certificado</p>
+                                    </div>
+
+                                    <!-- Fecha de vencimiento (informativo) -->
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                                            Fecha de Vencimiento del Certificado
+                                        </label>
+                                        <input type="date" name="fecha_vencimiento_certificado"
+                                            class="w-full rounded-lg border-2 border-gray-300 bg-white p-2 focus:border-blue-500 focus:ring focus:ring-blue-200">
+                                        <p class="text-xs text-gray-500 mt-1">Para recordatorio de renovación</p>
+                                    </div>
+                                </div>
+
+                                <div class="mt-4 p-3 bg-yellow-50 border-l-4 border-yellow-500 rounded">
+                                    <p class="text-sm text-yellow-800 flex items-start">
+                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                            class="w-5 h-5 mr-2 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24"
+                                            stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                        </svg>
+                                        <span>
+                                            <strong>Importante:</strong> El certificado digital es obligatorio para
+                                            emitir facturas electrónicas en ambiente de producción.
+                                            Sin él, solo podrás generar XMLs de prueba sin firma.
+                                        </span>
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Información Adicional -->
+                            <div class="p-4 bg-blue-50 border-l-4 border-blue-500 rounded-lg">
+                                <div class="flex items-start">
+                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                        class="w-5 h-5 text-blue-600 mr-3 mt-0.5 flex-shrink-0" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <div>
+                                        <p class="text-sm text-blue-800 font-medium">Próximos pasos</p>
+                                        <ul class="text-sm text-blue-700 mt-2 space-y-1 list-disc list-inside">
+                                            <li>Completa todos los campos marcados con asterisco (*)</li>
+                                            <li>Inicia en ambiente de "Pruebas" para validar tus comprobantes</li>
+                                            <li>Obtén tu certificado digital del Banco Central o Security Data</li>
+                                            <li>Solicita autorización al SRI para pasar a "Producción"</li>
+                                        </ul>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <!-- Mensaje de error si aplica -->
-                        {% if form.modo_operacion.errors %}
+
+                        <!-- Sección de modo de operación -->
+                        <div
+                            class="bg-gray-50 p-2 sm:p-6 rounded-lg border border-gray-200 mb-3 sm:mb-6 shadow-sm hover:shadow-md transition-shadow duration-300">
+                            <!-- Título de la sección -->
+                            <h4
+                                class="text-xl font-bold text-gray-800 mb-4 border-b border-gray-200 pb-2 flex items-center">
+                                <i data-lucide="layout" class="w-5 h-5 mr-2 text-emerald-600"></i>Modo de Operación
+                            </h4>
+
+                            <!-- Opciones de modo -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <!-- Modo Restaurante -->
+                                <div
+                                    class="p-4 rounded-lg border-2 {% if form.modo_operacion.value == 'restaurante' or business.modo_operacion == 'restaurante' %}border-emerald-500 bg-emerald-50{% else %}border-gray-200 bg-white{% endif %}">
+                                    <label class="flex items-center space-x-4 cursor-pointer">
+                                        <input type="radio" name="modo_operacion" value="restaurante"
+                                            id="modo_restaurante" class="form-radio h-5 w-5 text-emerald-600" 
+                                            {% if form.modo_operacion.value == 'restaurante' or business.modo_operacion == 'restaurante' %}checked{% endif %}>
+                                        <div>
+                                            <div class="flex items-center">
+                                                <i data-lucide="utensils" class="w-6 h-6 mr-2 text-emerald-600"></i>
+                                                <h5 class="text-lg font-semibold text-gray-800">Modo Restaurante</h5>
+                                            </div>
+                                            <p class="text-sm text-gray-600 mt-1">Interfaz orientada a restaurantes.</p>
+                                        </div>
+                                    </label>
+                                </div>
+
+                                <!-- Modo Retail/Supermercado -->
+                                <div
+                                    class="p-4 rounded-lg border-2 {% if form.modo_operacion.value == 'retail' or business.modo_operacion == 'retail' %}border-emerald-500 bg-emerald-50{% else %}border-gray-200 bg-white{% endif %}">
+                                    <label class="flex items-center space-x-4 cursor-pointer">
+                                        <input type="radio" name="modo_operacion" value="retail" id="modo_retail"
+                                            class="form-radio h-5 w-5 text-emerald-600" 
+                                            {% if form.modo_operacion.value == 'retail' or business.modo_operacion == 'retail' %}checked{% endif %}>
+                                        <div>
+                                            <div class="flex items-center">
+                                                <i data-lucide="shopping-cart"
+                                                    class="w-6 h-6 mr-2 text-emerald-600"></i>
+                                                <h5 class="text-lg font-semibold text-gray-800">Modo Retail /
+                                                    Supermercado</h5>
+                                            </div>
+                                            <p class="text-sm text-gray-600 mt-1">Interfaz optimizada para escaneo
+                                                rápido de productos con código de barras.</p>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                            <!-- Mensaje de error si aplica -->
+                            {% if form.modo_operacion.errors %}
                             <p class="text-red-500 text-xs mt-3">{{ form.modo_operacion.errors.0 }}</p>
-                        {% endif %}
-                    </div>
-                    
-                    <!-- Botón de acción para guardar -->
-                    <div class="flex justify-end">
-                        <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 px-4 rounded-lg transition duration-300 flex items-center">
-                            <i data-lucide="save" class="w-5 h-5 mr-2"></i>Guardar Cambios
-                        </button>
-                    </div>
-                </form>
+                            {% endif %}
+                        </div>
+
+                        <!-- Sección de Pantallas (solo visible en modo restaurante) -->
+                        <div id="restaurant_features"
+                            class="bg-gradient-to-br from-emerald-50 to-teal-50 p-6 rounded-xl border-2 border-emerald-200 mb-6 shadow-lg hover:shadow-xl transition-all duration-300 {% if business.modo_operacion != 'restaurante' %}hidden{% endif %}">
+                            <!-- Título de la sección -->
+                            <div class="flex items-center mb-6 pb-4 border-b-2 border-emerald-300">
+                                <div class="bg-emerald-600 p-3 rounded-lg mr-3">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-white" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                    </svg>
+                                </div>
+                                <h4 class="text-2xl font-bold text-gray-800">Funciones de Restaurante</h4>
+                            </div>
+
+                            <!-- Opción principal: Habilitar Sistema de Órdenes -->
+                            <div
+                                class="mb-3 sm:mb-6 p-2 sm:p-5 bg-white rounded-xl border-2 border-emerald-300 shadow-md">
+                                <div class="flex items-start">
+                                    <div class="flex items-center h-5">
+                                        <input type="checkbox" name="enable_orders" id="enable_orders"
+                                            class="w-5 h-5 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500 focus:ring-2"
+                                            {% if business.enable_orders %}checked{% endif %}>
+                                    </div>
+                                    <div class="ml-4 flex-1">
+                                        <label for="enable_orders"
+                                            class="font-bold text-lg text-gray-900 cursor-pointer flex items-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                class="w-6 h-6 mr-2 text-emerald-600" fill="none" viewBox="0 0 24 24"
+                                                stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                            </svg>
+                                            Habilitar Sistema de Órdenes
+                                        </label>
+                                        <p class="text-sm text-gray-600 mt-2 leading-relaxed">
+                                            Cuando está activo, todas las ventas nuevas generarán automáticamente un
+                                            número de orden secuencial.
+                                            Las ventas anteriores a la activación no tendrán número de orden.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Subsección: Pantallas (solo visible si enable_orders está activo) -->
+                            <div id="display_options"
+                                class="space-y-4 {% if not business.enable_orders %}opacity-50 pointer-events-none{% endif %}">
+                                <div class="mb-4">
+                                    <h5 class="text-lg font-semibold text-gray-800 mb-3 flex items-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2 text-emerald-600"
+                                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                        </svg>
+                                        Pantallas Disponibles
+                                    </h5>
+                                    <p class="text-sm text-gray-600 mb-4">
+                                        Selecciona qué pantallas deseas mostrar en el menú lateral.
+                                    </p>
+                                </div>
+
+                                <!-- Pantalla de Cocina (KDS) -->
+                                <div
+                                    class="flex items-start p-4 bg-white rounded-lg border-2 border-gray-200 hover:border-emerald-400 transition-all duration-200">
+                                    <div class="flex items-center h-5">
+                                        <input type="checkbox" name="enable_kds" id="enable_kds"
+                                            class="w-5 h-5 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
+                                            {% if business.enable_kds %}checked{% endif %}>
+                                    </div>
+                                    <div class="ml-3 flex-1">
+                                        <label for="enable_kds"
+                                            class="font-semibold text-gray-900 cursor-pointer flex items-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2 text-orange-600"
+                                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                                            </svg>
+                                            Pantalla de Cocina (KDS)
+                                        </label>
+                                        <p class="text-sm text-gray-600 mt-1">
+                                            Sistema de visualización para la cocina que muestra pedidos activos en
+                                            tiempo real.
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <!-- Pantalla Pública -->
+                                <div
+                                    class="flex items-start p-4 bg-white rounded-lg border-2 border-gray-200 hover:border-emerald-400 transition-all duration-200">
+                                    <div class="flex items-center h-5">
+                                        <input type="checkbox" name="enable_public_display" id="enable_public_display"
+                                            class="w-5 h-5 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
+                                            {% if business.enable_public_display %}checked{% endif %}>
+                                    </div>
+                                    <div class="ml-3 flex-1">
+                                        <label for="enable_public_display"
+                                            class="font-semibold text-gray-900 cursor-pointer flex items-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2 text-blue-600"
+                                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                            </svg>
+                                            Pantalla Pública (Turnos)
+                                        </label>
+                                        <p class="text-sm text-gray-600 mt-1">
+                                            Pantalla para mostrar números de pedidos listos para recoger.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-6 p-4 bg-blue-50 border-l-4 border-blue-500 rounded-lg">
+                                <div class="flex items-start">
+                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                        class="w-5 h-5 text-blue-600 mr-3 mt-0.5 flex-shrink-0" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <div>
+                                        <p class="text-sm text-blue-800 font-medium">Información importante</p>
+                                        <p class="text-sm text-blue-700 mt-1">
+                                            El sistema de órdenes debe estar habilitado para que las pantallas funcionen
+                                            correctamente.
+                                            Las pantallas seleccionadas aparecerán en el menú lateral para acceso
+                                            rápido.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Botón de acción para guardar -->
+                        <div class="flex justify-end mt-4 sm:mt-6">
+                            <button type="submit"
+                                class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 sm:py-3 px-4 sm:px-6 rounded-lg transition duration-300 flex items-center justify-center">
+                                <i data-lucide="save" class="w-4 h-4 sm:w-5 sm:h-5 mr-2"></i>Guardar Cambios
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
+
+        <!-- Columna derecha: Vista previa (4 columnas en desktop, oculta en móvil) -->
+        <div class="lg:col-span-4 hidden lg:block">
+            <div class="sticky top-4">
+                <!-- Tarjeta de vista previa -->
+                <div class="bg-white rounded-lg shadow-lg overflow-hidden border-2 border-emerald-200">
+                    <div class="bg-gradient-to-r from-emerald-600 to-teal-600 text-white px-4 py-3">
+                        <h4 class="text-lg font-bold flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                            Vista Previa
+                        </h4>
+                    </div>
+
+                    <div class="p-6 bg-gray-50">
+                        <!-- Logo preview -->
+                        <div class="text-center mb-6">
+                            <div id="preview-logo-container" class="inline-block">
+                                {% if business.company_logo %}
+                                <img id="preview-logo-image" src="{{ business.company_logo.url }}"
+                                    class="w-32 h-32 mx-auto object-contain rounded-lg" alt="Logo de la empresa">
+                                {% else %}
+                                <img id="preview-logo-image" src="{% static 'img/logo.png' %}"
+                                    class="w-32 h-32 mx-auto object-contain rounded-lg" alt="Logo Southern Food POS">
+                                {% endif %}
+                                <div id="preview-logo-placeholder"
+                                    class="w-32 h-32 mx-auto bg-gradient-to-br from-emerald-100 to-teal-100 rounded-lg flex items-center justify-center border-2 border-emerald-300 hidden">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-16 h-16 text-emerald-600"
+                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Business info preview -->
+                        <div class="space-y-4">
+                            <div class="text-center border-b border-gray-200 pb-4">
+                                <h3 id="preview-nombre" class="text-2xl font-bold text-gray-800 mb-1">
+                                    {{ business.nombre_negocio|default:"Nombre del Negocio" }}
+                                </h3>
+                                <p id="preview-ruc" class="text-sm text-gray-600">
+                                    RUC: {{ business.ruc_negocio|default:"0000000000001" }}
+                                </p>
+                            </div>
+
+                            <div class="space-y-2 text-sm">
+                                <div class="flex items-start">
+                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                        class="w-4 h-4 mr-2 text-emerald-600 flex-shrink-0 mt-0.5" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                    <span id="preview-direccion" class="text-gray-700">
+                                        {{ business.direccion_negocio|default:"Dirección del negocio" }}
+                                    </span>
+                                </div>
+
+                                <div class="flex items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2 text-emerald-600"
+                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                                    </svg>
+                                    <span id="preview-telefono" class="text-gray-700">
+                                        {{ business.telefono_negocio|default:"0000000000" }}
+                                    </span>
+                                </div>
+
+                                <div class="flex items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2 text-emerald-600"
+                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                    </svg>
+                                    <span id="preview-email" class="text-gray-700">
+                                        {{ business.email_negocio|default:"email@negocio.com" }}
+                                    </span>
+                                </div>
+
+                                <div class="flex items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2 text-emerald-600"
+                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                    </svg>
+                                    <span id="preview-ciudad" class="text-gray-700">
+                                        {{ business.ciudad|default:"Ciudad" }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="mt-6 pt-4 border-t border-gray-200">
+                                <div class="bg-emerald-50 rounded-lg p-3 border border-emerald-200">
+                                    <p class="text-xs text-emerald-800 font-medium mb-1">IVA:</p>
+                                    <p id="preview-iva" class="text-lg font-bold text-emerald-700">
+                                        {{ business.iva_porcentaje|default:"15" }}%
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                                <p class="text-xs text-blue-700 text-center">
+                                    Esta información aparecerá en tus facturas
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Inicializar iconos de Lucide
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+
+        // Mostrar/ocultar sección de funciones de restaurante
+        const modoRestaurante = document.getElementById('modo_restaurante');
+        const modoRetail = document.getElementById('modo_retail');
+        const restaurantFeatures = document.getElementById('restaurant_features');
+        const enableOrders = document.getElementById('enable_orders');
+        const displayOptions = document.getElementById('display_options');
+        const enableKds = document.getElementById('enable_kds');
+        const enablePublicDisplay = document.getElementById('enable_public_display');
+
+        function toggleRestaurantFeatures() {
+            if (modoRestaurante && modoRestaurante.checked) {
+                restaurantFeatures.classList.remove('hidden');
+            } else {
+                restaurantFeatures.classList.add('hidden');
+            }
+        }
+
+        function toggleDisplayOptions() {
+            if (enableOrders && enableOrders.checked) {
+                displayOptions.classList.remove('opacity-50', 'pointer-events-none');
+            } else {
+                displayOptions.classList.add('opacity-50', 'pointer-events-none');
+                // Desmarcar las opciones de pantallas si se deshabilita el sistema de órdenes
+                if (enableKds) enableKds.checked = false;
+                if (enablePublicDisplay) enablePublicDisplay.checked = false;
+            }
+        }
+
+        // Ejecutar al cargar la página
+        toggleRestaurantFeatures();
+        toggleDisplayOptions();
+
+        // Agregar listeners a los radio buttons
+        if (modoRestaurante) {
+            modoRestaurante.addEventListener('change', toggleRestaurantFeatures);
+        }
+        if (modoRetail) {
+            modoRetail.addEventListener('change', toggleRestaurantFeatures);
+        }
+
+        // Agregar listener al checkbox de enable_orders
+        if (enableOrders) {
+            enableOrders.addEventListener('change', toggleDisplayOptions);
+        }
+
+        // Función para actualizar el nombre del archivo seleccionado
+        function updateFileName(input, spanId) {
+            const span = document.getElementById(spanId);
+            if (input.files && input.files[0]) {
+                span.textContent = input.files[0].name;
+                span.classList.add('text-emerald-600', 'font-medium');
+
+                // Si es el logo, actualizar la vista previa
+                if (spanId === 'logo-filename') {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        const previewImage = document.getElementById('preview-logo-image');
+                        previewImage.src = e.target.result;
+                    };
+                    reader.readAsDataURL(input.files[0]);
+                }
+            } else {
+                if (spanId === 'cert-filename') {
+                    span.textContent = 'Seleccionar archivo .p12';
+                } else if (spanId === 'logo-filename') {
+                    span.textContent = 'Seleccionar imagen';
+                }
+                span.classList.remove('text-emerald-600', 'font-medium');
+            }
+        }
+
+        // Actualizar vista previa en tiempo real
+        function setupLivePreview() {
+            // Nombre del negocio
+            const nombreInput = document.querySelector('input[name="nombre_negocio"]');
+            if (nombreInput) {
+                nombreInput.addEventListener('input', function () {
+                    document.getElementById('preview-nombre').textContent = this.value || 'Nombre del Negocio';
+                });
+            }
+
+            // RUC
+            const rucInput = document.querySelector('input[name="ruc_negocio"]');
+            if (rucInput) {
+                rucInput.addEventListener('input', function () {
+                    document.getElementById('preview-ruc').textContent = 'RUC: ' + (this.value || '0000000000001');
+                });
+            }
+
+            // Dirección
+            const direccionInput = document.querySelector('input[name="direccion_negocio"]');
+            if (direccionInput) {
+                direccionInput.addEventListener('input', function () {
+                    document.getElementById('preview-direccion').textContent = this.value || 'Dirección del negocio';
+                });
+            }
+
+            // Ciudad
+            const ciudadInput = document.querySelector('input[name="ciudad"]');
+            if (ciudadInput) {
+                ciudadInput.addEventListener('input', function () {
+                    document.getElementById('preview-ciudad').textContent = this.value || 'Ciudad';
+                });
+            }
+
+            // Teléfono
+            const telefonoInput = document.querySelector('input[name="telefono_negocio"]');
+            if (telefonoInput) {
+                telefonoInput.addEventListener('input', function () {
+                    document.getElementById('preview-telefono').textContent = this.value || '0000000000';
+                });
+            }
+
+            // Email
+            const emailInput = document.querySelector('input[name="email_negocio"]');
+            if (emailInput) {
+                emailInput.addEventListener('input', function () {
+                    document.getElementById('preview-email').textContent = this.value || 'email@negocio.com';
+                });
+            }
+
+            // IVA
+            const ivaInput = document.querySelector('input[name="iva_porcentaje"]');
+            if (ivaInput) {
+                ivaInput.addEventListener('input', function () {
+                    document.getElementById('preview-iva').textContent = (this.value || '15') + '%';
+                });
+            }
+        }
+
+        // Inicializar vista previa
+        setupLivePreview();
+
+        // Auto-ocultar notificaciones después de 5 segundos
+        setTimeout(function () {
+            const notifications = document.querySelectorAll('[id^="notification-"]');
+            notifications.forEach(function (notification) {
+                notification.style.opacity = '0';
+                setTimeout(function () {
+                    notification.remove();
+                }, 300);
+            });
+        }, 5000);
+    });
+
+    // Función para actualizar nombre del archivo de logo y vista previa
+    function updateLogoFilename(input) {
+        const filename = document.getElementById('logo-filename');
+        const previewImage = document.getElementById('preview-logo-image');
+        
+        if (input.files && input.files[0]) {
+            // Actualizar nombre del archivo
+            filename.textContent = input.files[0].name;
+            
+            // Actualizar vista previa
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewImage.src = e.target.result;
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+</script>
 {% endblock %}

@@ -25,3 +25,11 @@ dj-database-url>=2.1.0
 # Cloudinary para almacenamiento de imagenes
 cloudinary>=1.36.0
 django-cloudinary-storage>=0.3.0
+
+# Django Channels para WebSockets
+channels>=4.0.0
+channels-redis>=4.1.0
+daphne>=4.0.0
+
+# lxml para procesamiento XML (facturación electrónica)
+lxml>=4.9.0

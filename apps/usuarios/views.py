@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from .forms import LoginForm, RegistrationForm
 from django.http import JsonResponse
-from .models import Usuario, Business  # Add Business import
+from .models import Usuario, Business
 from django.contrib.auth.decorators import login_required
 
 
@@ -52,7 +52,107 @@ def register_view(request):
             business.telefono_negocio = request.POST.get('telefono_negocio', '')
             business.ruc_negocio = request.POST.get('ruc_negocio', '')
             business.email_negocio = request.POST.get('email_negocio', '')
+            business.ciudad = request.POST.get('ciudad', '')
+            
+            # Guardar plan seleccionado
+            business.plan = request.POST.get('plan', 'free')
+            
+            # Guardar campos fiscales opcionales (siempre, aunque estén vacíos)
+            business.razon_social_legal = request.POST.get('razon_social_legal', '').strip() or None
+            business.ambiente_sri = request.POST.get('ambiente_sri', '1')
+            business.tipo_emision = request.POST.get('tipo_emision', '1')
+            business.obligado_contabilidad = request.POST.get('obligado_contabilidad', 'NO')
+            business.regimen_rimpe = request.POST.get('regimen_rimpe', '') or None
+            business.establecimiento = request.POST.get('establecimiento', '').strip() or None
+            business.punto_emision = request.POST.get('punto_emision', '').strip() or None
+            
             business.save()
+            
+            # Crear vistas predeterminadas para el usuario
+            from apps.productos.models_config import SavedProductFilter
+            
+            # Vista 1: Vista Completa (para administradores)
+            SavedProductFilter.objects.create(
+                user=user,
+                nombre='Vista Completa',
+                descripcion='Todos los productos con información detallada',
+                filtros={
+                    'vista': 'table',
+                    'orden': 'nombre'
+                },
+                config_vista={
+                    'mostrar_imagenes': True,
+                    'mostrar_codigo_barras': True,
+                    'mostrar_stock': True,
+                    'mostrar_categoria': True,
+                    'mostrar_descripcion': True
+                },
+                icono='layout-grid',
+                color='emerald',
+                es_favorito=True
+            )
+            
+            # Vista 2: Vista Rápida (para ventas)
+            SavedProductFilter.objects.create(
+                user=user,
+                nombre='Vista Rápida',
+                descripcion='Vista compacta para ventas rápidas',
+                filtros={
+                    'vista': 'grid',
+                    'orden': '-fecha_creacion'
+                },
+                config_vista={
+                    'mostrar_imagenes': True,
+                    'mostrar_codigo_barras': False,
+                    'mostrar_stock': True,
+                    'mostrar_categoria': True,
+                    'mostrar_descripcion': False
+                },
+                icono='zap',
+                color='blue'
+            )
+            
+            # Vista 3: Control de Inventario
+            SavedProductFilter.objects.create(
+                user=user,
+                nombre='Control de Inventario',
+                descripcion='Enfocada en stock y alertas',
+                filtros={
+                    'vista': 'list',
+                    'orden': 'stock'
+                },
+                config_vista={
+                    'mostrar_imagenes': False,
+                    'mostrar_codigo_barras': True,
+                    'mostrar_stock': True,
+                    'mostrar_categoria': True,
+                    'mostrar_descripcion': False,
+                    'alerta_stock_bajo': True
+                },
+                icono='package',
+                color='orange'
+            )
+            
+            # Vista 4: Catálogo Visual
+            SavedProductFilter.objects.create(
+                user=user,
+                nombre='Catálogo Visual',
+                descripcion='Vista atractiva con imágenes grandes',
+                filtros={
+                    'vista': 'grid',
+                    'orden': 'nombre'
+                },
+                config_vista={
+                    'mostrar_imagenes': True,
+                    'mostrar_codigo_barras': False,
+                    'mostrar_stock': False,
+                    'mostrar_categoria': True,
+                    'mostrar_descripcion': True,
+                    'tamano_imagen_grid': 'large'
+                },
+                icono='image',
+                color='purple'
+            )
             
             # Log the user in after registration
             login(request, user)

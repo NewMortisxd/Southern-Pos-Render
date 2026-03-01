@@ -1,0 +1,310 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedidos - {{ business.nombre_negocio }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .order-card {
+            animation: slideIn 0.6s ease;
+            transition: all 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+
+            to {
+                opacity: 0;
+                transform: scale(0.9) translateY(-30px);
+            }
+        }
+
+        .order-card:hover {
+            transform: scale(1.03);
+        }
+
+        .ready-card {
+            animation: readyPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes readyPulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+                filter: brightness(1);
+            }
+
+            50% {
+                transform: scale(1.02);
+                filter: brightness(1.1);
+            }
+        }
+
+        .gradient-bg {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+    </style>
+</head>
+
+<body class="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 overflow-hidden">
+    <!-- Header -->
+    <div class="gradient-bg shadow-2xl">
+        <div class="container mx-auto px-6 py-3">
+            <div class="flex items-center justify-between text-white">
+                <div class="flex items-center space-x-3">
+                    {% if business.logo %}
+                    <img src="{{ business.logo.url }}" alt="Logo" class="w-12 h-12 rounded-xl bg-white p-1.5 shadow-lg">
+                    {% endif %}
+                    <div>
+                        <h1 class="text-2xl md:text-3xl font-black">Estado de Pedidos</h1>
+                        <p class="text-sm md:text-base opacity-90 font-semibold">{{ business.nombre_negocio }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-4 h-[calc(100vh-80px)]">
+        <!-- Mobile Layout -->
+        <div class="md:hidden flex flex-col gap-4 h-full">
+            <!-- Ready Orders (Mobile) - PRINCIPAL -->
+            <div
+                class="bg-gradient-to-br from-emerald-600 via-emerald-500 to-teal-600 rounded-3xl p-6 shadow-2xl flex-1 overflow-hidden flex flex-col">
+                <div class="mb-4">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center">
+                            <div class="bg-white/25 p-3 rounded-2xl mr-3 backdrop-blur-sm shadow-lg">
+                                <i data-lucide="check-circle" class="w-8 h-8 text-white"></i>
+                            </div>
+                            <h2 class="text-3xl font-black text-white drop-shadow-lg">Listos</h2>
+                        </div>
+                        <div class="bg-white/25 backdrop-blur-sm rounded-2xl px-6 py-3 shadow-lg">
+                            <span id="ready-count-mobile" class="text-5xl font-black text-white">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="ready-orders-mobile" class="grid grid-cols-2 gap-4 overflow-y-auto flex-1 content-start pb-2">
+                </div>
+
+                <div id="empty-state-mobile" class="flex items-center justify-center h-full">
+                    <div class="text-center">
+                        <div class="bg-white/15 backdrop-blur-md rounded-3xl p-10 inline-block shadow-xl">
+                            <i data-lucide="clock" class="w-24 h-24 text-white/50 mx-auto mb-4"></i>
+                            <h3 class="text-2xl font-bold text-white mb-2">Sin pedidos listos</h3>
+                            <p class="text-white/80 text-lg">Aparecerán aquí cuando estén listos</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Preparing Orders (Mobile) - SECUNDARIO -->
+            <div
+                class="bg-white/10 backdrop-blur-md rounded-2xl p-4 shadow-xl border border-white/20 h-28 overflow-hidden">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center">
+                        <div class="bg-blue-500/20 p-2 rounded-lg mr-2">
+                            <i data-lucide="flame" class="w-5 h-5 text-blue-300"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-white/90">En Cocina</h3>
+                    </div>
+                    <span id="preparing-count-mobile" class="text-2xl font-black text-blue-300">0</span>
+                </div>
+                <div id="preparing-orders-mobile" class="flex gap-2 overflow-x-auto">
+                </div>
+            </div>
+        </div>
+
+        <!-- Desktop Layout -->
+        <div class="hidden md:grid md:grid-cols-12 gap-6 h-full">
+            <!-- Left - Preparing Orders -->
+            <div
+                class="md:col-span-4 bg-white/10 backdrop-blur-md rounded-3xl p-6 shadow-2xl border border-white/20 overflow-hidden flex flex-col">
+                <div class="mb-6">
+                    <div class="flex items-center justify-between pb-5 border-b border-white/20">
+                        <div class="flex items-center">
+                            <div class="bg-blue-500/20 p-3 rounded-xl mr-3">
+                                <i data-lucide="flame" class="w-7 h-7 text-blue-300"></i>
+                            </div>
+                            <h2 class="text-2xl font-black text-white">En Cocina</h2>
+                        </div>
+                        <div class="bg-blue-500/20 backdrop-blur-sm rounded-xl px-5 py-2.5">
+                            <span id="preparing-count" class="text-4xl font-black text-blue-300">0</span>
+                        </div>
+                    </div>
+                </div>
+                <div id="preparing-orders" class="grid grid-cols-2 gap-3 overflow-y-auto flex-1 content-start">
+                </div>
+            </div>
+
+            <!-- Right - Ready Orders -->
+            <div
+                class="md:col-span-8 bg-gradient-to-br from-emerald-600 via-emerald-500 to-teal-600 rounded-3xl p-8 shadow-2xl overflow-hidden flex flex-col">
+                <div class="mb-6">
+                    <div class="flex items-center justify-between pb-6 border-b-2 border-white/30">
+                        <div class="flex items-center">
+                            <div class="bg-white/25 p-4 rounded-2xl mr-4 backdrop-blur-sm shadow-lg animate-pulse">
+                                <i data-lucide="check-circle" class="w-12 h-12 text-white"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-5xl font-black text-white drop-shadow-lg mb-1">¡Pedidos Listos!</h2>
+                                <p class="text-white/90 text-xl font-semibold">Puede recoger su orden</p>
+                            </div>
+                        </div>
+                        <div class="bg-white/25 backdrop-blur-sm rounded-2xl px-10 py-5 shadow-lg">
+                            <span id="ready-count" class="text-7xl font-black text-white">0</span>
+                        </div>
+                    </div>
+                </div>
+                <div id="ready-orders" class="grid grid-cols-3 gap-6 overflow-y-auto flex-1 content-start pb-4">
+                </div>
+                <div id="empty-state" class="flex items-center justify-center h-full">
+                    <div class="text-center">
+                        <div class="bg-white/15 backdrop-blur-md rounded-3xl p-16 inline-block shadow-2xl">
+                            <i data-lucide="clock" class="w-36 h-36 text-white/40 mx-auto mb-6"></i>
+                            <h3 class="text-4xl font-bold text-white mb-3">Sin pedidos listos</h3>
+                            <p class="text-2xl text-white/80">Los pedidos aparecerán aquí</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+
+        let currentOrders = { preparing: new Set(), ready: new Set(), preparingMobile: new Set(), readyMobile: new Set() };
+        let ws = null;
+        let reconnectAttempts = 0;
+        const MAX_RECONNECT_ATTEMPTS = 5;
+
+        function connectWebSocket() {
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsUrl = `${protocol}//${window.location.host}/ws/orders/{{ business.id }}/`;
+            ws = new WebSocket(wsUrl);
+            ws.onopen = () => { console.log('WebSocket conectado'); reconnectAttempts = 0; loadOrders(); };
+            ws.onmessage = (e) => { const data = JSON.parse(e.data); if (data.type === 'order_created' || data.type === 'order_status_changed') loadOrders(); };
+            ws.onclose = () => { console.log('WebSocket cerrado'); if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) { reconnectAttempts++; setTimeout(connectWebSocket, 2000 * reconnectAttempts); } };
+            ws.onerror = (error) => console.error('WebSocket error:', error);
+        }
+
+        function loadOrders() {
+            fetch('/kds/display/orders/').then(r => r.json()).then(data => updateOrdersDisplay(data.orders)).catch(e => console.error('Error:', e));
+        }
+
+        function updateOrdersDisplay(orders) {
+            const preparingOrders = orders.filter(o => o.status === 'PREPARING');
+            const readyOrders = orders.filter(o => o.status === 'READY');
+
+            ['preparing-count', 'ready-count', 'preparing-count-mobile', 'ready-count-mobile'].forEach((id, i) => {
+                document.getElementById(id).textContent = i < 2 ? (i === 0 ? preparingOrders.length : readyOrders.length) : (i === 2 ? preparingOrders.length : readyOrders.length);
+            });
+
+            ['', '-mobile'].forEach(suffix => {
+                const emptyState = document.getElementById(`empty-state${suffix}`);
+                const readyContainer = document.getElementById(`ready-orders${suffix}`);
+                if (readyOrders.length === 0) { emptyState?.classList.remove('hidden'); readyContainer?.classList.add('hidden'); }
+                else { emptyState?.classList.add('hidden'); readyContainer?.classList.remove('hidden'); }
+            });
+
+            updatePreparingOrders(preparingOrders, document.getElementById('preparing-orders'), false);
+            updatePreparingOrders(preparingOrders, document.getElementById('preparing-orders-mobile'), true);
+            updateReadyOrders(readyOrders, document.getElementById('ready-orders'), false);
+            updateReadyOrders(readyOrders, document.getElementById('ready-orders-mobile'), true);
+        }
+
+        function updatePreparingOrders(orders, container, isMobile) {
+            if (!container) return;
+            const key = isMobile ? 'preparingMobile' : 'preparing';
+            const newIds = new Set(orders.map(o => o.id.toString()));
+            Array.from(currentOrders[key]).filter(id => !newIds.has(id)).forEach(id => {
+                const card = container.querySelector(`[data-order-id="${id}"]`);
+                if (card) { card.style.animation = 'slideOut 0.5s ease'; setTimeout(() => card.remove(), 500); }
+            });
+            orders.filter(o => !currentOrders[key].has(o.id.toString())).forEach(order => {
+                const card = document.createElement('div');
+                card.className = isMobile ? 'order-card bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl shadow-xl p-2 text-center border-2 border-blue-300 h-16 w-20 flex-shrink-0 flex flex-col justify-center' : 'order-card bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl shadow-xl p-4 text-center border-3 border-blue-300 h-36 flex flex-col justify-center';
+                card.dataset.orderId = order.id;
+                card.innerHTML = `<div class="${isMobile ? 'text-2xl' : 'text-5xl'} font-black text-white">#${order.order_number}</div>`;
+                container.appendChild(card);
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+            });
+            currentOrders[key] = newIds;
+        }
+
+        function updateReadyOrders(orders, container, isMobile) {
+            if (!container) return;
+            const key = isMobile ? 'readyMobile' : 'ready';
+            const newIds = new Set(orders.map(o => o.id.toString()));
+            Array.from(currentOrders[key]).filter(id => !newIds.has(id)).forEach(id => {
+                const card = container.querySelector(`[data-order-id="${id}"]`);
+                if (card) { card.style.animation = 'slideOut 0.5s ease'; setTimeout(() => card.remove(), 500); }
+            });
+            orders.filter(o => !currentOrders[key].has(o.id.toString())).forEach(order => {
+                const card = document.createElement('div');
+                card.className = isMobile ? 'order-card ready-card bg-white rounded-2xl shadow-2xl p-6 text-center h-44 flex flex-col justify-center' : 'order-card ready-card bg-white rounded-3xl shadow-2xl p-10 text-center h-72 flex flex-col justify-center';
+                card.dataset.orderId = order.id;
+                card.innerHTML = `
+                    <div class="bg-emerald-100 rounded-2xl p-4 mb-4 inline-block mx-auto">
+                        <i data-lucide="check-circle" class="${isMobile ? 'w-12 h-12' : 'w-20 h-20'} text-emerald-600"></i>
+                    </div>
+                    <div class="${isMobile ? 'text-6xl' : 'text-9xl'} font-black text-emerald-600 mb-3">#${order.order_number}</div>
+                    <div class="bg-emerald-100 rounded-xl py-3 px-6 inline-block">
+                        <p class="text-emerald-700 font-black ${isMobile ? 'text-xl' : 'text-3xl'}">¡LISTO!</p>
+                    </div>
+                `;
+                container.appendChild(card);
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+                playSound();
+            });
+            currentOrders[key] = newIds;
+        }
+
+        function playSound() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                [800, 1000].forEach((freq, i) => {
+                    setTimeout(() => {
+                        const osc = ctx.createOscillator(), gain = ctx.createGain();
+                        osc.connect(gain); gain.connect(ctx.destination);
+                        osc.frequency.value = freq; osc.type = 'sine';
+                        gain.gain.setValueAtTime(0.3, ctx.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+                        osc.start(ctx.currentTime); osc.stop(ctx.currentTime + 0.3);
+                    }, i * 200);
+                });
+            } catch (e) { console.log('Audio not supported'); }
+        }
+
+        connectWebSocket();
+    </script>
+</body>
+
+</html>

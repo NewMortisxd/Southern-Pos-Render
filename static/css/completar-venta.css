@@ -1,0 +1,345 @@
+/* ============================================
+   LEMON POS - Completar Venta Styles
+   Siguiendo Brand & UI System v1.0
+   Paleta simplificada: Solo 3 verdes
+   ============================================ */
+
+:root {
+    --color-primary: #16a34a;
+    --color-primary-hover: #15803d;
+    --color-primary-bg: #dcfce7;
+    --transition-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+    --border-radius-card: 12px;
+    --border-radius-button: 8px;
+}
+
+/* ============================================
+   Estados Activos
+   ============================================ */
+.payment-method.active,
+.customer-type.active {
+    border-color: var(--color-primary);
+    background-color: var(--color-primary-bg);
+    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+    transition: all 0.3s var(--transition-smooth);
+}
+
+.payment-method,
+.customer-type {
+    transition: all 0.3s var(--transition-smooth);
+}
+
+.payment-method:hover,
+.customer-type:hover {
+    border-color: var(--color-primary);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* ============================================
+   Botones del Teclado Numérico - MÁS GRANDES
+   ============================================ */
+.num-pad-btn {
+    transition: all 0.2s var(--transition-smooth);
+    font-size: 1.5rem;
+    font-weight: 700;
+    border-radius: var(--border-radius-button);
+    min-height: 60px;
+}
+
+.num-pad-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    background-color: var(--color-primary-bg) !important;
+}
+
+.num-pad-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Botones de pago rápido */
+.quick-amount-btn {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.2s var(--transition-smooth);
+    font-weight: 700;
+    border-radius: var(--border-radius-button);
+    color: #ffffff;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.quick-amount-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.4s var(--transition-smooth);
+}
+
+.quick-amount-btn:hover::before {
+    left: 100%;
+}
+
+.quick-amount-btn:hover {
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.quick-amount-btn:active {
+    transform: translateY(0) scale(0.98);
+}
+
+/* ============================================
+   Input de Cambio - Animaciones
+   ============================================ */
+#cash_change {
+    transition: all 0.4s var(--transition-smooth);
+    font-weight: 900;
+    letter-spacing: -0.02em;
+}
+
+#cash_change:focus {
+    outline: none;
+}
+
+/* Estado positivo - cambio correcto con animación */
+#cash_change.text-emerald-600 {
+    animation: glow-green 1.5s ease-in-out;
+}
+
+@keyframes glow-green {
+    0% {
+        box-shadow: 0 0 0 rgba(22, 163, 74, 0);
+        transform: scale(1);
+    }
+
+    50% {
+        box-shadow: 0 0 20px rgba(22, 163, 74, 0.4);
+        transform: scale(1.02);
+    }
+
+    100% {
+        box-shadow: 0 0 8px rgba(22, 163, 74, 0.2);
+        transform: scale(1);
+    }
+}
+
+/* Estado negativo - monto insuficiente */
+#cash_change.text-red-600 {
+    animation: shake 0.4s var(--transition-smooth);
+}
+
+@keyframes shake {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-8px);
+    }
+
+    75% {
+        transform: translateX(8px);
+    }
+}
+
+/* ============================================
+   Botón COBRAR Principal - MÁS GRANDE PARA TÁCTIL
+   ============================================ */
+#process-payment {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s var(--transition-smooth);
+    border-radius: var(--border-radius-card);
+    min-height: 90px;
+    padding: 20px 24px;
+}
+
+#process-payment .text-4xl {
+    font-size: 2.5rem;
+}
+
+#process-payment:not(:disabled):hover {
+    box-shadow: 0 12px 32px rgba(22, 163, 74, 0.4);
+    transform: scale(1.02);
+}
+
+#process-payment:not(:disabled):active {
+    transform: scale(0.98);
+    box-shadow: 0 8px 20px rgba(22, 163, 74, 0.3);
+}
+
+#process-payment:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* ============================================
+   Validación de Pago
+   ============================================ */
+#payment-validation {
+    animation: pulse-warning 1.5s ease-in-out infinite;
+    border-radius: var(--border-radius-button);
+}
+
+@keyframes pulse-warning {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.85;
+    }
+}
+
+/* ============================================
+   Animación de Entrada
+   ============================================ */
+.quick-amount-btn {
+    animation: fadeInUp 0.4s var(--transition-smooth) backwards;
+}
+
+.quick-amount-btn:nth-child(1) {
+    animation-delay: 0.05s;
+}
+
+.quick-amount-btn:nth-child(2) {
+    animation-delay: 0.08s;
+}
+
+.quick-amount-btn:nth-child(3) {
+    animation-delay: 0.11s;
+}
+
+.quick-amount-btn:nth-child(4) {
+    animation-delay: 0.14s;
+}
+
+.quick-amount-btn:nth-child(5) {
+    animation-delay: 0.17s;
+}
+
+.quick-amount-btn:nth-child(6) {
+    animation-delay: 0.2s;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ============================================
+   Inputs Mejorados
+   ============================================ */
+#cash_amount {
+    transition: all 0.3s var(--transition-smooth);
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+#cash_amount:focus {
+    box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.2);
+    border-color: var(--color-primary);
+}
+
+/* ============================================
+   Atajos de Teclado
+   ============================================ */
+kbd {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.75rem;
+    font-weight: 600;
+    transition: all 0.2s var(--transition-smooth);
+    display: inline-block;
+}
+
+kbd:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* ============================================
+   Responsive
+   ============================================ */
+@media (max-width: 1024px) {
+    .num-pad-btn {
+        min-height: 50px;
+        font-size: 1.25rem;
+    }
+
+    #cash_amount {
+        font-size: 1.5rem;
+    }
+}
+
+/* ============================================
+   Dark Mode Support
+   ============================================ */
+@media (prefers-color-scheme: dark) {
+
+    .payment-method.active,
+    .customer-type.active {
+        border-color: var(--color-primary);
+        background-color: rgba(22, 163, 74, 0.15);
+    }
+}
+
+/*
+ ============================================
+   MODAL DE CLIENTES - Lemon POS Style
+   ============================================ */
+.client-tab {
+    transition: all 0.3s;
+}
+
+.client-tab.active {
+    color: #22c55e;
+    border-bottom-color: #22c55e;
+}
+
+.client-item {
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.client-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.15);
+}
+
+/* Estilos para el modal de clientes */
+#clientModal {
+    backdrop-filter: blur(4px);
+}
+
+/* Animación de entrada del modal */
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+#clientModal:not(.hidden) > div {
+    animation: modalFadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}

@@ -18,4 +18,6 @@ urlpatterns = [
     path('detalle/<int:cliente_id>/', views.detalle_cliente, name='detalle'),
     # Ruta para la búsqueda de clientes
     path('search/', views.client_search_view, name='client_search'),
+    # Ruta para marcar/desmarcar favorito
+    path('toggle-favorito/<int:cliente_id>/', views.toggle_favorito, name='toggle_favorito'),
 ]

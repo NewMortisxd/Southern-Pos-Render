@@ -192,7 +192,7 @@ def dashboard(request):
         venta__transaccion__procesado_pago=True,
         venta__transaccion__usuario_creador=request.user,
         venta__transaccion__fecha__date__gte=week_ago
-    ).values('producto__nombre', 'producto__precio').annotate(
+    ).values('producto__nombre').annotate(
         cantidad=Sum('cantidad'),
         ingresos=Sum('subtotal')
     ).order_by('-ingresos')[:5]
@@ -285,6 +285,7 @@ def dashboard(request):
     # Alerta: productos con bajo stock
     productos_bajo_stock = Producto.objects.filter(
         usuario_creador=request.user,
+        activo=True,
         stock__lte=5,
         stock__gt=0
     ).count()
@@ -414,7 +415,8 @@ def dashboard(request):
         'ordenes_hoy_pagadas_count': facturas_hoy,
         'productos_nuevos_count': Producto.objects.filter(
             fecha_creacion__date=today,
-            usuario_creador=request.user
+            usuario_creador=request.user,
+            activo=True
         ).count(),
     }
 

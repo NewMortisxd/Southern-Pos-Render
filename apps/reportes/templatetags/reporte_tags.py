@@ -30,4 +30,14 @@ def multiply(value, arg):
     except (ValueError, TypeError):
         return 0
 
+@register.filter
+def currency(value):
+    """Formats a number as currency with thousands separator"""
+    try:
+        # Convert to float and format with 2 decimals and thousands separator
+        num = float(value)
+        return "{:,.2f}".format(num)
+    except (ValueError, TypeError):
+        return "0.00"
+
 # Keep any existing filters/tags that might be in this file

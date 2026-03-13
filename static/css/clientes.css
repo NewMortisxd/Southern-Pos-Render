@@ -1,0 +1,735 @@
+/* ============================================
+   LEMON POS - Estilos de Clientes
+   Sistema de Diseño v1.0
+   ============================================ */
+
+:root {
+    --lemon-primary: #22c55e;
+    --lemon-primary-dark: #16a34a;
+    --lemon-primary-light: #84cc16;
+    --lemon-primary-bg: #f0fdf4;
+    --lemon-gray-900: #111827;
+    --lemon-gray-700: #374151;
+    --lemon-gray-600: #4b5563;
+    --lemon-gray-400: #9ca3af;
+    --lemon-gray-100: #f3f4f6;
+    --lemon-gray-50: #f9fafb;
+    --lemon-radius: 16px;
+    --lemon-radius-lg: 20px;
+    --lemon-transition: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Métricas Dashboard Cards - Mejoradas */
+.metric-card {
+    background: white;
+    border-radius: var(--lemon-radius-lg);
+    padding: 28px 24px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    transition: all 0.3s var(--lemon-transition);
+    height: 120px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.metric-card:hover {
+    box-shadow: 0 8px 24px rgba(34, 197, 94, 0.12);
+    transform: translateY(-4px);
+    border-color: rgba(34, 197, 94, 0.2);
+}
+
+.metric-icon {
+    width: 68px;
+    height: 68px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    flex-shrink: 0;
+}
+
+.metric-content {
+    flex: 1;
+}
+
+.metric-value {
+    font-size: 36px;
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 8px;
+    color: var(--lemon-gray-900);
+    letter-spacing: -0.02em;
+}
+
+.metric-label {
+    font-size: 13px;
+    color: #6b7280;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+/* Avatar de Cliente - Mejorado */
+.client-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 16px;
+    flex-shrink: 0;
+    transition: all 0.3s var(--lemon-transition);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.client-avatar:hover {
+    transform: scale(1.05);
+}
+
+/* Badge de Estado Mejorado - Lemon Style */
+.status-badge {
+    padding: 8px 14px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s var(--lemon-transition);
+}
+
+.status-badge::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.status-activo {
+    background: var(--lemon-primary-bg);
+    color: var(--lemon-primary-dark);
+}
+
+.status-activo::before {
+    background: var(--lemon-primary);
+}
+
+.status-inactivo {
+    background: var(--lemon-gray-100);
+    color: var(--lemon-gray-600);
+}
+
+.status-inactivo::before {
+    background: var(--lemon-gray-400);
+    animation: none;
+}
+
+.status-suspendido {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.status-suspendido::before {
+    background: #ef4444;
+}
+
+/* Botones de Acción con Iconos - Lemon Style Mejorado */
+.action-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s var(--lemon-transition);
+    border: none;
+    cursor: pointer;
+    font-size: 15px;
+    position: relative;
+}
+
+.action-btn:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.action-btn-edit {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.action-btn-edit:hover {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: white;
+}
+
+.action-btn-delete {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.action-btn-delete:hover {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+}
+
+.action-btn-view {
+    background: var(--lemon-gray-100);
+    color: var(--lemon-gray-600);
+}
+
+.action-btn-view:hover {
+    background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+    color: white;
+}
+
+.action-btn-history {
+    background: #e9d5ff;
+    color: #6b21a8;
+}
+
+.action-btn-history:hover {
+    background: linear-gradient(135deg, #a855f7 0%, #9333ea 100%);
+    color: white;
+}
+
+/* Tooltips mejorados */
+.action-btn::after {
+    content: attr(title);
+    position: absolute;
+    bottom: -32px;
+    left: 50%;
+    transform: translateX(-50%) scale(0);
+    background: #1f2937;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+    opacity: 0;
+    transition: all 0.2s;
+    pointer-events: none;
+    z-index: 100;
+}
+
+.action-btn:hover::after {
+    transform: translateX(-50%) scale(1);
+    opacity: 1;
+}
+
+/* Estrella de Favorito - Lemon Style */
+.favorite-star {
+    cursor: pointer;
+    font-size: 20px;
+    transition: all 0.3s var(--lemon-transition);
+    color: #d1d5db;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.favorite-star.active {
+    color: #fbbf24;
+    animation: starPulse 0.6s ease-out;
+}
+
+@keyframes starPulse {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.3);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+.favorite-star:hover {
+    transform: scale(1.2) rotate(15deg);
+    color: #fbbf24;
+}
+
+/* Fila Clickeable */
+.client-row {
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.client-row:hover {
+    background: #f9fafb !important;
+}
+
+/* Búsqueda Mejorada - Lemon Style */
+.search-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.search-input {
+    height: 52px;
+    border-radius: 14px;
+    padding-left: 52px;
+    padding-right: 20px;
+    border: 2px solid #e5e7eb;
+    transition: all 0.3s var(--lemon-transition);
+    font-size: 15px;
+    color: var(--lemon-gray-700);
+    font-weight: 500;
+    width: 100%;
+    background: white;
+}
+
+.search-input:focus {
+    border-color: var(--lemon-primary);
+    box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.1);
+    outline: none;
+    background: #ffffff;
+}
+
+.search-input::placeholder {
+    color: var(--lemon-gray-400);
+    font-weight: 400;
+}
+
+.search-icon {
+    position: absolute;
+    left: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--lemon-gray-400);
+    font-size: 20px;
+    pointer-events: none;
+    z-index: 1;
+    transition: all 0.3s var(--lemon-transition);
+}
+
+.search-input:focus ~ .search-icon {
+    color: var(--lemon-primary);
+}
+
+/* Perfil de Cliente - Detalle - Lemon Style */
+.client-profile-header {
+    background: linear-gradient(135deg, var(--lemon-primary) 0%, var(--lemon-primary-light) 100%);
+    border-radius: var(--lemon-radius-lg);
+    padding: 40px;
+    color: white;
+    margin-bottom: 32px;
+    box-shadow: 0 8px 24px rgba(34, 197, 94, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.client-profile-avatar {
+    width: 96px;
+    height: 96px;
+    border-radius: var(--lemon-radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    font-weight: 700;
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(10px);
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    transition: all 0.3s var(--lemon-transition);
+}
+
+.client-profile-avatar:hover {
+    transform: scale(1.05);
+}
+
+.client-info-card {
+    background: white;
+    border-radius: var(--lemon-radius);
+    padding: 28px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    margin-bottom: 24px;
+    transition: all 0.3s var(--lemon-transition);
+}
+
+.client-info-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+}
+
+.client-info-row {
+    display: flex;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--lemon-gray-100);
+    transition: all 0.3s var(--lemon-transition);
+}
+
+.client-info-row:hover {
+    background: var(--lemon-gray-50);
+    margin: 0 -12px;
+    padding: 14px 12px;
+    border-radius: 8px;
+}
+
+.client-info-row:last-child {
+    border-bottom: none;
+}
+
+.client-info-label {
+    font-weight: 600;
+    color: var(--lemon-gray-600);
+    min-width: 160px;
+    font-size: 14px;
+}
+
+.client-info-value {
+    color: var(--lemon-gray-900);
+    flex: 1;
+    font-size: 15px;
+}
+
+/* Historial de Compras */
+.purchase-history-item {
+    display: flex;
+    align-items: center;
+    padding: 16px;
+    border-bottom: 1px solid #f3f4f6;
+    transition: background 0.2s;
+}
+
+.purchase-history-item:hover {
+    background: #f9fafb;
+}
+
+.purchase-history-item:last-child {
+    border-bottom: none;
+}
+
+.purchase-date {
+    font-size: 14px;
+    color: #6b7280;
+    min-width: 120px;
+}
+
+.purchase-invoice {
+    font-weight: 600;
+    color: #1f2937;
+    min-width: 140px;
+}
+
+.purchase-total {
+    font-weight: 700;
+    color: #10b981;
+    margin-left: auto;
+}
+
+/* Estadísticas del Cliente - Lemon Style */
+.client-stat-card {
+    background: white;
+    border-radius: var(--lemon-radius);
+    padding: 28px 24px;
+    text-align: center;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    transition: all 0.3s var(--lemon-transition);
+}
+
+.client-stat-card:hover {
+    box-shadow: 0 8px 24px rgba(34, 197, 94, 0.12);
+    transform: translateY(-4px);
+    border-color: rgba(34, 197, 94, 0.2);
+}
+
+.client-stat-value {
+    font-size: 36px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    line-height: 1;
+}
+
+.client-stat-label {
+    font-size: 14px;
+    color: var(--lemon-gray-600);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .metric-card {
+        height: auto;
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .metric-icon {
+        margin-bottom: 8px;
+    }
+
+    .search-input {
+        padding-left: 40px;
+    }
+
+    .client-info-row {
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .client-info-label {
+        min-width: auto;
+    }
+}
+
+/* ============================================
+   FORMULARIOS - Lemon Style
+   ============================================ */
+
+/* Inputs y Selects */
+input[type="text"],
+input[type="email"],
+input[type="number"],
+select {
+    width: 100%;
+    height: 52px;
+    border: 2px solid #e5e7eb;
+    border-radius: 14px;
+    padding: 0 16px;
+    font-size: 15px;
+    color: #374151;
+    font-weight: 500;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: white;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="number"]:focus,
+select:focus {
+    outline: none;
+    border-color: #22c55e;
+    box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.1);
+}
+
+input[type="text"]::placeholder,
+input[type="email"]::placeholder,
+input[type="number"]::placeholder {
+    color: #9ca3af;
+    font-weight: 400;
+}
+
+/* Selects mejorados */
+select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+    background-position: right 12px center;
+    background-repeat: no-repeat;
+    background-size: 20px;
+    padding-right: 40px;
+}
+
+select:hover {
+    border-color: #d1d5db;
+}
+
+select:focus {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%2322c55e' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+}
+
+/* Textarea */
+textarea {
+    width: 100%;
+    min-height: 120px;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 14px 16px;
+    font-size: 15px;
+    color: #374151;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    resize: vertical;
+    background: white;
+}
+
+textarea:focus {
+    outline: none;
+    border-color: #22c55e;
+    box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.1);
+}
+
+textarea::placeholder {
+    color: #9ca3af;
+}
+
+/* Botones Lemon POS */
+.btn-lemon-primary {
+    background: linear-gradient(135deg, #22c55e 0%, #84cc16 100%);
+    color: white;
+    font-weight: 600;
+    padding: 12px 24px;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-lemon-primary:hover {
+    background: linear-gradient(135deg, #16a34a 0%, #65a30d 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(34, 197, 94, 0.4);
+}
+
+.btn-lemon-secondary {
+    background: white;
+    color: #22c55e;
+    font-weight: 600;
+    padding: 12px 24px;
+    border-radius: 12px;
+    border: 2px solid #22c55e;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-lemon-secondary:hover {
+    background: #f0fdf4;
+    transform: translateY(-2px);
+}
+
+/* Cards y Contenedores */
+.lemon-card {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.lemon-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+}
+
+.lemon-card-header {
+    font-size: 20px;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #f3f4f6;
+}
+
+/* Tabla Mejorada */
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+thead {
+    background: linear-gradient(to right, #f9fafb, #f3f4f6);
+}
+
+thead th {
+    padding: 16px 24px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 700;
+    color: #374151;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+tbody td {
+    padding: 16px 24px;
+    border-bottom: 1px solid #f3f4f6;
+    color: #4b5563;
+    font-size: 15px;
+}
+
+tbody tr {
+    transition: all 0.2s;
+}
+
+tbody tr:hover {
+    background: #f9fafb;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.empty-state-icon {
+    width: 80px;
+    height: 80px;
+    background: #f3f4f6;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+}
+
+.empty-state-icon i {
+    font-size: 36px;
+    color: #9ca3af;
+}
+
+.empty-state-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #374151;
+    margin-bottom: 8px;
+}
+
+.empty-state-text {
+    font-size: 15px;
+    color: #6b7280;
+}
+
+/* Badges y Tags */
+.badge-grupo {
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.badge-regular {
+    background: #f3f4f6;
+    color: #4b5563;
+}
+
+.badge-vip {
+    background: #e9d5ff;
+    color: #6b21a8;
+}
+
+.badge-corporativo {
+    background: #dbeafe;
+    color: #1e40af;
+}

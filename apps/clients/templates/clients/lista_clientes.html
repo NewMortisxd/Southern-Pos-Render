@@ -1,38 +1,400 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}
     Lista de Clientes
 {% endblock %}
 
+{% block extra_css %}
+<style>
+    /* Métricas Cards - Mejoradas */
+    .metric-card {
+        background: white;
+        border-radius: 20px;
+        padding: 28px 24px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        height: 120px;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+    
+    .metric-card:hover {
+        box-shadow: 0 8px 24px rgba(34, 197, 94, 0.12);
+        transform: translateY(-4px);
+        border-color: rgba(34, 197, 94, 0.2);
+    }
+    
+    .metric-icon {
+        width: 68px;
+        height: 68px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32px;
+        flex-shrink: 0;
+    }
+    
+    .metric-content {
+        flex: 1;
+    }
+    
+    .metric-value {
+        font-size: 36px;
+        font-weight: 800;
+        line-height: 1;
+        margin-bottom: 8px;
+        color: #111827;
+        letter-spacing: -0.02em;
+    }
+    
+    .metric-label {
+        font-size: 13px;
+        color: #6b7280;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+    }
+    
+    /* Búsqueda Mejorada */
+    .search-wrapper {
+        position: relative;
+        width: 100%;
+    }
+    
+    .search-input {
+        height: 52px;
+        border-radius: 14px;
+        padding-left: 52px;
+        padding-right: 20px;
+        border: 2px solid #e5e7eb;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        font-size: 15px;
+        width: 100%;
+        background: white;
+        color: #374151;
+        font-weight: 500;
+    }
+    
+    .search-input:focus {
+        border-color: #22c55e;
+        box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.1);
+        outline: none;
+        background: #ffffff;
+    }
+    
+    .search-input::placeholder {
+        color: #9ca3af;
+        font-size: 14px;
+        font-weight: 400;
+    }
+    
+    .search-icon {
+        position: absolute;
+        left: 18px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9ca3af;
+        font-size: 20px;
+        pointer-events: none;
+        z-index: 1;
+        transition: all 0.3s;
+    }
+    
+    .search-input:focus ~ .search-icon {
+        color: #22c55e;
+    }
+    
+    /* Avatar mejorado */
+    .client-avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 16px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+    
+    /* Status Badge */
+    .status-badge {
+        padding: 8px 14px;
+        border-radius: 10px;
+        font-size: 13px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .status-badge::before {
+        content: '';
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+    
+    .status-activo {
+        background: #f0fdf4;
+        color: #16a34a;
+    }
+    
+    .status-activo::before {
+        background: #22c55e;
+    }
+    
+    .status-inactivo {
+        background: #f3f4f6;
+        color: #4b5563;
+    }
+    
+    .status-inactivo::before {
+        background: #9ca3af;
+    }
+    
+    /* Action Buttons mejorados */
+    .action-btn {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        border: none;
+        cursor: pointer;
+        font-size: 15px;
+        position: relative;
+    }
+    
+    .action-btn:hover {
+        transform: translateY(-2px) scale(1.05);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    .action-btn-edit {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+    
+    .action-btn-edit:hover {
+        background: #3b82f6;
+        color: white;
+    }
+    
+    .action-btn-delete {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+    
+    .action-btn-delete:hover {
+        background: #ef4444;
+        color: white;
+    }
+    
+    .action-btn-view {
+        background: #f3f4f6;
+        color: #4b5563;
+    }
+    
+    .action-btn-view:hover {
+        background: #6b7280;
+        color: white;
+    }
+    
+    /* Tooltips */
+    .action-btn::after {
+        content: attr(title);
+        position: absolute;
+        bottom: -32px;
+        left: 50%;
+        transform: translateX(-50%) scale(0);
+        background: #1f2937;
+        color: white;
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 500;
+        white-space: nowrap;
+        opacity: 0;
+        transition: all 0.2s;
+        pointer-events: none;
+        z-index: 100;
+    }
+    
+    .action-btn:hover::after {
+        transform: translateX(-50%) scale(1);
+        opacity: 1;
+    }
+    
+    /* Favorito */
+    .favorite-star {
+        cursor: pointer;
+        font-size: 20px;
+        transition: all 0.3s;
+        color: #d1d5db;
+    }
+    
+    .favorite-star.active {
+        color: #fbbf24;
+    }
+    
+    .favorite-star:hover {
+        transform: scale(1.2);
+        color: #fbbf24;
+    }
+    
+    /* Row hover */
+    .client-row {
+        cursor: pointer;
+        transition: all 0.15s;
+    }
+    
+    .client-row:hover {
+        background: #f9fafb !important;
+    }
+    
+    /* Selects mejorados */
+    select {
+        cursor: pointer;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+        background-position: right 12px center;
+        background-repeat: no-repeat;
+        background-size: 20px;
+        padding-right: 40px;
+    }
+    
+    select:hover {
+        border-color: #d1d5db;
+    }
+    
+    select:focus {
+        outline: none;
+        border-color: #22c55e;
+        box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.1);
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%2322c55e' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<!-- Contenedor principal con márgenes automáticos y padding -->
 <div class="container mx-auto px-4 py-8">
-    <!-- Encabezado con título y botón para agregar cliente -->
-    <div class="flex justify-between items-center mb-6">
-        <h1 class="text-2xl font-bold text-gray-800">{{ section_title }}</h1>
-        <a href="{% url 'clients:agregar' %}" class="bg-emerald-500 hover:bg-emerald-600 text-white font-medium py-2 px-4 rounded-lg transition duration-300 flex items-center shadow-sm hover:shadow">
-            <i class="fas fa-plus mr-2"></i>Agregar Cliente
+    <!-- Encabezado -->
+    <div class="flex justify-between items-center mb-8">
+        <div>
+            <h1 class="text-4xl font-bold text-gray-900 mb-2 flex items-center gap-3">
+                <i class="fas fa-users text-emerald-500"></i>
+                {{ section_title }}
+            </h1>
+            <p class="text-gray-600 text-lg">Gestiona tu base de clientes de forma profesional</p>
+        </div>
+        <div class="flex gap-3">
+            <a href="{% url 'clients:agregar' %}" 
+               class="bg-gradient-to-br from-emerald-500 to-lime-500 hover:from-emerald-600 hover:to-lime-600 text-white font-bold py-4 px-8 rounded-xl transition-all duration-300 flex items-center gap-3 shadow-lg hover:shadow-xl hover:-translate-y-1 text-base">
+                <i class="fas fa-user-plus text-xl"></i>
+                <span>Agregar Cliente</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Métricas Dashboard -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <!-- Total Clientes -->
+        <div class="metric-card">
+            <div class="metric-icon" style="background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); color: #1e40af;">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="metric-content">
+                <div class="metric-value" style="color: #1e40af;">{{ total_clientes }}</div>
+                <div class="metric-label">Clientes Totales</div>
+            </div>
+        </div>
+        
+        <!-- Clientes Activos -->
+        <div class="metric-card">
+            <div class="metric-icon" style="background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%); color: #166534;">
+                <i class="fas fa-user-check"></i>
+            </div>
+            <div class="metric-content">
+                <div class="metric-value" style="color: #166534;">{{ clientes_activos }}</div>
+                <div class="metric-label">Clientes Activos</div>
+            </div>
+        </div>
+        
+        <!-- Clientes con Crédito -->
+        <div class="metric-card">
+            <div class="metric-icon" style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); color: #92400e;">
+                <i class="fas fa-credit-card"></i>
+            </div>
+            <div class="metric-content">
+                <div class="metric-value" style="color: #92400e;">{{ clientes_con_credito }}</div>
+                <div class="metric-label">Con Crédito</div>
+            </div>
+        </div>
+        
+        <!-- Nuevos este mes -->
+        <div class="metric-card">
+            <div class="metric-icon" style="background: linear-gradient(135deg, #e9d5ff 0%, #d8b4fe 100%); color: #6b21a8;">
+                <i class="fas fa-user-plus"></i>
+            </div>
+            <div class="metric-content">
+                <div class="metric-value" style="color: #6b21a8;">{{ clientes_nuevos_mes }}</div>
+                <div class="metric-label">Nuevos este mes</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros rápidos -->
+    <div class="flex gap-3 mb-6">
+        <a href="{% url 'clients:lista' %}" 
+           class="px-5 py-2.5 rounded-xl font-semibold text-sm transition-all {% if not estado_filter %}bg-emerald-500 text-white shadow-md{% else %}bg-white text-gray-700 hover:bg-gray-50 border border-gray-200{% endif %}">
+            <i class="fas fa-list mr-2"></i>Todos
         </a>
+        <a href="?estado=activo" 
+           class="px-5 py-2.5 rounded-xl font-semibold text-sm transition-all {% if estado_filter == 'activo' %}bg-emerald-500 text-white shadow-md{% else %}bg-white text-gray-700 hover:bg-gray-50 border border-gray-200{% endif %}">
+            <i class="fas fa-check-circle mr-2"></i>Activos
+        </a>
+        <a href="?estado=inactivo" 
+           class="px-5 py-2.5 rounded-xl font-semibold text-sm transition-all {% if estado_filter == 'inactivo' %}bg-emerald-500 text-white shadow-md{% else %}bg-white text-gray-700 hover:bg-gray-50 border border-gray-200{% endif %}">
+            <i class="fas fa-pause-circle mr-2"></i>Inactivos
+        </a>
+        <button onclick="filterFavorites()" 
+                class="px-5 py-2.5 rounded-xl font-semibold text-sm transition-all bg-white text-gray-700 hover:bg-gray-50 border border-gray-200">
+            <i class="fas fa-star mr-2 text-yellow-400"></i>Favoritos
+        </button>
     </div>
 
     <!-- Barra de búsqueda y filtros -->
-    <div class="bg-white rounded-lg shadow-sm p-4 mb-6">
-        <form method="get" class="flex flex-wrap gap-4">
+    <div class="bg-white rounded-2xl shadow-sm p-6 mb-8 border border-gray-100">
+        <form method="get" class="flex flex-wrap gap-4 items-center">
             <!-- Campo de búsqueda -->
-            <div class="flex-1 min-w-[200px]">
-                <div class="relative">
-                    <input type="text" name="q" value="{{ query }}" placeholder="Buscar clientes..." autocomplete="off"
-                           class="w-full border border-gray-300 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                    <button type="submit" class="absolute right-2 top-2 text-gray-400 hover:text-emerald-500 transition duration-300">
-                        <i class="fas fa-search"></i>
-                    </button>
+            <div class="flex-1 min-w-[300px]">
+                <div class="search-wrapper">
+                    <input type="text" 
+                           name="q" 
+                           value="{{ query }}" 
+                           placeholder="Buscar por nombre, teléfono, email o identificación..." 
+                           autocomplete="off"
+                           class="search-input">
+                    <i class="fas fa-search search-icon"></i>
                 </div>
             </div>
+            
             <!-- Filtro de ordenación -->
-            <div class="flex items-center">
-                <label class="mr-2 text-gray-600">Ordenar por:</label>
-                <select name="sort" onchange="this.form.submit()" 
-                        class="border border-gray-300 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+            <div class="flex items-center gap-3">
+                <label class="text-sm font-semibold text-gray-700 whitespace-nowrap">
+                    <i class="fas fa-sort mr-1 text-gray-400"></i>Ordenar:
+                </label>
+                <select name="sort" 
+                        onchange="this.form.submit()" 
+                        style="height: 52px; border-radius: 14px; border: 2px solid #e5e7eb; padding: 0 16px; font-size: 15px; font-weight: 500; color: #374151; transition: all 0.3s; background: white; min-width: 160px;">
                     <option value="nombre" {% if sort_by == 'nombre' %}selected{% endif %}>Nombre</option>
                     <option value="identificacion" {% if sort_by == 'identificacion' %}selected{% endif %}>Identificación</option>
                     <option value="email" {% if sort_by == 'email' %}selected{% endif %}>Email</option>
@@ -40,11 +402,15 @@
                     <option value="estado" {% if sort_by == 'estado' %}selected{% endif %}>Estado</option>
                 </select>
             </div>
+            
             <!-- Filtro por estado -->
-            <div class="flex items-center">
-                <label class="mr-2 text-gray-600">Filtrar por estado:</label>
-                <select name="estado" onchange="this.form.submit()" 
-                        class="border border-gray-300 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+            <div class="flex items-center gap-3">
+                <label class="text-sm font-semibold text-gray-700 whitespace-nowrap">
+                    <i class="fas fa-filter mr-1 text-gray-400"></i>Estado:
+                </label>
+                <select name="estado" 
+                        onchange="this.form.submit()" 
+                        style="height: 52px; border-radius: 14px; border: 2px solid #e5e7eb; padding: 0 16px; font-size: 15px; font-weight: 500; color: #374151; transition: all 0.3s; background: white; min-width: 140px;">
                     <option value="" {% if not estado_filter %}selected{% endif %}>Todos</option>
                     <option value="activo" {% if estado_filter == 'activo' %}selected{% endif %}>Activos</option>
                     <option value="inactivo" {% if estado_filter == 'inactivo' %}selected{% endif %}>Inactivos</option>
@@ -54,70 +420,100 @@
         </form>
     </div>
 
-    <!-- Lista de clientes -->
-    <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+    <!-- Tabla de clientes mejorada -->
+    <div class="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100"></div>
         <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
+            <thead class="bg-gradient-to-r from-gray-50 to-gray-100">
                 <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Código</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Identificación</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Grupo</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
-                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                    <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                        <i class="fas fa-star mr-1 text-yellow-400"></i>
+                    </th>
+                    <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Cliente</th>
+                    <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Contacto</th>
+                    <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Estado</th>
+                    <th class="px-6 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">Acciones</th>
                 </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
                 {% for cliente in clientes %}
-                <!-- Fila para cada cliente -->
-                <tr class="hover:bg-gray-50 transition duration-150">
-                    <td class="px-6 py-4 whitespace-nowrap">{{ cliente.codigo|default:"-" }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap font-medium">{{ cliente.nombre }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">{{ cliente.identificacion }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full 
-                            {% if cliente.grupo == 'vip' %}bg-purple-100 text-purple-800
-                            {% elif cliente.grupo == 'corporativo' %}bg-blue-100 text-blue-800
-                            {% else %}bg-gray-100 text-gray-800{% endif %}">
-                            {{ cliente.get_grupo_display }}
-                        </span>
+                <tr class="client-row" onclick="window.location='{% url 'clients:detalle' cliente.id %}'">
+                    <!-- Favorito -->
+                    <td class="px-6 py-4" onclick="event.stopPropagation();">
+                        <i class="fas fa-star favorite-star {% if cliente.es_favorito %}active{% endif %}" 
+                           data-cliente-id="{{ cliente.id }}"
+                           onclick="toggleFavorito({{ cliente.id }}, this)"></i>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full 
-                            {% if cliente.estado == 'activo' %}bg-green-100 text-green-800
-                            {% elif cliente.estado == 'inactivo' %}bg-gray-100 text-gray-800
-                            {% else %}bg-red-100 text-red-800{% endif %}">
+                    
+                    <!-- Cliente con avatar -->
+                    <td class="px-6 py-4">
+                        <div class="flex items-center gap-3">
+                            <div class="client-avatar" style="background: {% cycle '#dbeafe' '#dcfce7' '#fef3c7' '#e9d5ff' '#fce7f3' %}; color: {% cycle '#1e40af' '#166534' '#92400e' '#6b21a8' '#9f1239' %};">
+                                {{ cliente.get_iniciales }}
+                            </div>
+                            <div>
+                                <div class="font-semibold text-gray-900">{{ cliente.nombre }}</div>
+                                <div class="text-sm text-gray-500">{{ cliente.identificacion }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <!-- Contacto -->
+                    <td class="px-6 py-4">
+                        <div class="space-y-1">
+                            {% if cliente.telefono %}
+                                <div class="text-sm text-gray-700">
+                                    <i class="fas fa-phone text-gray-400 mr-2"></i>{{ cliente.telefono }}
+                                </div>
+                            {% endif %}
+                            {% if cliente.email %}
+                                <div class="text-sm text-gray-700">
+                                    <i class="fas fa-envelope text-gray-400 mr-2"></i>{{ cliente.email|truncatechars:30 }}
+                                </div>
+                            {% endif %}
+                            {% if not cliente.telefono and not cliente.email %}
+                                <span class="text-gray-400 text-sm">Sin contacto</span>
+                            {% endif %}
+                        </div>
+                    </td>
+                    
+                    <!-- Estado -->
+                    <td class="px-6 py-4">
+                        <span class="status-badge status-{{ cliente.estado }}">
                             {{ cliente.get_estado_display }}
                         </span>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right">
-                        <div class="flex justify-end space-x-2">
-                            <!-- Botón para editar -->
-                            <a href="{% url 'clients:editar' cliente.id %}" 
-                               class="text-white bg-blue-500 hover:bg-blue-600 px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-300 shadow-sm hover:shadow flex items-center">
-                                <i class="fas fa-edit mr-1.5"></i>Editar
-                            </a>
-                            <!-- Botón para eliminar -->
-                            <a href="{% url 'clients:eliminar' cliente.id %}" 
-                               class="text-white bg-red-500 hover:bg-red-600 px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-300 shadow-sm hover:shadow flex items-center">
-                                <i class="fas fa-trash mr-1.5"></i>Eliminar
-                            </a>
-                            <!-- Botón para ver detalles -->
+                    
+                    <!-- Acciones -->
+                    <td class="px-6 py-4" onclick="event.stopPropagation();">
+                        <div class="flex justify-center gap-2">
                             <a href="{% url 'clients:detalle' cliente.id %}" 
-                               class="text-white bg-gray-500 hover:bg-gray-600 px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-300 shadow-sm hover:shadow flex items-center">
-                                <i class="fas fa-eye mr-1.5"></i>Ver
+                               class="action-btn action-btn-view" 
+                               title="Ver detalles">
+                                <i class="far fa-eye"></i>
+                            </a>
+                            <a href="{% url 'clients:editar' cliente.id %}" 
+                               class="action-btn action-btn-edit" 
+                               title="Editar">
+                                <i class="far fa-edit"></i>
+                            </a>
+                            <a href="{% url 'clients:eliminar' cliente.id %}" 
+                               class="action-btn action-btn-delete" 
+                               title="Eliminar"
+                               onclick="return confirm('¿Estás seguro de eliminar este cliente?')">
+                                <i class="far fa-trash-alt"></i>
                             </a>
                         </div>
                     </td>
                 </tr>
                 {% empty %}
-                <!-- Mensaje cuando no hay clientes -->
                 <tr>
-                    <td colspan="6" class="px-6 py-8 text-center text-gray-500">
+                    <td colspan="5" class="px-6 py-12 text-center">
                         <div class="flex flex-col items-center justify-center">
-                            <i class="fas fa-users text-gray-300 text-4xl mb-3"></i>
-                            <p class="text-lg">No hay clientes registrados.</p>
-                            <p class="text-sm text-gray-400 mt-1">Agrega un nuevo cliente para comenzar.</p>
+                            <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                                <i class="fas fa-users text-gray-400 text-3xl"></i>
+                            </div>
+                            <p class="text-lg font-semibold text-gray-700 mb-1">No hay clientes registrados</p>
+                            <p class="text-sm text-gray-500">Agrega tu primer cliente para comenzar</p>
                         </div>
                     </td>
                 </tr>
@@ -126,4 +522,32 @@
         </table>
     </div>
 </div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/clientes.js' %}"></script>
+<script>
+// Filtrar favoritos
+function filterFavorites() {
+    const rows = document.querySelectorAll('.client-row');
+    rows.forEach(row => {
+        const star = row.querySelector('.favorite-star');
+        if (star && star.classList.contains('active')) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+
+// Mejorar tooltips en móvil
+if ('ontouchstart' in window) {
+    document.querySelectorAll('.action-btn').forEach(btn => {
+        btn.addEventListener('touchstart', function(e) {
+            e.stopPropagation();
+        });
+    });
+}
+</script>
 {% endblock %}

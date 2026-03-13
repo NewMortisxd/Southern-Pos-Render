@@ -23,35 +23,53 @@
             
             <div class="p-6 bg-white dark:bg-gray-800">
                 <!-- Tarjetas de Resumen -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                    <div class="bg-white dark:bg-gray-800 p-5 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+                    <!-- Tarjeta PRINCIPAL: Valor Total (más grande y destacada) -->
+                    <div class="lg:col-span-2 bg-gradient-to-br from-green-50 via-white to-green-50 dark:from-green-900/30 dark:via-gray-800 dark:to-green-800/30 p-6 rounded-2xl border-2 border-green-300 dark:border-green-700 shadow-xl hover:shadow-2xl transition-all duration-400">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="bg-gradient-to-br from-green-500 to-green-600 p-3 rounded-xl shadow-lg">
+                                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                            </div>
+                            <span class="text-xs font-bold text-green-700 dark:text-green-400 bg-green-200 dark:bg-green-800 px-3 py-1.5 rounded-full uppercase tracking-wide">Capital Inmovilizado</span>
+                        </div>
+                        <p class="text-gray-600 dark:text-gray-400 text-sm font-medium mb-2">Valor Total Inventario (Costo)</p>
+                        <p class="text-5xl font-bold bg-gradient-to-r from-green-600 to-green-700 dark:from-green-400 dark:to-green-500 bg-clip-text text-transparent mb-3">${{ valor_total_costo|floatformat:2 }}</p>
+                        <div class="space-y-1 pt-3 border-t border-green-200 dark:border-green-700">
+                            <div class="flex justify-between items-center">
+                                <p class="text-xs text-gray-500 dark:text-gray-400">Valor Venta:</p>
+                                <p class="text-sm font-semibold text-gray-700 dark:text-gray-300">${{ valor_total_venta|floatformat:2 }}</p>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <p class="text-xs text-green-600 dark:text-green-400 font-semibold">Utilidad Potencial:</p>
+                                <p class="text-sm font-bold text-green-700 dark:text-green-400">${{ utilidad_potencial|floatformat:2 }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 🎯 CAMBIO: Productos inventariables (no "Total Productos") -->
+                    <div class="bg-white dark:bg-gray-800 p-5 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-all duration-300">
                         <div class="flex items-center">
-                            <div class="bg-blue-100 dark:bg-blue-800/40 p-3 rounded-full mr-3">
-                                <i data-lucide="package" class="w-6 h-6 text-blue-600 dark:text-blue-400"></i>
+                            <div class="bg-blue-100 dark:bg-blue-800/40 p-3 rounded-xl mr-3">
+                                <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                                </svg>
                             </div>
                             <div>
-                                <p class="text-gray-500 dark:text-gray-400 text-sm">Total Productos</p>
+                                <p class="text-gray-500 dark:text-gray-400 text-sm">Productos Inventariables</p>
                                 <p class="text-2xl font-bold text-gray-800 dark:text-white">{{ total_productos }}</p>
+                                <p class="text-xs text-gray-400 dark:text-gray-500">{{ total_productos_fisicos }} físicos + {{ total_productos_insumos }} insumos</p>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="bg-white dark:bg-gray-800 p-5 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
+                    <div class="bg-white dark:bg-gray-800 p-5 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-all duration-300">
                         <div class="flex items-center">
-                            <div class="bg-green-100 dark:bg-green-800/40 p-3 rounded-full mr-3">
-                                <i data-lucide="dollar-sign" class="w-6 h-6 text-green-600 dark:text-green-400"></i>
-                            </div>
-                            <div>
-                                <p class="text-gray-500 dark:text-gray-400 text-sm">Valor Total</p>
-                                <p class="text-2xl font-bold text-gray-800 dark:text-white">${{ valor_total|floatformat:2 }}</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="bg-white dark:bg-gray-800 p-5 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
-                        <div class="flex items-center">
-                            <div class="bg-amber-100 dark:bg-amber-800/40 p-3 rounded-full mr-3">
-                                <i data-lucide="tag" class="w-6 h-6 text-amber-600 dark:text-amber-400"></i>
+                            <div class="bg-amber-100 dark:bg-amber-800/40 p-3 rounded-xl mr-3">
+                                <svg class="w-6 h-6 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                                </svg>
                             </div>
                             <div>
                                 <p class="text-gray-500 dark:text-gray-400 text-sm">Categorías</p>
@@ -60,15 +78,112 @@
                         </div>
                     </div>
                     
-                    <!-- For the Stock Bajo counter in the card at the top -->
-                    <div class="bg-white dark:bg-gray-800 p-5 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
+                    <!-- 🎯 CAMBIO: Stock bajo ahora usa stock_minimo dinámico -->
+                    <div class="bg-white dark:bg-gray-800 p-5 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-all duration-300">
                         <div class="flex items-center">
-                            <div class="bg-red-100 dark:bg-red-800/40 p-3 rounded-full mr-3">
-                                <i data-lucide="alert-triangle" class="w-6 h-6 text-red-600 dark:text-red-400"></i>
+                            <div class="bg-red-100 dark:bg-red-800/40 p-3 rounded-xl mr-3">
+                                <svg class="w-6 h-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                </svg>
                             </div>
                             <div>
                                 <p class="text-gray-500 dark:text-gray-400 text-sm">Stock Bajo</p>
-                                <p class="text-2xl font-bold text-gray-800 dark:text-white" id="stock-bajo-count">0</p>
+                                <p class="text-2xl font-bold text-gray-800 dark:text-white">{{ count_stock_bajo }}</p>
+                                <p class="text-xs text-gray-400 dark:text-gray-500">≤ stock mínimo</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Indicadores Críticos Adicionales -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                    <!-- 🎯 CAMBIO: Valor en riesgo ahora es capital real (costo × stock bajo) -->
+                    <div class="bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/30 p-5 rounded-xl border border-red-200 dark:border-red-700 hover:shadow-lg transition-all duration-300">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <div class="flex items-center mb-2">
+                                    <div class="bg-red-100 dark:bg-red-800/40 p-2 rounded-lg mr-2">
+                                        <svg class="w-5 h-5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                        </svg>
+                                    </div>
+                                    <p class="text-red-600 dark:text-red-400 text-sm font-semibold">Capital en Riesgo</p>
+                                </div>
+                                <p class="text-3xl font-bold text-red-700 dark:text-red-300">${{ valor_en_riesgo|floatformat:2 }}</p>
+                                <p class="text-xs text-gray-600 dark:text-gray-400 mt-1">Costo de productos con stock bajo</p>
+                            </div>
+                            <div class="bg-red-200 dark:bg-red-800/60 p-3 rounded-full">
+                                <svg class="w-8 h-8 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-700/50 dark:to-gray-600/50 p-5 rounded-xl border border-gray-200 dark:border-gray-600 hover:shadow-lg transition-all duration-300">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <div class="flex items-center mb-2">
+                                    <div class="bg-gray-200 dark:bg-gray-600 p-2 rounded-lg mr-2">
+                                        <svg class="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                        </svg>
+                                    </div>
+                                    <p class="text-gray-600 dark:text-gray-300 text-sm font-semibold">Productos Agotados</p>
+                                </div>
+                                <p class="text-3xl font-bold text-gray-700 dark:text-gray-200">{{ count_agotados }}</p>
+                                <p class="text-xs text-gray-600 dark:text-gray-400 mt-1">Requieren reposición urgente</p>
+                            </div>
+                            <div class="bg-gray-200 dark:bg-gray-600 p-3 rounded-full">
+                                <svg class="w-8 h-8 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 🎯 NUEVO: Utilidad potencial productos físicos -->
+                    <div class="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/30 p-5 rounded-xl border border-blue-200 dark:border-blue-700 hover:shadow-lg transition-all duration-300">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <div class="flex items-center mb-2">
+                                    <div class="bg-blue-100 dark:bg-blue-800/40 p-2 rounded-lg mr-2">
+                                        <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                                        </svg>
+                                    </div>
+                                    <p class="text-blue-600 dark:text-blue-400 text-sm font-semibold">Utilidad Físicos</p>
+                                </div>
+                                <p class="text-3xl font-bold text-blue-700 dark:text-blue-300">${{ utilidad_fisicos|floatformat:2 }}</p>
+                                <p class="text-xs text-gray-600 dark:text-gray-400 mt-1">Productos físicos en stock</p>
+                            </div>
+                            <div class="bg-blue-200 dark:bg-blue-800/60 p-3 rounded-full">
+                                <svg class="w-8 h-8 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 🎯 NUEVO: Utilidad potencial insumos -->
+                    <div class="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/30 p-5 rounded-xl border border-purple-200 dark:border-purple-700 hover:shadow-lg transition-all duration-300">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <div class="flex items-center mb-2">
+                                    <div class="bg-purple-100 dark:bg-purple-800/40 p-2 rounded-lg mr-2">
+                                        <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
+                                        </svg>
+                                    </div>
+                                    <p class="text-purple-600 dark:text-purple-400 text-sm font-semibold">Utilidad Insumos</p>
+                                </div>
+                                <p class="text-3xl font-bold text-purple-700 dark:text-purple-300">${{ utilidad_insumos|floatformat:2 }}</p>
+                                <p class="text-xs text-gray-600 dark:text-gray-400 mt-1">Insumos / materia prima</p>
+                            </div>
+                            <div class="bg-purple-200 dark:bg-purple-800/60 p-3 rounded-full">
+                                <svg class="w-8 h-8 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"/>
+                                </svg>
                             </div>
                         </div>
                     </div>
@@ -87,12 +202,12 @@
                             <!-- For the Stock Bajo tab button -->
                             <li class="mr-2">
                                 <button type="button" data-tab="bajo" @click="activeTab = 'bajo'" :class="activeTab === 'bajo' ? 'border-red-500 text-red-600 dark:text-red-400 dark:border-red-400' : 'border-transparent text-gray-500 dark:text-gray-400'" class="inline-block py-4 px-4 text-sm font-medium border-b-2 rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300">
-                                    Stock Bajo <span class="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300 text-xs font-medium px-2 py-0.5 rounded-full ml-2 stock-bajo-counter">0</span>
+                                    Stock Bajo <span class="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300 text-xs font-medium px-2 py-0.5 rounded-full ml-2">{{ count_stock_bajo }}</span>
                                 </button>
                             </li>
                             <li class="mr-2">
                                 <button type="button" @click="activeTab = 'agotados'" :class="activeTab === 'agotados' ? 'border-gray-500 text-gray-600 dark:text-gray-400 dark:border-gray-400' : 'border-transparent text-gray-500 dark:text-gray-400'" class="inline-block py-4 px-4 text-sm font-medium border-b-2 rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300">
-                                    Agotados <span class="bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300 text-xs font-medium px-2 py-0.5 rounded-full ml-2">{{ productos_agotados.count }}</span>
+                                    Agotados <span class="bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300 text-xs font-medium px-2 py-0.5 rounded-full ml-2">{{ count_agotados }}</span>
                                 </button>
                             </li>
                             <li class="mr-2">
@@ -109,54 +224,93 @@
                             <thead class="bg-gray-50 dark:bg-gray-800">
                                 <tr>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Producto</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Categoría</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Stock</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Precio</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Valor Total</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">SKU</th>
+                                    <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Stock</th>
+                                    <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Estado</th>
+                                    <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Costo</th>
+                                    <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Valor Costo</th>
+                                    <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Margen %</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
                                 {% for producto in productos %}
-                                <tr class="{% if producto.stock == 0 %}bg-red-50 dark:bg-red-900/20{% elif producto.stock < 10 %}bg-amber-50 dark:bg-amber-900/20{% endif %}">
-                                    <td class="px-6 py-4 whitespace-nowrap">
+                                <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                                    <td class="px-6 py-4">
                                         <div class="flex items-center">
                                             {% if producto.imagen %}
-                                            <div class="flex-shrink-0 h-10 w-10">
-                                                <img class="h-10 w-10 rounded-full object-cover" src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}">
+                                            <div class="flex-shrink-0 h-12 w-12">
+                                                <img class="h-12 w-12 rounded-lg object-cover" src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}">
                                             </div>
                                             {% else %}
-                                            <div class="flex-shrink-0 h-10 w-10 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center">
-                                                <i data-lucide="package" class="h-5 w-5 text-gray-500 dark:text-gray-400"></i>
+                                            <div class="flex-shrink-0 h-12 w-12 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center">
+                                                <i data-lucide="package" class="h-6 w-6 text-gray-500 dark:text-gray-400"></i>
                                             </div>
                                             {% endif %}
                                             <div class="ml-4">
-                                                <div class="text-sm font-medium text-gray-900 dark:text-white">{{ producto.nombre }}</div>
-                                                <div class="text-sm text-gray-500 dark:text-gray-400">SKU: {{ producto.sku|default:"N/A" }}</div>
+                                                <div class="text-sm font-semibold text-gray-900 dark:text-white">{{ producto.nombre }}</div>
+                                                <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                                    {% if producto.tipo_producto == 'fisico' %}
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+                                                        Físico
+                                                    </span>
+                                                    {% elif producto.tipo_producto == 'insumo' %}
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300">
+                                                        Insumo
+                                                    </span>
+                                                    {% endif %}
+                                                    <span class="ml-2">{{ producto.categoria.nombre }}</span>
+                                                </div>
                                             </div>
                                         </div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
-                                            {{ producto.categoria.nombre }}
-                                        </span>
+                                        <span class="text-sm text-gray-600 dark:text-gray-400 font-mono">{{ producto.sku|default:"N/A" }}</span>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
+                                    <td class="px-6 py-4 whitespace-nowrap text-center">
+                                        <div class="text-sm font-semibold text-gray-900 dark:text-white">{{ producto.stock }}</div>
+                                        <div class="text-xs text-gray-500 dark:text-gray-400">mín: {{ producto.stock_minimo|default:"0" }}</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-center">
                                         {% if producto.stock == 0 %}
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300">
+                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300">
+                                            <svg class="w-3 h-3 mr-1.5" fill="currentColor" viewBox="0 0 20 20">
+                                                <circle cx="10" cy="10" r="8"/>
+                                            </svg>
                                             Agotado
                                         </span>
-                                        {% elif producto.stock < 10 %}
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300">
-                                            {{ producto.stock }} unidades
+                                        {% elif producto.stock <= producto.stock_minimo %}
+                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300">
+                                            <svg class="w-3 h-3 mr-1.5" fill="currentColor" viewBox="0 0 20 20">
+                                                <circle cx="10" cy="10" r="8"/>
+                                            </svg>
+                                            Bajo Mínimo
                                         </span>
                                         {% else %}
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
-                                            {{ producto.stock }} unidades
+                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
+                                            <svg class="w-3 h-3 mr-1.5" fill="currentColor" viewBox="0 0 20 20">
+                                                <circle cx="10" cy="10" r="8"/>
+                                            </svg>
+                                            Normal
                                         </span>
                                         {% endif %}
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">${{ producto.precio|floatformat:2 }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">${{ producto.precio|multiply:producto.stock|floatformat:2 }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900 dark:text-white font-medium">
+                                        ${{ producto.costo|default:0|floatformat:2 }}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900 dark:text-white font-semibold">
+                                        {% if producto.stock %}
+                                            ${{ producto.costo|default:0|multiply:producto.stock|floatformat:2 }}
+                                        {% else %}
+                                            <span class="text-gray-400">$0.00</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm">
+                                        {% if producto.costo and producto.costo > 0 %}
+                                        <span class="text-green-600 dark:text-green-400 font-bold text-base">{{ producto.margen_utilidad|floatformat:1 }}%</span>
+                                        {% else %}
+                                        <span class="text-gray-400">N/A</span>
+                                        {% endif %}
+                                    </td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -168,46 +322,67 @@
                             <thead class="bg-gray-50 dark:bg-gray-800">
                                 <tr>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Producto</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Categoría</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Stock</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Precio</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Acciones</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">SKU</th>
+                                    <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Stock</th>
+                                    <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Estado</th>
+                                    <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Precio</th>
+                                    <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
                                 {% for producto in productos_stock_bajo %}
                                 {% if producto.stock > 0 %}
-                                <tr class="bg-amber-50 dark:bg-amber-900/20">
-                                    <td class="px-6 py-4 whitespace-nowrap">
+                                <tr class="bg-amber-50 dark:bg-amber-900/20 hover:bg-amber-100 dark:hover:bg-amber-900/30 transition-colors">
+                                    <td class="px-6 py-4">
                                         <div class="flex items-center">
                                             {% if producto.imagen %}
-                                            <div class="flex-shrink-0 h-10 w-10">
-                                                <img class="h-10 w-10 rounded-full object-cover" src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}">
+                                            <div class="flex-shrink-0 h-12 w-12">
+                                                <img class="h-12 w-12 rounded-lg object-cover" src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}">
                                             </div>
                                             {% else %}
-                                            <div class="flex-shrink-0 h-10 w-10 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center">
-                                                <i data-lucide="package" class="h-5 w-5 text-gray-500 dark:text-gray-400"></i>
+                                            <div class="flex-shrink-0 h-12 w-12 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center">
+                                                <i data-lucide="package" class="h-6 w-6 text-gray-500 dark:text-gray-400"></i>
                                             </div>
                                             {% endif %}
                                             <div class="ml-4">
-                                                <div class="text-sm font-medium text-gray-900 dark:text-white">{{ producto.nombre }}</div>
-                                                <div class="text-sm text-gray-500 dark:text-gray-400">SKU: {{ producto.sku|default:"N/A" }}</div>
+                                                <div class="text-sm font-semibold text-gray-900 dark:text-white">{{ producto.nombre }}</div>
+                                                <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                                    {% if producto.tipo_producto == 'fisico' %}
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+                                                        Físico
+                                                    </span>
+                                                    {% elif producto.tipo_producto == 'insumo' %}
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300">
+                                                        Insumo
+                                                    </span>
+                                                    {% endif %}
+                                                    <span class="ml-2">{{ producto.categoria.nombre }}</span>
+                                                </div>
                                             </div>
                                         </div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
-                                            {{ producto.categoria.nombre }}
+                                        <span class="text-sm text-gray-600 dark:text-gray-400 font-mono">{{ producto.sku|default:"N/A" }}</span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-center">
+                                        <div class="text-sm font-semibold text-amber-700 dark:text-amber-300">{{ producto.stock }}</div>
+                                        <div class="text-xs text-gray-500 dark:text-gray-400">mín: {{ producto.stock_minimo|default:"0" }}</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-center">
+                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300">
+                                            <svg class="w-3 h-3 mr-1.5" fill="currentColor" viewBox="0 0 20 20">
+                                                <circle cx="10" cy="10" r="8"/>
+                                            </svg>
+                                            Bajo Mínimo
                                         </span>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300">
-                                            {{ producto.stock }} unidades
-                                        </span>
+                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900 dark:text-white font-medium">
+                                        ${{ producto.precio|floatformat:2 }}
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">${{ producto.precio|floatformat:2 }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <a href="{% url 'productos:editar' producto.id %}" class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 mr-3">Editar</a>
+                                        <a href="{% url 'productos:editar' producto.id %}" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+                                            Editar
+                                        </a>
                                     </td>
                                 </tr>
                                 {% endif %}
@@ -221,45 +396,61 @@
                             <thead class="bg-gray-50 dark:bg-gray-800">
                                 <tr>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Producto</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Categoría</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Stock</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Precio</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Acciones</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">SKU</th>
+                                    <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Estado</th>
+                                    <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Precio</th>
+                                    <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
                                 {% for producto in productos_agotados %}
-                                <tr class="bg-red-50 dark:bg-red-900/20">
-                                    <td class="px-6 py-4 whitespace-nowrap">
+                                <tr class="bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors">
+                                    <td class="px-6 py-4">
                                         <div class="flex items-center">
                                             {% if producto.imagen %}
-                                            <div class="flex-shrink-0 h-10 w-10">
-                                                <img class="h-10 w-10 rounded-full object-cover" src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}">
+                                            <div class="flex-shrink-0 h-12 w-12">
+                                                <img class="h-12 w-12 rounded-lg object-cover" src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}">
                                             </div>
                                             {% else %}
-                                            <div class="flex-shrink-0 h-10 w-10 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center">
-                                                <i data-lucide="package" class="h-5 w-5 text-gray-500 dark:text-gray-400"></i>
+                                            <div class="flex-shrink-0 h-12 w-12 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center">
+                                                <i data-lucide="package" class="h-6 w-6 text-gray-500 dark:text-gray-400"></i>
                                             </div>
                                             {% endif %}
                                             <div class="ml-4">
-                                                <div class="text-sm font-medium text-gray-900 dark:text-white">{{ producto.nombre }}</div>
-                                                <div class="text-sm text-gray-500 dark:text-gray-400">SKU: {{ producto.sku|default:"N/A" }}</div>
+                                                <div class="text-sm font-semibold text-gray-900 dark:text-white">{{ producto.nombre }}</div>
+                                                <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                                    {% if producto.tipo_producto == 'fisico' %}
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+                                                        Físico
+                                                    </span>
+                                                    {% elif producto.tipo_producto == 'insumo' %}
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300">
+                                                        Insumo
+                                                    </span>
+                                                    {% endif %}
+                                                    <span class="ml-2">{{ producto.categoria.nombre }}</span>
+                                                </div>
                                             </div>
                                         </div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
-                                            {{ producto.categoria.nombre }}
-                                        </span>
+                                        <span class="text-sm text-gray-600 dark:text-gray-400 font-mono">{{ producto.sku|default:"N/A" }}</span>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300">
+                                    <td class="px-6 py-4 whitespace-nowrap text-center">
+                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300">
+                                            <svg class="w-3 h-3 mr-1.5" fill="currentColor" viewBox="0 0 20 20">
+                                                <circle cx="10" cy="10" r="8"/>
+                                            </svg>
                                             Agotado
                                         </span>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">${{ producto.precio|floatformat:2 }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900 dark:text-white font-medium">
+                                        ${{ producto.precio|floatformat:2 }}
+                                    </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <a href="{% url 'productos:editar' producto.id %}" class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 mr-3">Editar</a>
+                                        <a href="{% url 'productos:editar' producto.id %}" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+                                            Editar
+                                        </a>
                                     </td>
                                 </tr>
                                 {% endfor %}
@@ -273,7 +464,9 @@
                                 <tr>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Categoría</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Total Productos</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Valor Inventario</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Valor Inventario (Costo)</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Valor Inventario (Venta)</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Utilidad Potencial</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
@@ -288,7 +481,11 @@
                                         </div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ categoria.total_productos }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">${{ categoria.valor_inventario|floatformat:2 }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-green-700 dark:text-green-400">${{ categoria.valor_inventario_costo|floatformat:2 }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">${{ categoria.valor_inventario_venta|floatformat:2 }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-blue-700 dark:text-blue-400">
+                                        ${{ categoria.utilidad_potencial|floatformat:2 }}
+                                    </td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -298,18 +495,24 @@
                 
                 <!-- Botones de Acción -->
                 <div class="mt-8 flex flex-wrap gap-4">
-                    <button id="btn-imprimir" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-blue-700 dark:hover:bg-blue-600">
-                        <i data-lucide="printer" class="h-4 w-4 mr-2"></i>
+                    <button id="btn-imprimir" class="inline-flex items-center px-6 py-3 border border-transparent rounded-xl shadow-sm text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transform hover:scale-105 transition-all duration-300">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+                        </svg>
                         Imprimir Reporte
                     </button>
-                    <button id="btn-excel" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 dark:bg-green-700 dark:hover:bg-green-600">
-                        <i data-lucide="file-text" class="h-4 w-4 mr-2"></i>
+                    <a href="?export=excel" class="inline-flex items-center px-6 py-3 border border-transparent rounded-xl shadow-sm text-sm font-semibold text-white bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transform hover:scale-105 transition-all duration-300">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
                         Exportar a Excel
-                    </button>
-                    <button id="btn-pdf" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 dark:bg-red-700 dark:hover:bg-red-600">
-                        <i data-lucide="file" class="h-4 w-4 mr-2"></i>
+                    </a>
+                    <a href="?export=pdf" class="inline-flex items-center px-6 py-3 border border-transparent rounded-xl shadow-sm text-sm font-semibold text-white bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transform hover:scale-105 transition-all duration-300">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                        </svg>
                         Exportar a PDF
-                    </button>
+                    </a>
                 </div>
             </div>
         </div>

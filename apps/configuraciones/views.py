@@ -75,8 +75,83 @@ def business_config(request):
             business.tipo_emision = request.POST.get('tipo_emision', '1')
             business.obligado_contabilidad = request.POST.get('obligado_contabilidad', 'NO')
             business.regimen_rimpe = request.POST.get('regimen_rimpe', '') or None
-            business.establecimiento = request.POST.get('establecimiento', '').strip() or None
-            business.punto_emision = request.POST.get('punto_emision', '').strip() or None
+            
+            # 🎯 Actualizar establecimiento y punto de emisión
+            establecimiento = request.POST.get('establecimiento', '001').strip()
+            punto_emision_codigo = request.POST.get('punto_emision', '001').strip()
+            
+            # Validar y formatear a 3 dígitos
+            if establecimiento and establecimiento.isdigit():
+                establecimiento = establecimiento.zfill(3)
+            else:
+                establecimiento = '001'
+            
+            if punto_emision_codigo and punto_emision_codigo.isdigit():
+                punto_emision_codigo = punto_emision_codigo.zfill(3)
+            else:
+                punto_emision_codigo = '001'
+            
+            # 🚨 PROTECCIÓN CRÍTICA: Verificar si ya existen ventas
+            from apps.ventas.models import PuntoEmision, Venta
+            
+            # Buscar el punto de emisión principal del negocio
+            punto = PuntoEmision.objects.filter(business=business, activo=True).first()
+            
+            if punto:
+                # Verificar si el punto tiene ventas emitidas
+                tiene_ventas = Venta.objects.filter(punto_emision=punto).exists()
+                
+                # Si tiene ventas y se intenta cambiar establecimiento o código
+                if tiene_ventas and (
+                    punto.establecimiento_codigo != establecimiento or 
+                    punto.codigo != punto_emision_codigo
+                ):
+                    # 🔒 NO PERMITIR cambiar códigos si ya hay facturas emitidas
+                    messages.warning(
+                        request,
+                        f'⚠️ No se puede cambiar el establecimiento o punto de emisión porque ya existen facturas emitidas con {punto.establecimiento_codigo}-{punto.codigo}. '
+                        f'Para usar una nueva numeración, contacte a soporte para crear un nuevo punto de emisión.'
+                    )
+                    # Mantener los valores originales
+                    establecimiento = punto.establecimiento_codigo
+                    punto_emision_codigo = punto.codigo
+                else:
+                    # Si no tiene ventas, permitir actualizar
+                    punto.establecimiento_codigo = establecimiento
+                    punto.codigo = punto_emision_codigo
+                    punto.save(update_fields=['establecimiento_codigo', 'codigo'])
+                    
+                    # 🔥 AUDITORÍA: Registrar el cambio
+                    import logging
+                    logger = logging.getLogger('facturacion')
+                    logger.info(
+                        f'CAMBIO DE CONFIGURACIÓN - Usuario: {request.user.username}, '
+                        f'Business: {business.nombre_negocio}, '
+                        f'Nuevo establecimiento: {establecimiento}, '
+                        f'Nuevo punto emisión: {punto_emision_codigo}'
+                    )
+            else:
+                # Crear nuevo punto de emisión
+                punto = PuntoEmision.objects.create(
+                    business=business,
+                    codigo=punto_emision_codigo,
+                    establecimiento_codigo=establecimiento,
+                    nombre='Caja Principal',
+                    activo=True
+                )
+                
+                # 🔥 AUDITORÍA: Registrar creación
+                import logging
+                logger = logging.getLogger('facturacion')
+                logger.info(
+                    f'NUEVO PUNTO DE EMISIÓN - Usuario: {request.user.username}, '
+                    f'Business: {business.nombre_negocio}, '
+                    f'Establecimiento: {establecimiento}, '
+                    f'Punto emisión: {punto_emision_codigo}'
+                )
+            
+            business.establecimiento = establecimiento
+            business.punto_emision = punto_emision_codigo
             
             # Guardar ciudad
             business.ciudad = request.POST.get('ciudad', '').strip() or None
@@ -96,9 +171,14 @@ def business_config(request):
     print(f"Form fields: {form.fields}")
     print(f"Form initial data: {form.initial}")
     
+    # Obtener punto de emisión activo para mostrar secuencial actual
+    from apps.ventas.models import PuntoEmision
+    punto_emision = PuntoEmision.objects.filter(business=business, activo=True).first()
+    
     return render(request, 'configuraciones/business_config.html', {
         'form': form,
         'business': business,
+        'punto_emision': punto_emision,
     })
 
 

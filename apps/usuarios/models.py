@@ -184,17 +184,20 @@ class Business(models.Model):
     )
     establecimiento = models.CharField(
         max_length=3,
-        blank=True,
-        null=True,
+        default='001',
         verbose_name="Establecimiento",
         help_text="3 dígitos (ej: 001)"
     )
     punto_emision = models.CharField(
         max_length=3,
-        blank=True,
-        null=True,
+        default='001',
         verbose_name="Punto de Emisión",
         help_text="3 dígitos (ej: 001)"
+    )
+    secuencial_actual = models.PositiveIntegerField(
+        default=1,
+        verbose_name="Secuencial Actual de Facturación",
+        help_text="Número secuencial que se autoincrementa con cada factura. NO modificar manualmente."
     )
     
     def __str__(self):

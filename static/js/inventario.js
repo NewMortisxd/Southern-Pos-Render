@@ -148,7 +148,7 @@ $('#stock-bajo-count').text(lowStockCount);
                         try {
                             // Create an image element to check if logo exists
                             const img = new Image();
-                            img.src = '{% static "img/logo.png" %}';
+                            img.src = '{% static "img/LemonPosLogo.svg" %}';
                             
                             img.onload = function() {
                                 // If logo loads successfully, add it to the PDF

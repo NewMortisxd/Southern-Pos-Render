@@ -32,8 +32,9 @@ urlpatterns = [
     path('logout/', custom_logout, name='logout'),
     path('register/', usuarios_views.register_view, name='register'),  # Usar vista de usuarios
     path('dashboard/', views.dashboard, name='dashboard'),
+    path('test-logo/', TemplateView.as_view(template_name='test_logo.html'), name='test_logo'),
     # Favicon
-    path('favicon.ico', RedirectView.as_view(url=settings.STATIC_URL + 'img/logo.png', permanent=True)),
+    path('favicon.ico', RedirectView.as_view(url=settings.STATIC_URL + 'img/favicon.svg', permanent=True)),
 ]
 
 # Servir archivos media en desarrollo y producción

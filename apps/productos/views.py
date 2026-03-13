@@ -123,9 +123,10 @@ def lista_productos(request):
     stock_bajo = request.GET.get('stock_bajo')
     sin_imagen = request.GET.get('sin_imagen')
     
-    # Query base
+    # Query base - Solo productos activos
     productos = Producto.objects.filter(
-        usuario_creador=request.user
+        usuario_creador=request.user,
+        activo=True
     ).select_related('categoria')
     
     # Aplicar filtros
@@ -174,8 +175,10 @@ def crear_producto(request):
     try:
         business = Business.objects.get(user=request.user)
         modo_operacion = business.modo_operacion
+        iva_porcentaje = business.iva_porcentaje
     except Business.DoesNotExist:
         modo_operacion = 'restaurante'  # Valor por defecto
+        iva_porcentaje = 15  # IVA por defecto para Ecuador
     
     if request.method == 'POST':
         form = ProductoForm(request.POST, request.FILES, user=request.user)
@@ -194,7 +197,8 @@ def crear_producto(request):
     return render(request, 'productos/form_producto.html', {
         'form': form,
         'section_title': 'Nuevo Producto',
-        'modo_operacion': modo_operacion
+        'modo_operacion': modo_operacion,
+        'iva_porcentaje': iva_porcentaje
     })
 
 # Vista para editar un producto existente
@@ -205,8 +209,10 @@ def editar_producto(request, pk):
     try:
         business = Business.objects.get(user=request.user)
         modo_operacion = business.modo_operacion
+        iva_porcentaje = business.iva_porcentaje
     except Business.DoesNotExist:
         modo_operacion = 'restaurante'  # Valor por defecto
+        iva_porcentaje = 15  # IVA por defecto para Ecuador
     
     # Obtiene el producto solo si fue creado por el usuario actual
     producto = get_object_or_404(Producto, pk=pk, usuario_creador=request.user)
@@ -221,16 +227,48 @@ def editar_producto(request, pk):
         'form': form,
         'object': producto,
         'section_title': 'Editar Producto',
-        'modo_operacion': modo_operacion
+        'modo_operacion': modo_operacion,
+        'iva_porcentaje': iva_porcentaje
     })
 
 # Vista para eliminar un producto
 @login_required
 def eliminar_producto(request, pk):
-    # Solo permite eliminar productos creados por el usuario actual
+    """
+    Soft delete de producto - No elimina físicamente si tiene historial de ventas
+    """
+    from apps.ventas.models import DetalleVenta
+    from django.utils import timezone
+    
     producto = get_object_or_404(Producto, pk=pk, usuario_creador=request.user)
+    
     if request.method == 'POST':
-        producto.delete()
+        # Verificar si el producto tiene historial de ventas
+        tiene_ventas = DetalleVenta.objects.filter(producto=producto).exists()
+        
+        if tiene_ventas:
+            # Soft delete - solo desactivar y registrar fecha
+            producto.activo = False
+            producto.deleted_at = timezone.now()
+            producto.save()
+            messages.success(
+                request, 
+                f'El producto "{producto.nombre}" ha sido desactivado. '
+                'No se eliminó porque tiene historial de ventas.'
+            )
+        else:
+            # Si no tiene ventas, se puede eliminar físicamente
+            # Pero primero eliminar la imagen si existe
+            if producto.imagen:
+                try:
+                    producto.imagen.delete(save=False)
+                except:
+                    pass
+            
+            nombre_producto = producto.nombre
+            producto.delete()
+            messages.success(request, f'El producto "{nombre_producto}" ha sido eliminado.')
+    
     return redirect('productos:lista')
 
 
@@ -241,7 +279,8 @@ def buscar_productos(request):
     
     if not query:
         productos = Producto.objects.filter(
-            usuario_creador=request.user
+            usuario_creador=request.user,
+            activo=True
         ).select_related('categoria')
         return render(request, 'productos/lista_productos.html', {
             'productos': productos,
@@ -252,6 +291,7 @@ def buscar_productos(request):
     # Buscar por código de barras exacto primero
     producto_por_codigo = Producto.objects.filter(
         usuario_creador=request.user,
+        activo=True,
         codigo_barras__iexact=query
     ).first()
     
@@ -264,7 +304,8 @@ def buscar_productos(request):
     
     # Si no encuentra por código, buscar por nombre o descripción
     productos = Producto.objects.filter(
-        usuario_creador=request.user
+        usuario_creador=request.user,
+        activo=True
     ).filter(
         Q(nombre__icontains=query) |
         Q(descripcion__icontains=query) |
@@ -287,7 +328,8 @@ def buscar_producto_por_codigo(request):
     try:
         producto = Producto.objects.get(
             codigo_barras=codigo,
-            usuario_creador=request.user
+            usuario_creador=request.user,
+            activo=True
         )
         data = {
             'success': True,

@@ -1,0 +1,670 @@
+📘 LEMON POS – BRAND & UI SYSTEM v1.0
+Sistema de Diseño Oficial
+
+═══════════════════════════════════════════════════════════════
+
+# 1️⃣ IDENTIDAD DE MARCA
+
+## 🧠 Personalidad
+
+Lemon POS es:
+✓ Moderno y limpio
+✓ Profesional sin ser corporativo
+✓ Optimista y energético
+✓ Claro y directo
+✓ Tecnológico pero accesible
+✓ Enfocado en eficiencia y crecimiento
+✓ Espacioso y respirable
+
+No es:
+✗ Infantil o juguetón
+✗ Minimalista frío tipo fintech
+✗ Corporativo rígido
+✗ Oscuro o pesado
+✗ Saturado o abrumador
+✗ Complicado o técnico
+
+---
+
+# 2️⃣ SISTEMA DE COLORES
+
+## 🎨 Paleta Principal
+
+```css
+/* Verde Primario - Identidad */
+--lemon-primary: #22c55e;
+--lemon-primary-dark: #16a34a;
+--lemon-primary-light: #84cc16;
+--lemon-primary-bg: #f0fdf4;
+
+/* Grises - Jerarquía Visual */
+--lemon-gray-900: #111827;  /* Títulos principales */
+--lemon-gray-700: #374151;  /* Subtítulos */
+--lemon-gray-600: #4b5563;  /* Texto normal */
+--lemon-gray-400: #9ca3af;  /* Texto secundario, iconos */
+--lemon-gray-200: #e5e7eb;  /* Bordes */
+--lemon-gray-100: #f3f4f6;  /* Fondos suaves */
+--lemon-gray-50: #f9fafb;   /* Fondos muy suaves */
+
+/* Colores de Estado */
+--lemon-success: #22c55e;
+--lemon-warning: #f59e0b;
+--lemon-error: #ef4444;
+--lemon-info: #3b82f6;
+```
+
+## 📋 Uso de Colores
+
+| Color | Uso Principal | Nunca Usar Para |
+|-------|---------------|-----------------|
+| Primary | Botones CTA, enlaces, acentos | Texto largo, fondos grandes |
+| Gray 900 | Títulos H1-H3 | Texto de párrafo |
+| Gray 600 | Texto de párrafo, labels | Títulos |
+| Gray 400 | Placeholders, iconos secundarios | Texto importante |
+| Gray 100 | Fondos de cards, secciones | Texto |
+
+### ⚠️ Reglas Estrictas
+- NUNCA usar negro puro (#000000)
+- NUNCA usar blanco puro para fondos principales
+- NUNCA mezclar tonos de verde diferentes
+- NUNCA usar más de 3 colores en una sección
+
+---
+
+# 3️⃣ TIPOGRAFÍA
+
+## 🅰️ Fuente Principal
+
+Sistema actual (System Font Stack):
+```css
+font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 
+             'Helvetica Neue', Arial, sans-serif;
+```
+
+Recomendación futura premium: **Inter** (Google Fonts)
+
+## 📏 Escala Tipográfica
+
+### H1 – Hero Principal
+- Desktop: 56-64px (3.5-4rem)
+- Mobile: 36-40px (2.25-2.5rem)
+- Peso: 700 (Bold)
+- Line-height: 1.1
+- Color: Gray 900
+
+### H2 – Títulos de Sección
+- Desktop: 40-48px (2.5-3rem)
+- Mobile: 28-32px (1.75-2rem)
+- Peso: 700 (Bold)
+- Line-height: 1.2
+- Color: Gray 900
+
+### H3 – Subtítulos
+- 24-28px (1.5-1.75rem)
+- Peso: 600-700 (Semibold/Bold)
+- Color: Gray 900
+
+### Texto Grande (Lead)
+- 18-20px (1.125-1.25rem)
+- Peso: 400-500
+- Color: Gray 600
+- Uso: Subtítulos, descripciones importantes
+
+### Texto Normal (Body)
+- 15-16px (0.9375-1rem)
+- Peso: 400-500
+- Color: Gray 600-700
+- Line-height: 1.6
+
+### Texto Pequeño
+- 13-14px (0.8125-0.875rem)
+- Peso: 400-500
+- Color: Gray 500-600
+- Uso: Labels, metadata, ayuda
+
+### Texto Mínimo
+- 12px (0.75rem)
+- Peso: 500-600
+- Color: Gray 500
+- Uso: SOLO para uppercase labels
+
+## ⚠️ Reglas Tipográficas
+- NUNCA usar menos de 14px en interfaces principales
+- NUNCA usar más de 2 pesos de fuente en una sección
+- Siempre usar line-height 1.5+ para texto largo
+- Títulos siempre en Gray 900
+- Texto de párrafo siempre en Gray 600-700
+
+---
+
+# 4️⃣ SISTEMA DE BOTONES
+
+## 🔘 Botón Primario (CTA Principal)
+
+```css
+background: linear-gradient(135deg, #22c55e 0%, #84cc16 100%);
+border-radius: 12-14px;
+padding: 14-16px 28-32px;
+font-size: 15-16px;
+font-weight: 600;
+box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+```
+
+Hover:
+- Transform: translateY(-2px)
+- Shadow: 0 8px 20px rgba(34, 197, 94, 0.4)
+- Gradient más oscuro
+
+Altura mínima: **48-52px**
+
+## 🔘 Botón Secundario
+
+```css
+background: white;
+border: 2px solid #22c55e;
+color: #22c55e;
+border-radius: 12-14px;
+padding: 14-16px 28-32px;
+```
+
+Hover:
+- Background: #f0fdf4
+- Transform: translateY(-2px)
+
+## 🔘 Botón Terciario (Ghost)
+
+```css
+background: transparent;
+color: #4b5563;
+border: 2px solid #e5e7eb;
+```
+
+Hover:
+- Background: #f9fafb
+- Border: #d1d5db
+
+## 🔘 Botones de Acción (Icon Buttons)
+
+```css
+width: 40-44px;
+height: 40-44px;
+border-radius: 12px;
+display: flex;
+align-items: center;
+justify-content: center;
+```
+
+Variantes:
+- Edit: bg-blue-50, color-blue-600
+- Delete: bg-red-50, color-red-600
+- View: bg-gray-100, color-gray-600
+
+## ⚠️ Reglas de Botones
+- NUNCA usar border-radius menor a 10px
+- NUNCA usar botones sin padding adecuado
+- NUNCA usar más de 2 estilos de botón en una vista
+- Siempre incluir hover states
+- Siempre usar transiciones suaves (0.3s)
+
+---
+
+# 5️⃣ SISTEMA DE ESPACIADO
+
+## 📐 Escala de Espaciado (8px base)
+
+```css
+--space-1: 8px;    /* Espaciado mínimo */
+--space-2: 16px;   /* Espaciado pequeño */
+--space-3: 24px;   /* Espaciado medio */
+--space-4: 32px;   /* Espaciado grande */
+--space-5: 40px;   /* Espaciado muy grande */
+--space-6: 48px;   /* Espaciado extra grande */
+--space-8: 64px;   /* Espaciado de sección */
+--space-10: 80px;  /* Espaciado de página */
+```
+
+## 📦 Aplicación por Contexto
+
+### Secciones de Página
+- Padding vertical: 80-100px
+- Padding horizontal: 16-24px (mobile), 32-48px (desktop)
+- Gap entre secciones: 80-120px
+
+### Cards y Contenedores
+- Padding interno: 24-32px
+- Gap entre cards: 24-32px
+- Border radius: 16-20px
+
+### Formularios
+- Gap entre campos: 20-24px
+- Padding de inputs: 14-16px
+- Altura de inputs: 48-52px
+
+### Tablas
+- Padding de celdas: 16-24px
+- Gap entre filas: 0 (usar border)
+- Espaciado de acciones: 8-12px
+
+### Listas
+- Gap entre items: 12-16px
+- Padding de items: 16-20px
+
+## 🎯 Principio de Espaciado
+
+**"Más aire = Más premium"**
+
+- Nunca apretar elementos
+- Siempre dejar respirar
+- Usar espaciado consistente
+- Agrupar elementos relacionados
+
+---
+
+# 6️⃣ SISTEMA DE CARDS
+
+## 🎴 Anatomía de una Card
+
+```css
+.lemon-card {
+    background: white;
+    border-radius: 16-20px;
+    padding: 24-32px;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.lemon-card:hover {
+    box-shadow: 0 8px 24px rgba(34, 197, 94, 0.12);
+    transform: translateY(-4px);
+    border-color: rgba(34, 197, 94, 0.2);
+}
+```
+
+## 📊 Tipos de Cards
+
+### Card Métrica (Dashboard)
+- Altura fija: 110-120px
+- Display: flex
+- Icono: 64x64px con border-radius 14px
+- Hover con elevación
+
+### Card de Contenido
+- Padding: 28-32px
+- Border radius: 16px
+- Sombra sutil
+- Hover opcional
+
+### Card de Lista
+- Padding: 20-24px
+- Border bottom entre items
+- Hover con background change
+
+## ⚠️ Reglas de Cards
+- NUNCA usar sombras duras o negras
+- NUNCA usar border-radius menor a 12px
+- Siempre incluir transiciones
+- Siempre usar bordes sutiles
+- Hover states son opcionales pero recomendados
+
+---
+
+# 7️⃣ SISTEMA DE ANIMACIONES
+
+## ⚡ Filosofía de Animación
+
+Lemon POS usa animaciones **suaves y profesionales**, nunca agresivas.
+
+## ⏱️ Duraciones Estándar
+
+```css
+--duration-fast: 150ms;      /* Feedback inmediato */
+--duration-normal: 300ms;    /* Interacciones */
+--duration-slow: 600ms;      /* Transiciones grandes */
+--duration-ambient: 8-12s;   /* Animaciones de fondo */
+```
+
+## 📈 Curvas de Animación
+
+```css
+/* Principal - Suave y natural */
+--ease-lemon: cubic-bezier(0.4, 0, 0.2, 1);
+
+/* Entrada - Aceleración */
+--ease-in: cubic-bezier(0.4, 0, 1, 1);
+
+/* Salida - Desaceleración */
+--ease-out: cubic-bezier(0, 0, 0.2, 1);
+```
+
+## 🎬 Casos de Uso
+
+### Hover States
+```css
+transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+transform: translateY(-2px);
+```
+
+### Modales y Overlays
+```css
+transition: opacity 0.3s, transform 0.3s;
+```
+
+### Loading States
+```css
+animation: pulse 2s infinite;
+```
+
+### Favoritos / Estrellas
+```css
+animation: starPulse 0.6s ease-out;
+```
+
+## ⚠️ Reglas de Animación
+- NUNCA usar bounce exagerado
+- NUNCA usar duraciones menores a 150ms
+- NUNCA animar más de 2 propiedades a la vez
+- Siempre usar will-change para animaciones complejas
+- Preferir transform y opacity sobre otras propiedades
+
+---
+
+# 8️⃣ SISTEMA DE GRADIENTES
+
+## 🌈 Gradientes Oficiales
+
+### Gradiente Principal (Botones CTA)
+```css
+background: linear-gradient(135deg, #22c55e 0%, #84cc16 100%);
+```
+
+### Gradiente Hover (Botones CTA)
+```css
+background: linear-gradient(135deg, #16a34a 0%, #65a30d 100%);
+```
+
+### Gradiente Suave (Fondos de Sección)
+```css
+background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 50%, #f0fdf4 100%);
+```
+
+### Gradiente Header (Perfiles, Headers)
+```css
+background: linear-gradient(135deg, #22c55e 0%, #84cc16 100%);
+```
+
+### Gradiente de Iconos (Métricas)
+```css
+/* Azul */
+background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+
+/* Verde */
+background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+
+/* Amarillo */
+background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+
+/* Púrpura */
+background: linear-gradient(135deg, #e9d5ff 0%, #d8b4fe 100%);
+```
+
+## ⚠️ Reglas de Gradientes
+- NUNCA usar más de 2 colores en un gradiente
+- NUNCA usar ángulos diferentes a 135deg
+- Siempre usar gradientes sutiles en fondos
+- Reservar gradientes vibrantes para CTAs
+
+---
+
+# 9️⃣ Sistema de Layout
+
+Ancho máximo:
+
+```
+1200px
+```
+
+Grillas:
+
+* 2 columnas hero
+* 3 columnas features
+* 3 columnas pricing
+* 4 columnas footer
+
+Siempre centrado.
+
+---
+
+# 🔟 TONO DE VOZ Y COPY
+
+## 📝 Principios de Escritura
+
+### ✅ Debe Sonar:
+- Claro y directo
+- Orientado a beneficios
+- Profesional pero accesible
+- Confiable y seguro
+- Optimista sin exagerar
+
+### ❌ Nunca Debe Sonar:
+- Técnico o complicado
+- Exagerado o marketero
+- Corporativo rígido
+- Infantil o casual
+- Agresivo o urgente
+
+## 📋 Ejemplos de Copy
+
+### ✅ Correcto
+- "Controla tu restaurante en tiempo real"
+- "Gestiona tu inventario de forma simple"
+- "Facturación electrónica integrada"
+- "Todo lo que necesitas en un solo lugar"
+
+### ❌ Incorrecto
+- "Revoluciona tu universo comercial"
+- "La solución disruptiva definitiva"
+- "Tecnología de punta para tu negocio"
+- "¡No te quedes atrás!"
+
+## 🎯 Estructura de Mensajes
+
+### Títulos
+- Máximo 8-10 palabras
+- Enfocados en beneficio
+- Sin signos de exclamación
+
+### Subtítulos
+- Máximo 15-20 palabras
+- Complementan el título
+- Agregan contexto
+
+### Botones
+- Verbos de acción
+- Máximo 3 palabras
+- Ejemplos: "Comenzar ahora", "Ver planes", "Probar gratis"
+
+---
+
+# 1️⃣1️⃣ Reglas de Consistencia
+
+* Nunca mezclar verdes diferentes
+* Nunca usar azul
+* Nunca usar sombras negras fuertes
+* Nunca usar 3 tipos de border-radius distintos
+* Nunca usar más de 2 estilos de botón
+
+---
+
+# 1️⃣2️⃣ Navbar Guidelines
+
+Altura:
+
+* 70–80px
+
+CTA:
+
+* No más grande que 36–40px alto
+
+Logo:
+
+* 24–28px icono
+* 20–22px texto
+
+Espaciado links:
+
+* 32px
+
+---
+
+# 1️⃣3️⃣ Secciones Clave Siempre Presentes
+
+Landing debe incluir:
+
+1. Hero
+2. Métricas
+3. Diferenciador (Restaurante)
+4. Features
+5. Demo
+6. Planes
+7. Testimonios
+8. Soporte
+9. CTA final
+
+---
+
+# 1️⃣4️⃣ SENSACIÓN VISUAL OBJETIVO
+
+## ✨ Debe Transmitir:
+
+1. **Aire y Espacio** - Nunca apretar elementos
+2. **Orden y Claridad** - Jerarquía visual clara
+3. **Limpieza** - Diseño minimalista pero cálido
+4. **Profesionalismo** - Confiable y serio
+5. **Crecimiento** - Optimista y positivo
+6. **Tecnología Amigable** - Moderno pero accesible
+7. **Eficiencia** - Rápido de entender y usar
+
+## 🚫 Señales de Alerta (Está Mal Si):
+
+- Se siente apretado o saturado
+- Hay demasiados colores (más de 3)
+- El texto es difícil de leer
+- Los elementos no tienen espacio para respirar
+- Las sombras son muy oscuras o duras
+- Hay demasiada información en una vista
+- Los botones son muy pequeños (menos de 44px)
+- Los border-radius son inconsistentes
+- Las animaciones son bruscas o molestas
+
+## 🎯 Test de Calidad Visual
+
+Pregúntate:
+1. ¿Puedo entender la jerarquía en 3 segundos?
+2. ¿Los elementos importantes destacan naturalmente?
+3. ¿Hay suficiente espacio entre secciones?
+4. ¿Los colores son consistentes con la marca?
+5. ¿Las interacciones son suaves y predecibles?
+
+Si alguna respuesta es "no", hay que mejorar.
+
+---
+
+# 1️⃣5️⃣ REGLAS TÉCNICAS Y MEJORES PRÁCTICAS
+
+## 💻 Código CSS
+
+### ✅ Siempre Hacer:
+```css
+/* Usar variables CSS */
+:root {
+    --lemon-primary: #22c55e;
+    --lemon-radius: 16px;
+    --lemon-transition: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Agrupar propiedades relacionadas */
+.card {
+    /* Layout */
+    display: flex;
+    padding: 24px;
+    
+    /* Visual */
+    background: white;
+    border-radius: var(--lemon-radius);
+    
+    /* Interacción */
+    transition: all 0.3s var(--lemon-transition);
+}
+```
+
+### ❌ Nunca Hacer:
+- Usar inline styles (style="...")
+- Repetir valores hardcodeados
+- Usar !important sin razón
+- Mezclar unidades (px, rem, em) sin consistencia
+- Crear clases de un solo uso
+
+## 🎨 Componentes
+
+### Estructura de Archivos
+```
+static/css/
+├── variables.css      (Colores, espaciado, etc.)
+├── base.css          (Reset, tipografía base)
+├── components.css    (Botones, cards, forms)
+├── layouts.css       (Grid, containers)
+└── utilities.css     (Helpers)
+```
+
+### Nomenclatura
+```css
+/* BEM Simplificado */
+.lemon-card { }
+.lemon-card__header { }
+.lemon-card__body { }
+.lemon-card--featured { }
+```
+
+## 📱 Responsive
+
+### Breakpoints Estándar
+```css
+/* Mobile First */
+@media (min-width: 640px) { }   /* sm */
+@media (min-width: 768px) { }   /* md */
+@media (min-width: 1024px) { }  /* lg */
+@media (min-width: 1280px) { }  /* xl */
+```
+
+## ⚡ Performance
+
+### Optimizaciones
+- Usar transform y opacity para animaciones
+- Evitar animaciones de width/height
+- Lazy load de imágenes
+- Minificar CSS en producción
+- Usar will-change con cuidado
+
+## 🔍 Accesibilidad
+
+### Checklist Básico
+- [ ] Contraste mínimo 4.5:1 para texto
+- [ ] Tamaño mínimo de botones 44x44px
+- [ ] Focus states visibles
+- [ ] Labels en todos los inputs
+- [ ] Alt text en imágenes
+- [ ] Navegación por teclado funcional
+
+═══════════════════════════════════════════════════════════════
+
+## 📌 RESUMEN EJECUTIVO
+
+**Lemon POS es limpio, espacioso, profesional y verde.**
+
+Si algo no se siente así, necesita ajuste.
+
+Última actualización: Marzo 2026
+Versión: 1.0
+

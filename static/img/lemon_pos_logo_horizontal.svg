@@ -1,0 +1,18 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Forma de limón horizontal (más ancho que alto) -->
+  <path d="M 35 100 C 35 97, 36 94, 39 91 C 45 74, 70 45, 100 45 C 130 45, 155 74, 161 91 C 164 94, 165 97, 165 100 C 165 103, 164 106, 161 109 C 155 126, 130 155, 100 155 C 70 155, 45 126, 39 109 C 36 106, 35 103, 35 100 Z" fill="#20B558" stroke="#16A34A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Puntito izquierdo -->
+  <circle cx="35" cy="100" r="2.5" fill="#16A34A"/>
+  
+  <!-- Puntito derecho -->
+  <circle cx="165" cy="100" r="2.5" fill="#16A34A"/>
+  
+  <!-- Líneas de ticket con variación (centradas) -->
+  <line x1="72" y1="88" x2="118" y2="88" stroke="#FFFFFF" stroke-width="2.3" stroke-linecap="round" opacity="0.95"/>
+  <line x1="72" y1="100" x2="108" y2="100" stroke="#FFFFFF" stroke-width="2.3" stroke-linecap="round" opacity="0.95"/>
+  <line x1="72" y1="112" x2="122" y2="112" stroke="#FFFFFF" stroke-width="2.3" stroke-linecap="round" opacity="0.95"/>
+  
+  <!-- Símbolo $ alineado -->
+  <text x="126" y="103" fill="#FFFFFF" font-family="Arial, sans-serif" font-size="12" font-weight="600" opacity="0.95">$</text>
+</svg>

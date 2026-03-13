@@ -1,0 +1,13 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Limón sólido horizontal - 15% más grande, ocupa 75% del área -->
+  <!-- Padding: 2px por lado en 16x16 = área útil 12x12px -->
+  <path d="M 2 16 C 2 14.5, 3 13, 4.5 11.5 C 8 7.5, 13 4, 16 4 C 19 4, 24 7.5, 27.5 11.5 C 29 13, 30 14.5, 30 16 C 30 17.5, 29 19, 27.5 20.5 C 24 24.5, 19 28, 16 28 C 13 28, 8 24.5, 4.5 20.5 C 3 19, 2 17.5, 2 16 Z" fill="#16A34A"/>
+  
+  <!-- Puntas laterales más pronunciadas -->
+  <ellipse cx="2" cy="16" rx="1.8" ry="1.4" fill="#16A34A"/>
+  <ellipse cx="30" cy="16" rx="1.8" ry="1.4" fill="#16A34A"/>
+  
+  <!-- Líneas de ticket - MUY gruesas para visibilidad en 16x16px -->
+  <line x1="10" y1="13" x2="22" y2="13" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" opacity="0.9"/>
+  <line x1="10" y1="19" x2="22" y2="19" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" opacity="0.9"/>
+</svg>

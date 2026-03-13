@@ -1,0 +1,16 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Forma de limón horizontal optimizada: 8% más ancho, puntas más definidas, proporción profesional -->
+  <path d="M 30 100 C 30 97.5, 31 95, 34 92 C 40 73, 68 42, 100 42 C 132 42, 160 73, 166 92 C 169 95, 170 97.5, 170 100 C 170 102.5, 169 105, 166 108 C 160 127, 132 158, 100 158 C 68 158, 40 127, 34 108 C 31 105, 30 102.5, 30 100 Z" fill="#16A34A" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Puntas laterales más definidas (micro tensión) -->
+  <ellipse cx="30" cy="100" rx="2.8" ry="2.2" fill="#16A34A"/>
+  <ellipse cx="170" cy="100" rx="2.8" ry="2.2" fill="#16A34A"/>
+  
+  <!-- Líneas de ticket con ritmo visual profesional - grosor aumentado para visibilidad -->
+  <line x1="68" y1="86" x2="124" y2="86" stroke="#FFFFFF" stroke-width="2.8" stroke-linecap="round" opacity="0.95"/>
+  <line x1="68" y1="100" x2="108" y2="100" stroke="#FFFFFF" stroke-width="2.8" stroke-linecap="round" opacity="0.95"/>
+  <line x1="68" y1="114" x2="118" y2="114" stroke="#FFFFFF" stroke-width="2.8" stroke-linecap="round" opacity="0.95"/>
+  
+  <!-- Micro curva refinada en el centro (ajuste óptico, no matemático) -->
+  <path d="M 100 42 Q 101 100 100 158" stroke="#16A34A" stroke-width="0.5" opacity="0.15" fill="none"/>
+</svg>

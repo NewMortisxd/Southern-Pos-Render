@@ -11,8 +11,17 @@
 <div class="container mx-auto px-4 py-6">
     <div class="max-w-4xl mx-auto">
         <div class="bg-white rounded-lg shadow-md overflow-hidden">
-            <div class="bg-emerald-600 text-white px-6 py-4">
-                <h3 class="text-2xl font-bold flex items-center"><i class="fas fa-receipt mr-2"></i>Detalle de Transacción #{{ transaccion.factuID }}</h3>
+            <div class="bg-emerald-600 text-white px-6 py-6">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h3 class="text-3xl font-bold mb-1">FACTURA</h3>
+                        <p class="text-xl font-semibold">#{{ transaccion.factuID }}</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-sm opacity-90">{{ venta.fecha_hora|date:"d/m/Y" }}</p>
+                        <p class="text-xs opacity-75">{{ venta.fecha_hora|date:"H:i:s" }}</p>
+                    </div>
+                </div>
             </div>
             
             <div class="p-6">
@@ -38,7 +47,13 @@
                             <!-- Update the invoice number display -->
                             <div class="mb-4">
                                 <p class="text-sm text-gray-500">Número de Factura</p>
-                                <p class="text-lg font-semibold">#{{ transaccion.factuID }}</p>
+                                <p class="text-lg font-semibold">
+                                    {% if venta.numero_factura %}
+                                        {{ venta.numero_factura }}
+                                    {% else %}
+                                        #{{ transaccion.factuID }}
+                                    {% endif %}
+                                </p>
                             </div>
                             
                             <div class="mb-4">
@@ -89,33 +104,59 @@
                         
                         <!-- Right column - Payment details -->
                         <div class="bg-white p-4 rounded-lg border border-gray-200">
-                            <div class="mb-4">
-                                <p class="text-sm text-gray-500">Subtotal (sin IVA)</p>
-                                <p class="text-lg">{{ currency_symbol }}{{ venta.subtotal|floatformat:2 }}</p>
+                            <div class="mb-3">
+                                <p class="text-xs text-gray-400 uppercase tracking-wide">Subtotal (sin IVA)</p>
+                                <p class="text-base text-gray-700">{{ currency_symbol }}{{ venta.subtotal|floatformat:2 }}</p>
                             </div>
                             
-                            <div class="mb-4">
-                                <p class="text-sm text-gray-500">IVA ({{ request.user.business.iva_porcentaje|default:"12" }}%)</p>
-                                <p class="text-lg">{{ currency_symbol }}{{ venta.iva|floatformat:2 }}</p>
+                            {% if venta.descuento_total and venta.descuento_total > 0 %}
+                            <div class="mb-3">
+                                <p class="text-xs text-gray-400 uppercase tracking-wide">Descuento Cliente {% if venta.cliente and venta.cliente.tasa_descuento %}({{ venta.cliente.tasa_descuento }}%){% endif %}</p>
+                                <p class="text-base text-emerald-600">-{{ currency_symbol }}{{ venta.descuento_total|floatformat:2 }}</p>
+                            </div>
+                            {% endif %}
+                            
+                            {% if venta.recargo_total and venta.recargo_total > 0 %}
+                            <div class="mb-3">
+                                <p class="text-xs text-gray-400 uppercase tracking-wide">Recargo Cliente {% if venta.cliente and venta.cliente.tasa_recargo %}({{ venta.cliente.tasa_recargo }}%){% endif %}</p>
+                                <p class="text-base text-orange-600">+{{ currency_symbol }}{{ venta.recargo_total|floatformat:2 }}</p>
+                            </div>
+                            {% endif %}
+                            
+                            <div class="mb-3">
+                                <p class="text-xs text-gray-400 uppercase tracking-wide">IVA ({{ request.user.business.iva_porcentaje|default:"15" }}%)</p>
+                                <p class="text-base text-gray-700">{{ currency_symbol }}{{ venta.iva|floatformat:2 }}</p>
                             </div>
                             
-                            <div class="mb-4">
-                                <p class="text-sm text-gray-500">Total</p>
-                                <p class="text-2xl font-bold text-emerald-600">{{ currency_symbol }}{{ venta.total|floatformat:2 }}</p>
+                            <div class="mb-4 pt-3 border-t-2 border-gray-300">
+                                <p class="text-sm text-gray-500 uppercase tracking-wide">TOTAL</p>
+                                <p class="text-3xl font-bold text-emerald-600">{{ currency_symbol }}{{ venta.total|floatformat:2 }}</p>
                             </div>
                             
                             {% if venta.metodo_pago == 'cash' %}
                             <div class="border-t border-gray-200 pt-3 mt-3">
                                 <div class="flex justify-between mb-2">
-                                    <p class="text-gray-600">Monto Recibido:</p>
+                                    <p class="text-sm text-gray-600">Monto Recibido:</p>
                                     <p class="font-semibold">{{ currency_symbol }}{{ venta.monto_recibido|floatformat:2 }}</p>
                                 </div>
                                 <div class="flex justify-between">
-                                    <p class="text-gray-600">Cambio:</p>
+                                    <p class="text-sm text-gray-600">Cambio:</p>
                                     <p class="font-semibold text-blue-600">{{ currency_symbol }}{{ venta.cambio|floatformat:2 }}</p>
                                 </div>
                             </div>
                             {% endif %}
+                            
+                            <!-- Info adicional profesional -->
+                            <div class="border-t border-gray-200 pt-3 mt-3 text-xs text-gray-500">
+                                <div class="flex justify-between mb-1">
+                                    <span>Cajero:</span>
+                                    <span class="font-medium">{{ request.user.get_full_name|default:request.user.username }}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Ambiente:</span>
+                                    <span class="font-medium">{% if request.user.business.ambiente == 'produccion' %}Producción{% else %}Pruebas{% endif %}</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -132,8 +173,8 @@
                                 <tr>
                                     <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase">Producto</th>
                                     <th class="py-3 px-4 text-center text-xs font-medium text-gray-500 uppercase">Cantidad</th>
-                                    <th class="py-3 px-4 text-right text-xs font-medium text-gray-500 uppercase">Precio</th>
-                                    <th class="py-3 px-4 text-right text-xs font-medium text-gray-500 uppercase">Subtotal</th>
+                                    <th class="py-3 px-4 text-right text-xs font-medium text-gray-500 uppercase">Precio Unit. (incl. IVA)</th>
+                                    <th class="py-3 px-4 text-right text-xs font-medium text-gray-500 uppercase">Total Línea</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-200">
@@ -141,16 +182,21 @@
                                 <tr>
                                     <td class="py-3 px-4">
                                         <div class="flex items-center">
-                                            {% if detalle.producto.imagen %}
+                                            {% if detalle.producto and detalle.producto.imagen %}
                                                 <div class="w-10 h-10 flex-shrink-0 mr-3">
-                                                    <img src="{{ detalle.producto.imagen.url }}" alt="{{ detalle.producto.nombre }}" class="w-10 h-10 rounded-full object-cover border border-gray-200">
+                                                    <img src="{{ detalle.producto.imagen.url }}" alt="{{ detalle.nombre_producto }}" class="w-10 h-10 rounded-full object-cover border border-gray-200">
                                                 </div>
                                             {% else %}
                                                 <div class="w-10 h-10 flex-shrink-0 mr-3 bg-gray-100 rounded-full flex items-center justify-center">
                                                     <i class="fas fa-utensils text-gray-400"></i>
                                                 </div>
                                             {% endif %}
-                                            <span>{{ detalle.producto.nombre }}</span>
+                                            <div>
+                                                <span class="font-medium">{{ detalle.nombre_producto }}</span>
+                                                {% if detalle.codigo_producto %}
+                                                    <span class="text-xs text-gray-500 block">Código: {{ detalle.codigo_producto }}</span>
+                                                {% endif %}
+                                            </div>
                                         </div>
                                     </td>
                                     <td class="py-3 px-4 text-center">
@@ -189,15 +235,20 @@
 <div id="invoicePrintTemplate" style="display: none;">
     <div class="invoice-print">
         <div class="text-center mb-4">
-            <h2 class="text-2xl font-bold">{{ request.user.business.nombre_negocio|default:"SouthernPOS" }}</h2>
-            <p class="mb-1">{{ request.user.business.direccion_negocio|default:"" }}</p>
-            <p class="mb-1">Teléfono: {{ request.user.business.telefono_negocio|default:"" }}</p>
-            <p class="mb-1">RUC: {{ request.user.business.ruc_negocio|default:"" }}</p>
-            <p>Email: {{ request.user.business.email_negocio|default:"" }}</p>
-            <hr class="my-4">
-            <h3 class="text-xl font-bold">FACTURA</h3>
-            <p class="font-bold mb-1">No. 001-001-{{ transaccion.factuID|stringformat:"08d" }}</p>
-            <p>Fecha: {{ venta.fecha_hora|date:"d/m/Y H:i:s" }}</p>
+            <h2 class="text-2xl font-bold">{{ request.user.business.nombre_negocio|default:"Lemon POS" }}</h2>
+            <p class="text-sm mb-1">{{ request.user.business.direccion_negocio|default:"" }}</p>
+            <p class="text-sm mb-1">Teléfono: {{ request.user.business.telefono_negocio|default:"" }}</p>
+            <p class="text-sm mb-1">RUC: {{ request.user.business.ruc_negocio|default:"" }}</p>
+            <p class="text-sm">Email: {{ request.user.business.email_negocio|default:"" }}</p>
+            <hr class="my-4 border-t-2 border-gray-800">
+            <h3 class="text-3xl font-bold mb-2">FACTURA</h3>
+            <p class="text-xl font-bold mb-1">
+                No. {% if venta.numero_factura %}{{ venta.numero_factura }}{% else %}001-001-{{ transaccion.factuID|stringformat:"08d" }}{% endif %}
+            </p>
+            {% if venta.order %}
+            <p class="text-sm text-gray-600">Orden #{{ venta.order.order_number }}</p>
+            {% endif %}
+            <p class="text-sm">Fecha: {{ venta.fecha_hora|date:"d/m/Y H:i:s" }}</p>
         </div>
         
         <div class="border p-4 rounded mb-4">
@@ -232,20 +283,20 @@
             <thead class="bg-gray-800 text-white">
                 <tr>
                     <th class="py-2 px-4 text-left">Producto</th>
-                    <th class="py-2 px-4 text-left">Cantidad</th>
-                    <th class="py-2 px-4 text-left">Precio Unit.</th>
-                    <th class="py-2 px-4 text-left">Subtotal</th>
+                    <th class="py-2 px-4 text-center">Cantidad</th>
+                    <th class="py-2 px-4 text-right">Precio Unit. (incl. IVA)</th>
+                    <th class="py-2 px-4 text-right">Total Línea</th>
                 </tr>
             </thead>
             <tbody>
                 {% for detalle in detalles %}
                 <tr class="border-b">
                     <td class="py-2 px-4">{{ detalle.producto.nombre }}</td>
-                    <td class="py-2 px-4">{{ detalle.cantidad }}</td>
-                    <td class="py-2 px-4">
+                    <td class="py-2 px-4 text-center">{{ detalle.cantidad }}</td>
+                    <td class="py-2 px-4 text-right">
                         {{ currency_symbol }}{{ detalle.precio_unitario|floatformat:2 }}
                     </td>
-                    <td class="py-2 px-4">{{ currency_symbol }}{{ detalle.subtotal|floatformat:2 }}</td>
+                    <td class="py-2 px-4 text-right font-semibold">{{ currency_symbol }}{{ detalle.subtotal|floatformat:2 }}</td>
                 </tr>
                 {% empty %}
                 <tr>
@@ -259,31 +310,47 @@
             <div class="w-1/2 ml-auto">
                 <table class="w-full border-collapse">
                     <tr class="border-b">
-                        <th class="py-2 px-4 text-left bg-gray-50">Subtotal (sin IVA):</th>
-                        <td class="py-2 px-4">{{ currency_symbol }}{{ venta.subtotal|floatformat:2 }}</td>
+                        <th class="py-2 px-4 text-left bg-gray-50 text-gray-600 text-sm">Subtotal (sin IVA):</th>
+                        <td class="py-2 px-4 text-right">{{ currency_symbol }}{{ venta.subtotal|floatformat:2 }}</td>
+                    </tr>
+                    {% if venta.descuento_total and venta.descuento_total > 0 %}
+                    <tr class="border-b">
+                        <th class="py-2 px-4 text-left bg-gray-50 text-emerald-600 text-sm">Descuento Cliente {% if venta.cliente and venta.cliente.tasa_descuento %}({{ venta.cliente.tasa_descuento }}%){% endif %}:</th>
+                        <td class="py-2 px-4 text-right text-emerald-600">-{{ currency_symbol }}{{ venta.descuento_total|floatformat:2 }}</td>
+                    </tr>
+                    {% endif %}
+                    {% if venta.recargo_total and venta.recargo_total > 0 %}
+                    <tr class="border-b">
+                        <th class="py-2 px-4 text-left bg-gray-50 text-orange-600 text-sm">Recargo Cliente {% if venta.cliente and venta.cliente.tasa_recargo %}({{ venta.cliente.tasa_recargo }}%){% endif %}:</th>
+                        <td class="py-2 px-4 text-right text-orange-600">+{{ currency_symbol }}{{ venta.recargo_total|floatformat:2 }}</td>
+                    </tr>
+                    {% endif %}
+                    <tr class="border-b">
+                        <th class="py-2 px-4 text-left bg-gray-50 text-gray-600 text-sm">IVA ({{ request.user.business.iva_porcentaje|default:"15" }}%):</th>
+                        <td class="py-2 px-4 text-right">{{ currency_symbol }}{{ venta.iva|floatformat:2 }}</td>
+                    </tr>
+                    <tr class="border-b-2 border-gray-800 bg-emerald-50">
+                        <th class="py-3 px-4 text-left text-lg">TOTAL:</th>
+                        <td class="py-3 px-4 text-right font-bold text-xl">{{ currency_symbol }}{{ venta.total|floatformat:2 }}</td>
                     </tr>
                     <tr class="border-b">
-                        <th class="py-2 px-4 text-left bg-gray-50">IVA ({{ request.user.business.iva_porcentaje|default:"12" }}%):</th>
-                        <td class="py-2 px-4">{{ currency_symbol }}{{ venta.iva|floatformat:2 }}</td>
-                    </tr>
-                    <tr class="border-b bg-emerald-50">
-                        <th class="py-2 px-4 text-left">Total:</th>
-                        <td class="py-2 px-4 font-bold">{{ currency_symbol }}{{ venta.total|floatformat:2 }}</td>
-                    </tr>
-                    <tr class="border-b">
-                        <th class="py-2 px-4 text-left bg-gray-50">Método de Pago:</th>
-                        <td class="py-2 px-4">{% if venta.metodo_pago == 'cash' %}Efectivo{% elif venta.metodo_pago == 'card' %}Tarjeta{% elif venta.metodo_pago == 'transfer' %}Transferencia{% else %}{{ venta.metodo_pago }}{% endif %}</td>
+                        <th class="py-2 px-4 text-left bg-gray-50 text-sm">Método de Pago:</th>
+                        <td class="py-2 px-4 text-right">{% if venta.metodo_pago == 'cash' %}Efectivo{% elif venta.metodo_pago == 'card' %}Tarjeta{% elif venta.metodo_pago == 'transfer' %}Transferencia{% else %}{{ venta.metodo_pago }}{% endif %}</td>
                     </tr>
                     {% if venta.metodo_pago == 'cash' %}
                     <tr class="border-b">
-                        <th class="py-2 px-4 text-left bg-gray-50">Monto Recibido:</th>
-                        <td class="py-2 px-4">{{ currency_symbol }}{{ venta.monto_recibido|floatformat:2 }}</td>
+                        <th class="py-2 px-4 text-left bg-gray-50 text-sm">Monto Recibido:</th>
+                        <td class="py-2 px-4 text-right">{{ currency_symbol }}{{ venta.monto_recibido|floatformat:2 }}</td>
                     </tr>
                     <tr class="border-b">
-                        <th class="py-2 px-4 text-left bg-gray-50">Cambio:</th>
-                        <td class="py-2 px-4">{{ currency_symbol }}{{ venta.cambio|floatformat:2 }}</td>
+                        <th class="py-2 px-4 text-left bg-gray-50 text-sm">Cambio:</th>
+                        <td class="py-2 px-4 text-right font-semibold">{{ currency_symbol }}{{ venta.cambio|floatformat:2 }}</td>
                     </tr>
                     {% endif %}
+                    <tr>
+                        <th class="py-2 px-4 text-left text-xs text-gray-500">Cajero:</th>
+                        <td class="py-2 px-4 text-right text-xs">{{ request.user.get_full_name|default:request.user.username }}</td>
+                    </tr>
                 </table>
             </div>
         </div>
@@ -313,7 +380,7 @@ document.addEventListener('DOMContentLoaded', function() {
         printWindow.document.write(`
             <html>
             <head>
-                <title>Factura #{{ venta.numero_factura_usuario }} - SouthernPOS</title>
+                <title>Factura #{{ venta.numero_factura_usuario }} - Lemon POS</title>
                 <style>
                     body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
                     .invoice-print { max-width: 800px; margin: 0 auto; }

@@ -29,7 +29,7 @@ def business_settings(request):
             context['brand_name'] = (
                 business.custom_brand_name 
                 if business.use_custom_brand_name and business.custom_brand_name
-                else 'SouthernPOS'  # Valor por defecto registrado
+                else 'Lemon POS'  # Valor por defecto registrado
             )
                 
         except Exception:  # Broad exception para evitar 500 en cualquier fallo
@@ -43,7 +43,7 @@ def business_settings(request):
                     'secondary_color_rgb': '99, 102, 241',
                 },
                 'dark_mode': False,
-                'brand_name': 'SouthernPOS'  # Marca base
+                'brand_name': 'Lemon POS'  # Marca base
             })
     
     return context

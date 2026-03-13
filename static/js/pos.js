@@ -74,12 +74,12 @@ document.addEventListener('DOMContentLoaded', function() {
             return fullItem;
         });
         
-        localStorage.setItem('southernPosCart', JSON.stringify(cartWithDetails));
+        localStorage.setItem('Lemon POSCart', JSON.stringify(cartWithDetails));
     }
 
     // Load cart from localStorage
     function loadCartFromLocalStorage() {
-        const savedCart = localStorage.getItem('southernPosCart');
+        const savedCart = localStorage.getItem('Lemon POSrt');
         if (savedCart) {
             try {
                 cart = JSON.parse(savedCart);
@@ -109,7 +109,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
    // Clear cart from localStorage
    function clearCartFromLocalStorage() {
-    localStorage.removeItem('southernPosCart');
+    localStorage.removeItem('Lemon POS;
 }
 
     // Get business configuration
@@ -478,7 +478,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         // Remove customer from localStorage
-        localStorage.removeItem('southernPosCustomer');
+        localStorage.removeItem('Lemon POSCustomer');
         
         // Show notification
         showNotification('Cliente removido', 'info');
@@ -487,13 +487,13 @@ document.addEventListener('DOMContentLoaded', function() {
     // Save customer to localStorage
     function saveCustomerToLocalStorage() {
         if (selectedCustomer) {
-            localStorage.setItem('southernPosCustomer', JSON.stringify(selectedCustomer));
+            localStorage.setItem('Lemon POSCustomer', JSON.stringify(selectedCustomer));
         }
     }
 
     // Load customer from localStorage
     function loadCustomerFromLocalStorage() {
-        const savedCustomer = localStorage.getItem('southernPosCustomer');
+        const savedCustomer = localStorage.getItem('Lemon POSCustomer');
         if (savedCustomer) {
             try {
                 selectedCustomer = JSON.parse(savedCustomer);

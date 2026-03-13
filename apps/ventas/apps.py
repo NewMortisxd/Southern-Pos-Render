@@ -6,5 +6,9 @@ class VentasConfig(AppConfig):
     name = 'apps.ventas'
     
     def ready(self):
+        """Importar signals cuando la app esté lista"""
+        import apps.ventas.signals
+    
+    def ready(self):
         """Importar señales cuando la app esté lista"""
         import apps.ventas.signals

@@ -274,9 +274,31 @@ async function toggleFavorito(id, button) {
 }
 
 async function eliminarVista(id, nombre) {
-    if (!confirm(`¿Estás seguro de eliminar la vista "${nombre}"?`)) {
-        return;
-    }
+    showConfirm(
+        'Eliminar Vista',
+        `¿Estás seguro de eliminar la vista "${nombre}"?`,
+        async function() {
+            try {
+                const response = await fetch(`/productos/vistas/${id}/eliminar/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    }
+                });
+                
+                if (response.ok) {
+                    showNotification('Vista eliminada correctamente', 'success');
+                    cargarVistas();
+                } else {
+                    showNotification('Error al eliminar la vista', 'error');
+                }
+            } catch (error) {
+                showNotification('Error de conexión', 'error');
+            }
+        },
+        { type: 'danger', confirmText: 'Eliminar', cancelText: 'Cancelar' }
+    );
+}
     
     try {
         const response = await fetch(`/productos/filtro/${id}/eliminar/`, {

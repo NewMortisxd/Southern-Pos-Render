@@ -17,6 +17,10 @@ urlpatterns = [
     path('verificar-stock/', views.verificar_stock, name='verificar_stock'),
     # Add this to your existing URL patterns
     path('actualizar-cliente/<int:venta_id>/', views.actualizar_cliente_venta, name='actualizar_cliente_venta'),
+    path('aplicar-cliente-descuentos/', views.aplicar_cliente_descuentos, name='aplicar_cliente_descuentos'),
     # Add the cashier interface URL
     path('cajero/', views.ventas_cajero, name='ventas_cajero'),
+    # Ventas a crédito
+    path('ventas-credito/', views.ventas_credito, name='ventas_credito'),
+    path('procesar-pago-credito/', views.procesar_pago_credito, name='procesar_pago_credito'),
 ]

@@ -5,15 +5,55 @@ import random
 from django.utils import timezone
 
 class Transaccion(models.Model):
-    transaction_id = models.PositiveIntegerField(primary_key=True)
-    factuID = models.PositiveIntegerField(editable=False)  # New field for user-specific ID
+    TIPO_TRANSACCION_CHOICES = [
+        ('venta', 'Pago de Venta'),
+        ('pago_credito', 'Pago de Crédito'),
+        ('devolucion', 'Devolución'),
+        ('abono', 'Abono a Cuenta'),
+    ]
+    
+    METODO_PAGO_CHOICES = [
+        ('cash', 'Efectivo'),
+        ('card', 'Tarjeta'),
+        ('transfer', 'Transferencia'),
+        ('credit', 'Crédito'),
+    ]
+    
+    # === IDENTIFICACIÓN ===
+    transaction_id = models.PositiveIntegerField(primary_key=True, unique=True)
+    factuID = models.PositiveIntegerField(editable=False)
     numero_factura_usuario = models.PositiveIntegerField(editable=False)
-    venta = models.ForeignKey('ventas.Venta', on_delete=models.CASCADE)
-    monto = models.DecimalField(max_digits=10, decimal_places=2)
-    metodo_pago = models.CharField(max_length=50)
-    fecha = models.DateTimeField(auto_now_add=True)
+    
+    # === RELACIONES ===
+    venta = models.ForeignKey('ventas.Venta', on_delete=models.CASCADE, null=True, blank=True)
     usuario_creador = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    cliente = models.ForeignKey('clients.Cliente', on_delete=models.SET_NULL, null=True, blank=True)  # Para pagos de crédito
+    
+    # === TIPO Y MÉTODO ===
+    tipo_transaccion = models.CharField(
+        max_length=20,
+        choices=TIPO_TRANSACCION_CHOICES,
+        default='venta',
+        verbose_name="Tipo de Transacción"
+    )
+    metodo_pago = models.CharField(max_length=50, choices=METODO_PAGO_CHOICES)
+    
+    # === MONTOS ===
+    monto = models.DecimalField(max_digits=10, decimal_places=2)
+    venta_total_snapshot = models.DecimalField(
+        max_digits=10, 
+        decimal_places=2, 
+        null=True, 
+        blank=True,
+        verbose_name="Total de Venta (Snapshot)",
+        help_text="Snapshot del total de la venta al momento de la transacción"
+    )
+    
+    # === METADATA ===
+    fecha = models.DateTimeField(auto_now_add=True)
     procesado_pago = models.BooleanField(default=False)
+    referencia = models.CharField(max_length=100, null=True, blank=True, verbose_name="Referencia Bancaria")
+    notas = models.TextField(null=True, blank=True, verbose_name="Notas Adicionales")
 
     def save(self, *args, **kwargs):
         if not self.transaction_id:

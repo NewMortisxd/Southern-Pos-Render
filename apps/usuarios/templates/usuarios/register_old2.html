@@ -1,0 +1,1153 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro - Lemon POS</title>
+    <link rel="icon" type="image/png" href="{% static 'img/favicon.svg' %}">
+    <link rel="shortcut icon" type="image/png" href="{% static 'img/favicon.svg' %}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .step-content {
+            display: none;
+            opacity: 0;
+            transform: translateX(50px);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .step-content.active {
+            display: block;
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .step-content.prev {
+            transform: translateX(-50px);
+        }
+
+        .progress-bar {
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .plan-card {
+            transition: all 0.3s ease;
+        }
+
+        .plan-card.selected {
+            border-color: #047857;
+            box-shadow: 0 0 0 3px rgba(4, 120, 87, 0.1);
+        }
+
+        .plan-card.disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .hero-gradient {
+            background: linear-gradient(135deg, #4ade80 0%, #ffffff 100%);
+        }
+
+        .nav-link {
+            position: relative;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: #047857;
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .nav-link:hover {
+            color: #047857;
+            transition: color 0.3s ease;
+        }
+
+        .hamburger-menu {
+            display: none;
+        }
+
+        .mobile-menu {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .desktop-menu {
+                display: none;
+            }
+
+            .hamburger-menu {
+                display: block;
+            }
+
+            .mobile-menu {
+                display: none;
+                position: absolute;
+                top: 70px;
+                right: 0;
+                width: 100%;
+                background: white;
+                padding: 20px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                z-index: 100;
+            }
+
+            .mobile-menu.active {
+                display: block;
+            }
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 9999;
+        }
+
+        .toast {
+            background: white;
+            border-left: 4px solid #ef4444;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            padding: 16px 20px;
+            margin-bottom: 10px;
+            min-width: 300px;
+            max-width: 400px;
+            opacity: 0;
+            transform: translateX(400px);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .toast.hide {
+            opacity: 0;
+            transform: translateX(400px);
+        }
+
+        .toast-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+
+        .toast-content {
+            flex: 1;
+        }
+
+        .toast-title {
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 4px;
+        }
+
+        .toast-message {
+            font-size: 14px;
+            color: #6b7280;
+        }
+        
+        /* Campos con error */
+        .field-error {
+            border-color: #ef4444 !important;
+            background-color: #fef2f2 !important;
+        }
+        
+        .field-error:focus {
+            ring-color: #ef4444 !important;
+            border-color: #ef4444 !important;
+        }
+    </style>
+</head>
+
+<body class="hero-gradient min-h-screen p-4">
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Navbar -->
+    <header class="bg-white shadow-sm fixed w-full top-0 z-50 left-0">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center">
+                <img src="{% static 'img/favicon.svg' %}" alt="Lemon POS Logo" class="h-8 mr-2">
+                <span class="text-xl font-bold">Lemon POS</span>
+            </div>
+
+            <!-- Desktop Menu -->
+            <nav class="desktop-menu">
+                <ul class="flex space-x-6">
+                    <li><a href="{% url 'landing_page' %}" class="nav-link font-medium">Inicio</a></li>
+                    <li><a href="{% url 'landing_page' %}" class="nav-link font-medium">Características</a></li>
+                    <li><a href="{% url 'landing_page' %}" class="nav-link font-medium">Precios</a></li>
+                    <li><a href="{% url 'landing_page' %}" class="nav-link font-medium">Soporte</a></li>
+                    <li><a href="{% url 'login' %}" class="nav-link font-medium">Iniciar Sesión</a></li>
+                    <li><a href="{% url 'register' %}" style="background-color: rgba(4, 120, 87); color: white;"
+                            class="px-4 py-2 rounded hover:bg-green-700 transition transform hover:scale-105">Registrarse</a>
+                    </li>
+                </ul>
+            </nav>
+
+            <!-- Hamburger Menu - Only for Mobile -->
+            <div class="hamburger-menu">
+                <button id="menu-toggle" class="focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu - Only for Mobile -->
+        <div id="mobile-menu" class="mobile-menu">
+            <ul class="space-y-4">
+                <li><a href="{% url 'landing_page' %}" class="block py-2 hover:text-green-600">Inicio</a></li>
+                <li><a href="{% url 'landing_page' %}" class="block py-2 hover:text-green-600">Características</a></li>
+                <li><a href="{% url 'landing_page' %}" class="block py-2 hover:text-green-600">Precios</a></li>
+                <li><a href="{% url 'landing_page' %}" class="block py-2 hover:text-green-600">Soporte</a></li>
+                <li><a href="{% url 'login' %}" class="block py-2 hover:text-green-600">Iniciar Sesión</a></li>
+                <li><a href="{% url 'register' %}"
+                        class="block py-2 bg-green-600 text-white px-4 rounded hover:bg-green-700 text-center">Registrarse</a>
+                </li>
+            </ul>
+        </div>
+    </header>
+
+    <div class="pt-24 flex items-center justify-center min-h-screen">
+
+        <div class="w-full max-w-5xl">
+            <div class="text-center mb-8">
+                <h1 class="text-4xl font-bold text-gray-900 mb-2">Lemon POS</h1>
+                <p class="text-gray-600">Configura tu sistema empresarial en 5 simples pasos</p>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-2xl overflow-hidden">
+                <div class="bg-gray-100 h-2">
+                    <div id="progressBar" class="progress-bar h-full" style="width: 20%; background-color: #047857;">
+                    </div>
+                </div>
+
+                <div class="flex justify-between p-6 border-b border-gray-200">
+                    <div class="flex-1 text-center step-indicator active" data-step="1">
+                        <div class="w-10 h-10 mx-auto rounded-full text-white flex items-center justify-center mb-1 transition-all duration-300"
+                            style="background-color: #047857;">
+                            <i data-lucide="user" class="w-5 h-5"></i>
+                        </div>
+                        <p class="text-xs font-medium" style="color: #047857;">Cuenta</p>
+                    </div>
+                    <div class="flex-1 text-center step-indicator" data-step="2">
+                        <div
+                            class="w-10 h-10 mx-auto rounded-full bg-gray-200 text-gray-400 flex items-center justify-center mb-1 transition-all duration-300">
+                            <i data-lucide="building-2" class="w-5 h-5"></i>
+                        </div>
+                        <p class="text-xs font-medium text-gray-400">Negocio</p>
+                    </div>
+                    <div class="flex-1 text-center step-indicator" data-step="3">
+                        <div
+                            class="w-10 h-10 mx-auto rounded-full bg-gray-200 text-gray-400 flex items-center justify-center mb-1 transition-all duration-300">
+                            <i data-lucide="file-text" class="w-5 h-5"></i>
+                        </div>
+                        <p class="text-xs font-medium text-gray-400">Fiscal</p>
+                    </div>
+                    <div class="flex-1 text-center step-indicator" data-step="4">
+                        <div
+                            class="w-10 h-10 mx-auto rounded-full bg-gray-200 text-gray-400 flex items-center justify-center mb-1 transition-all duration-300">
+                            <i data-lucide="credit-card" class="w-5 h-5"></i>
+                        </div>
+                        <p class="text-xs font-medium text-gray-400">Plan</p>
+                    </div>
+                    <div class="flex-1 text-center step-indicator" data-step="5">
+                        <div
+                            class="w-10 h-10 mx-auto rounded-full bg-gray-200 text-gray-400 flex items-center justify-center mb-1 transition-all duration-300">
+                            <i data-lucide="check-circle" class="w-5 h-5"></i>
+                        </div>
+                        <p class="text-xs font-medium text-gray-400">Listo</p>
+                    </div>
+                </div>
+
+                <form method="POST" enctype="multipart/form-data" id="registerForm" class="p-8" novalidate>
+                    {% csrf_token %}
+
+                    <!-- Mostrar errores del formulario -->
+                    {% if form.errors %}
+                    <div id="form-errors" class="mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded">
+                        <div class="flex items-start">
+                            <svg class="w-5 h-5 text-red-500 mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <div>
+                                <p class="font-medium text-red-800 mb-2">Por favor corrige los siguientes errores:</p>
+                                <ul class="list-disc list-inside text-sm text-red-700 space-y-1">
+                                    {% for field, errors in form.errors.items %}
+                                        {% for error in errors %}
+                                            <li>{{ error }}</li>
+                                        {% endfor %}
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Paso 1: Tu Cuenta -->
+                    <div class="step-content active" data-step="1">
+                        <h2 class="text-2xl font-bold text-gray-900 mb-2">Crea tu cuenta</h2>
+                        <p class="text-gray-600 mb-6">Ingresa tus datos personales para comenzar</p>
+
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Nombre Completo</label>
+                                <input type="text" name="nombre_completo" id="nombre_completo" required
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent transition-all"
+                                    placeholder="Juan Pérez">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                                <input type="email" name="email" id="email" required
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent transition-all"
+                                    placeholder="tu@email.com">
+                                <p id="email-feedback" class="text-xs mt-1 hidden"></p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Contraseña</label>
+                                <input type="password" name="password1" id="password1" required
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent transition-all"
+                                    placeholder="Mínimo 8 caracteres">
+                                <div id="password-strength" class="mt-2 hidden">
+                                    <div class="flex gap-1 mb-2">
+                                        <div class="h-1 flex-1 rounded bg-gray-200" id="strength-bar-1"></div>
+                                        <div class="h-1 flex-1 rounded bg-gray-200" id="strength-bar-2"></div>
+                                        <div class="h-1 flex-1 rounded bg-gray-200" id="strength-bar-3"></div>
+                                        <div class="h-1 flex-1 rounded bg-gray-200" id="strength-bar-4"></div>
+                                    </div>
+                                    <p id="password-strength-text" class="text-xs text-gray-600"></p>
+                                    <ul class="text-xs mt-2 space-y-1">
+                                        <li id="req-length" class="text-gray-500">✗ Mínimo 8 caracteres</li>
+                                        <li id="req-lowercase" class="text-gray-500">✗ Una letra minúscula</li>
+                                        <li id="req-uppercase" class="text-gray-500">✗ Una letra mayúscula</li>
+                                        <li id="req-number" class="text-gray-500">✗ Un número</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Confirmar Contraseña</label>
+                                <input type="password" name="password2" id="password2" required
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent transition-all"
+                                    placeholder="Repite tu contraseña">
+                                <p id="password-match" class="text-xs mt-1 hidden"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Paso 2: Tu Negocio -->
+                    <div class="step-content" data-step="2">
+                        <h2 class="text-2xl font-bold text-gray-900 mb-2">Información del negocio</h2>
+                        <p class="text-gray-600 mb-6">Configura los datos de tu empresa</p>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Nombre del Negocio</label>
+                                <input type="text" name="nombre_negocio" required
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                                    placeholder="Mi Restaurante">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">RUC (13 dígitos)</label>
+                                <input type="text" name="ruc_negocio" maxlength="13"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                                    placeholder="1234567890001"
+                                    oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                                <p class="text-xs text-gray-500 mt-1">Opcional - Requerido para facturación electrónica
+                                </p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Teléfono</label>
+                                <input type="tel" name="telefono_negocio"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                                    placeholder="+593 987 654 321">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Dirección</label>
+                                <input type="text" name="direccion_negocio"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                                    placeholder="Av. Principal 123">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Ciudad</label>
+                                <input type="text" name="ciudad"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                                    placeholder="Quito">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Email del Negocio</label>
+                                <input type="email" name="email_negocio"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                                    placeholder="contacto@negocio.com">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Paso 3: Configuración Fiscal (Opcional) -->
+                    <div class="step-content" data-step="3">
+                        <h2 class="text-2xl font-bold text-gray-900 mb-2">Facturación Electrónica SRI</h2>
+                        <p class="text-gray-600 mb-6 flex items-center">
+                            <i data-lucide="info" class="w-4 h-4 mr-2" style="color: #047857;"></i>
+                            <span><strong>Opcional:</strong> Puedes configurar esto más tarde desde el panel de configuración</span>
+                        </p>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Razón Social Legal</label>
+                                <input type="text" name="razon_social_legal"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                                    placeholder="EMPRESA EJEMPLO S.A.">
+                                <p class="text-xs text-gray-500 mt-1">Exactamente como aparece en el RUC</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Ambiente SRI</label>
+                                <select name="ambiente_sri"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all">
+                                    <option value="1">1 - Pruebas</option>
+                                    <option value="2">2 - Producción</option>
+                                </select>
+                                <p class="text-xs text-gray-500 mt-1">Usar "Pruebas" hasta obtener autorización</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Tipo de Emisión</label>
+                                <select name="tipo_emision"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all">
+                                    <option value="1">1 - Emisión Normal</option>
+                                    <option value="2">2 - Emisión por Indisponibilidad</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Obligado a llevar contabilidad</label>
+                                <select name="obligado_contabilidad"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all">
+                                    <option value="NO">NO</option>
+                                    <option value="SI">SI</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Régimen RIMPE</label>
+                                <select name="regimen_rimpe"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all">
+                                    <option value="">No aplica</option>
+                                    <option value="RIMPE">RIMPE</option>
+                                    <option value="RIMPE_EMPRENDEDOR">RIMPE - Emprendedor</option>
+                                    <option value="NO">NO</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Establecimiento</label>
+                                <input type="text" name="establecimiento" maxlength="3"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                                    placeholder="001"
+                                    oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                                <p class="text-xs text-gray-500 mt-1">3 dígitos (ej: 001)</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Punto de Emisión</label>
+                                <input type="text" name="punto_emision" maxlength="3"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                                    placeholder="001"
+                                    oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                                <p class="text-xs text-gray-500 mt-1">3 dígitos (ej: 001)</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Paso 4: Seleccionar Plan -->
+                    <div class="step-content" data-step="4">
+                        <h2 class="text-2xl font-bold text-gray-900 mb-2">Elige tu plan</h2>
+                        <p class="text-gray-600 mb-6">Comienza gratis y actualiza cuando estés listo</p>
+
+                        <input type="hidden" name="plan" id="selectedPlan" value="free">
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <!-- Plan Gratuito -->
+                            <div class="plan-card selected border-2 rounded-xl p-6 cursor-pointer hover:shadow-lg transition-all"
+                                style="border-color: #047857;" onclick="selectPlan('free', this)">
+                                <div class="text-center mb-4">
+                                    <div class="inline-flex items-center justify-center w-12 h-12 rounded-full mb-3"
+                                        style="background-color: rgba(4, 120, 87, 0.1); color: #047857;">
+                                        <i data-lucide="zap" class="w-6 h-6"></i>
+                                    </div>
+                                    <h3 class="text-xl font-bold text-gray-900">Gratuito</h3>
+                                    <div class="mt-2">
+                                        <span class="text-3xl font-bold text-gray-900">$0</span>
+                                        <span class="text-gray-600">/mes</span>
+                                    </div>
+                                </div>
+                                <ul class="space-y-3 mb-6">
+                                    <li class="flex items-start text-sm">
+                                        <i data-lucide="check" class="w-5 h-5 mr-2 flex-shrink-0"
+                                            style="color: #047857;"></i>
+                                        <span>1 Usuario</span>
+                                    </li>
+                                    <li class="flex items-start text-sm">
+                                        <i data-lucide="check" class="w-5 h-5 mr-2 flex-shrink-0"
+                                            style="color: #047857;"></i>
+                                        <span>Ventas ilimitadas</span>
+                                    </li>
+                                    <li class="flex items-start text-sm">
+                                        <i data-lucide="check" class="w-5 h-5 mr-2 flex-shrink-0"
+                                            style="color: #047857;"></i>
+                                        <span>Productos ilimitados</span>
+                                    </li>
+                                    <li class="flex items-start text-sm text-gray-400">
+                                        <i data-lucide="x" class="w-5 h-5 text-gray-400 mr-2 flex-shrink-0"></i>
+                                        <span>Facturación electrónica</span>
+                                    </li>
+                                </ul>
+                                <div class="text-center">
+                                    <span class="inline-block px-4 py-2 rounded-lg text-sm font-medium"
+                                        style="background-color: rgba(4, 120, 87, 0.1); color: #047857;">Seleccionado</span>
+                                </div>
+                            </div>
+
+                            <!-- Plan Pro -->
+                            <div
+                                class="plan-card disabled border-2 border-gray-200 rounded-xl p-6 relative overflow-hidden">
+                                <div
+                                    class="absolute top-4 right-4 bg-blue-500 text-white text-xs font-bold px-3 py-1 rounded-full">
+                                    Próximamente
+                                </div>
+                                <div class="text-center mb-4">
+                                    <div
+                                        class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-100 text-blue-600 mb-3">
+                                        <i data-lucide="trending-up" class="w-6 h-6"></i>
+                                    </div>
+                                    <h3 class="text-xl font-bold text-gray-900">Pro</h3>
+                                    <div class="mt-2">
+                                        <span class="text-3xl font-bold text-gray-900">$29</span>
+                                        <span class="text-gray-600">/mes</span>
+                                    </div>
+                                </div>
+                                <ul class="space-y-3 mb-6">
+                                    <li class="flex items-start text-sm">
+                                        <i data-lucide="check" class="w-5 h-5 text-blue-500 mr-2 flex-shrink-0"></i>
+                                        <span>3 Usuarios</span>
+                                    </li>
+                                    <li class="flex items-start text-sm">
+                                        <i data-lucide="check" class="w-5 h-5 text-blue-500 mr-2 flex-shrink-0"></i>
+                                        <span>Facturación electrónica</span>
+                                    </li>
+                                    <li class="flex items-start text-sm">
+                                        <i data-lucide="check" class="w-5 h-5 text-blue-500 mr-2 flex-shrink-0"></i>
+                                        <span>Reportes avanzados</span>
+                                    </li>
+                                    <li class="flex items-start text-sm">
+                                        <i data-lucide="check" class="w-5 h-5 text-blue-500 mr-2 flex-shrink-0"></i>
+                                        <span>Soporte prioritario</span>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <!-- Plan Enterprise -->
+                            <div
+                                class="plan-card disabled border-2 border-gray-200 rounded-xl p-6 relative overflow-hidden">
+                                <div
+                                    class="absolute top-4 right-4 bg-purple-500 text-white text-xs font-bold px-3 py-1 rounded-full">
+                                    Próximamente
+                                </div>
+                                <div class="text-center mb-4">
+                                    <div
+                                        class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-purple-100 text-purple-600 mb-3">
+                                        <i data-lucide="building" class="w-6 h-6"></i>
+                                    </div>
+                                    <h3 class="text-xl font-bold text-gray-900">Enterprise</h3>
+                                    <div class="mt-2">
+                                        <span class="text-3xl font-bold text-gray-900">$99</span>
+                                        <span class="text-gray-600">/mes</span>
+                                    </div>
+                                </div>
+                                <ul class="space-y-3 mb-6">
+                                    <li class="flex items-start text-sm">
+                                        <i data-lucide="check" class="w-5 h-5 text-purple-500 mr-2 flex-shrink-0"></i>
+                                        <span>Usuarios ilimitados</span>
+                                    </li>
+                                    <li class="flex items-start text-sm">
+                                        <i data-lucide="check" class="w-5 h-5 text-purple-500 mr-2 flex-shrink-0"></i>
+                                        <span>Multi-sucursal</span>
+                                    </li>
+                                    <li class="flex items-start text-sm">
+                                        <i data-lucide="check" class="w-5 h-5 text-purple-500 mr-2 flex-shrink-0"></i>
+                                        <span>API personalizada</span>
+                                    </li>
+                                    <li class="flex items-start text-sm">
+                                        <i data-lucide="check" class="w-5 h-5 text-purple-500 mr-2 flex-shrink-0"></i>
+                                        <span>Soporte 24/7</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Paso 5: Confirmación -->
+                    <div class="step-content" data-step="5">
+                        <div class="text-center py-8">
+                            <div class="w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-4"
+                                style="background-color: rgba(4, 120, 87, 0.1);">
+                                <i data-lucide="clipboard-check" class="w-10 h-10" style="color: #047857;"></i>
+                            </div>
+                            <h2 class="text-2xl font-bold text-gray-900 mb-2">Último paso: Crear tu cuenta</h2>
+                            <p class="text-gray-600 mb-4">Haz clic en el botón "Crear Cuenta" para finalizar</p>
+                            
+                            <div class="bg-green-50 border-2 border-green-500 rounded-lg p-6 mb-6 max-w-md mx-auto">
+                                <p class="text-lg font-semibold text-green-900 mb-2">✓ Todo está listo</p>
+                                <p class="text-sm text-green-700">Hemos guardado tu información. Ahora solo falta confirmar la creación de tu cuenta.</p>
+                            </div>
+
+                            <div
+                                class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 text-left max-w-md mx-auto">
+                                <div class="flex items-start">
+                                    <i data-lucide="info" class="w-5 h-5 text-blue-600 mr-3 mt-0.5 flex-shrink-0"></i>
+                                    <div>
+                                        <p class="text-sm font-medium text-blue-900 mb-1">Configuración Fiscal Opcional
+                                        </p>
+                                        <p class="text-sm text-blue-700">Podrás configurar la facturación electrónica
+                                            más
+                                            tarde desde el panel de configuración cuando estés listo.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between mt-8 pt-6 border-t border-gray-200">
+                        <button type="button" id="prevBtn"
+                            class="px-6 py-3 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-all duration-200 flex items-center"
+                            style="display: none;">
+                            <i data-lucide="chevron-left" class="w-5 h-5 mr-2"></i>
+                            Anterior
+                        </button>
+                        <button type="button" id="nextBtn"
+                            class="ml-auto px-6 py-3 text-white rounded-lg hover:shadow-lg transition-all duration-200 flex items-center"
+                            style="background-color: #047857;">
+                            Siguiente
+                            <i data-lucide="chevron-right" class="w-5 h-5 ml-2"></i>
+                        </button>
+                        <button type="submit" id="submitBtn"
+                            class="ml-auto px-8 py-4 text-white text-lg font-bold rounded-lg hover:shadow-lg transition-all duration-200 flex items-center animate-pulse"
+                            style="background-color: #047857; display: none;">
+                            <i data-lucide="check-circle" class="w-6 h-6 mr-2"></i>
+                            Crear Cuenta Ahora
+                        </button>
+                    </div>
+                </form>
+
+                <div class="px-8 pb-8 text-center" id="loginLink">
+                    <p class="text-sm text-gray-600">
+                        ¿Ya tienes cuenta?
+                        <a href="{% url 'login' %}" class="font-medium" style="color: #047857;">Inicia
+                            sesión aquí</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        let currentStep = 1;
+        const totalSteps = 5;
+
+        const nextBtn = document.getElementById('nextBtn');
+        const prevBtn = document.getElementById('prevBtn');
+        const submitBtn = document.getElementById('submitBtn');
+        const progressBar = document.getElementById('progressBar');
+
+        // Función para mostrar notificaciones toast
+        function showToast(message) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = `
+                <svg class="toast-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: #ef4444;">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <div class="toast-content">
+                    <div class="toast-title">Error de validación</div>
+                    <div class="toast-message">${message}</div>
+                </div>
+            `;
+            
+            container.appendChild(toast);
+            
+            // Mostrar toast
+            setTimeout(() => toast.classList.add('show'), 10);
+            
+            // Ocultar y eliminar después de 3 segundos
+            setTimeout(() => {
+                toast.classList.add('hide');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Validación de campos requeridos por paso
+        function validateStep(step) {
+            let isValid = true;
+            let errorMessage = '';
+            let errorField = null;
+
+            if (step === 1) {
+                const nombreInput = document.querySelector('input[name="nombre_completo"]');
+                const emailInput = document.querySelector('input[name="email"]');
+                const password1Input = document.querySelector('input[name="password1"]');
+                const password2Input = document.querySelector('input[name="password2"]');
+                
+                const nombre = nombreInput.value.trim();
+                const email = emailInput.value.trim();
+                const password1 = password1Input.value;
+                const password2 = password2Input.value;
+
+                if (!nombre) {
+                    errorMessage = 'Por favor ingresa tu nombre completo';
+                    errorField = nombreInput;
+                    isValid = false;
+                } else if (!email) {
+                    errorMessage = 'Por favor ingresa tu email';
+                    errorField = emailInput;
+                    isValid = false;
+                } else if (!email.includes('@') || !email.includes('.')) {
+                    errorMessage = 'Por favor ingresa un email válido';
+                    errorField = emailInput;
+                    isValid = false;
+                } else if (!password1 || password1.length < 8) {
+                    errorMessage = 'La contraseña debe tener al menos 8 caracteres';
+                    errorField = password1Input;
+                    isValid = false;
+                } else if (!/[a-z]/.test(password1)) {
+                    errorMessage = 'La contraseña debe contener al menos una letra minúscula';
+                    errorField = password1Input;
+                    isValid = false;
+                } else if (!/[A-Z]/.test(password1)) {
+                    errorMessage = 'La contraseña debe contener al menos una letra mayúscula';
+                    errorField = password1Input;
+                    isValid = false;
+                } else if (!/[0-9]/.test(password1)) {
+                    errorMessage = 'La contraseña debe contener al menos un número';
+                    errorField = password1Input;
+                    isValid = false;
+                } else if (password1 !== password2) {
+                    errorMessage = 'Las contraseñas no coinciden';
+                    errorField = password2Input;
+                    isValid = false;
+                }
+            } else if (step === 2) {
+                const nombreNegocioInput = document.querySelector('input[name="nombre_negocio"]');
+                const emailNegocioInput = document.querySelector('input[name="email_negocio"]');
+                const rucInput = document.querySelector('input[name="ruc_negocio"]');
+                
+                const nombreNegocio = nombreNegocioInput.value.trim();
+                const emailNegocio = emailNegocioInput.value.trim();
+                const ruc = rucInput.value.trim();
+
+                if (!nombreNegocio) {
+                    errorMessage = 'Por favor ingresa el nombre del negocio';
+                    errorField = nombreNegocioInput;
+                    isValid = false;
+                } else if (emailNegocio && (!emailNegocio.includes('@') || !emailNegocio.includes('.'))) {
+                    errorMessage = 'El email del negocio no es válido';
+                    errorField = emailNegocioInput;
+                    isValid = false;
+                } else if (ruc && ruc.length > 0 && ruc.length !== 13) {
+                    errorMessage = 'El RUC debe tener exactamente 13 dígitos';
+                    errorField = rucInput;
+                    isValid = false;
+                } else if (ruc && !/^\d+$/.test(ruc)) {
+                    errorMessage = 'El RUC solo debe contener números';
+                    errorField = rucInput;
+                    isValid = false;
+                }
+            } else if (step === 3) {
+                // Validar campos opcionales del paso 3 si tienen valor
+                const establecimientoInput = document.querySelector('input[name="establecimiento"]');
+                const puntoEmisionInput = document.querySelector('input[name="punto_emision"]');
+                
+                const establecimiento = establecimientoInput.value.trim();
+                const puntoEmision = puntoEmisionInput.value.trim();
+                
+                if (establecimiento && establecimiento.length > 0 && establecimiento.length !== 3) {
+                    errorMessage = 'El establecimiento debe tener exactamente 3 dígitos';
+                    errorField = establecimientoInput;
+                    isValid = false;
+                } else if (establecimiento && !/^\d+$/.test(establecimiento)) {
+                    errorMessage = 'El establecimiento solo debe contener números';
+                    errorField = establecimientoInput;
+                    isValid = false;
+                } else if (puntoEmision && puntoEmision.length > 0 && puntoEmision.length !== 3) {
+                    errorMessage = 'El punto de emisión debe tener exactamente 3 dígitos';
+                    errorField = puntoEmisionInput;
+                    isValid = false;
+                } else if (puntoEmision && !/^\d+$/.test(puntoEmision)) {
+                    errorMessage = 'El punto de emisión solo debe contener números';
+                    errorField = puntoEmisionInput;
+                    isValid = false;
+                }
+            }
+            // Paso 4 (Plan) siempre tiene un valor por defecto
+
+            if (!isValid) {
+                showToast(errorMessage);
+                if (errorField) {
+                    errorField.classList.add('field-error');
+                    errorField.focus();
+                    // Remover el error cuando el usuario empiece a escribir
+                    errorField.addEventListener('input', function() {
+                        this.classList.remove('field-error');
+                    }, { once: true });
+                }
+            }
+
+            return isValid;
+        }
+
+        function selectPlan(plan, element) {
+            if (element.classList.contains('disabled')) return;
+
+            document.querySelectorAll('.plan-card').forEach(card => {
+                card.classList.remove('selected');
+                card.style.borderColor = '#e5e7eb';
+                const badge = card.querySelector('.text-center > span');
+                if (badge && badge.textContent === 'Seleccionado') {
+                    badge.remove();
+                }
+            });
+
+            element.classList.add('selected');
+            element.style.borderColor = '#047857';
+
+            const badge = document.createElement('span');
+            badge.className = 'inline-block px-4 py-2 rounded-lg text-sm font-medium';
+            badge.style.backgroundColor = 'rgba(4, 120, 87, 0.1)';
+            badge.style.color = '#047857';
+            badge.textContent = 'Seleccionado';
+            element.querySelector('.text-center').appendChild(badge);
+
+            document.getElementById('selectedPlan').value = plan;
+        }
+
+        function showStep(step) {
+            document.querySelectorAll('.step-content').forEach(content => {
+                content.classList.remove('active', 'prev');
+                if (parseInt(content.dataset.step) < step) {
+                    content.classList.add('prev');
+                }
+            });
+
+            const currentContent = document.querySelector(`.step-content[data-step="${step}"]`);
+            if (currentContent) {
+                setTimeout(() => currentContent.classList.add('active'), 50);
+            }
+
+            document.querySelectorAll('.step-indicator').forEach(indicator => {
+                const indicatorStep = parseInt(indicator.dataset.step);
+                const circle = indicator.querySelector('div');
+                const text = indicator.querySelector('p');
+
+                if (indicatorStep <= step) {
+                    circle.classList.remove('bg-gray-200', 'text-gray-400');
+                    circle.classList.add('text-white');
+                    circle.style.backgroundColor = '#047857';
+                    text.classList.remove('text-gray-400');
+                    text.style.color = '#047857';
+                } else {
+                    circle.classList.remove('text-white');
+                    circle.classList.add('bg-gray-200', 'text-gray-400');
+                    circle.style.backgroundColor = '';
+                    text.classList.add('text-gray-400');
+                    text.style.color = '';
+                }
+            });
+
+            const progress = (step / totalSteps) * 100;
+            progressBar.style.width = progress + '%';
+
+            prevBtn.style.display = step === 1 ? 'none' : 'flex';
+            nextBtn.style.display = step === totalSteps ? 'none' : 'flex';
+            submitBtn.style.display = step === totalSteps ? 'flex' : 'none';
+            
+            // Ocultar el link de "¿Ya tienes cuenta?" en el paso final para evitar confusión
+            const loginLink = document.getElementById('loginLink');
+            if (loginLink) {
+                loginLink.style.display = step === totalSteps ? 'none' : 'block';
+            }
+        }
+
+        nextBtn.addEventListener('click', () => {
+            if (currentStep < totalSteps) {
+                if (validateStep(currentStep)) {
+                    currentStep++;
+                    showStep(currentStep);
+                }
+            }
+        });
+
+        prevBtn.addEventListener('click', () => {
+            if (currentStep > 1) {
+                currentStep--;
+                showStep(currentStep);
+            }
+        });
+
+        showStep(currentStep);
+
+        // Prevenir envío del formulario con Enter
+        document.getElementById('registerForm').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && currentStep < totalSteps) {
+                e.preventDefault();
+                // Simular click en botón siguiente
+                if (validateStep(currentStep)) {
+                    currentStep++;
+                    showStep(currentStep);
+                }
+            }
+        });
+
+        // Si hay errores del formulario, detectar el paso y marcar campos
+        {% if form.errors %}
+        // Mapeo de campos a pasos
+        const fieldToStep = {
+            'nombre_completo': 1,
+            'email': 1,
+            'password1': 1,
+            'password2': 1,
+            'nombre_negocio': 2,
+            'ruc_negocio': 2,
+            'telefono_negocio': 2,
+            'direccion_negocio': 2,
+            'ciudad': 2,
+            'email_negocio': 2,
+            'razon_social_legal': 3,
+            'ambiente_sri': 3,
+            'tipo_emision': 3,
+            'obligado_contabilidad': 3,
+            'regimen_rimpe': 3,
+            'establecimiento': 3,
+            'punto_emision': 3
+        };
+        
+        // Detectar el primer paso con error
+        let errorStep = 1;
+        const errorFields = [{% for field in form.errors %}'{{ field }}'{% if not forloop.last %},{% endif %}{% endfor %}];
+        
+        for (const field of errorFields) {
+            if (fieldToStep[field]) {
+                errorStep = fieldToStep[field];
+                break;
+            }
+        }
+        
+        // Marcar campos con error en rojo
+        {% for field in form.errors %}
+        const field_{{ forloop.counter }} = document.querySelector('[name="{{ field }}"]');
+        if (field_{{ forloop.counter }}) {
+            field_{{ forloop.counter }}.classList.add('field-error');
+            // Remover el error cuando el usuario empiece a escribir
+            field_{{ forloop.counter }}.addEventListener('input', function() {
+                this.classList.remove('field-error');
+            });
+        }
+        {% endfor %}
+        
+        // Ir al paso con error
+        currentStep = errorStep;
+        showStep(errorStep);
+        
+        // Mostrar toast con el error
+        setTimeout(() => {
+            showToast('Por favor corrige los errores marcados en rojo');
+        }, 500);
+        
+        // Scroll al contenedor de errores
+        setTimeout(() => {
+            const errorDiv = document.getElementById('form-errors');
+            if (errorDiv) {
+                errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }, 100);
+        {% endif %}
+
+        // ============================================
+        // VALIDACIÓN EN TIEMPO REAL
+        // ============================================
+        
+        // Validar email en tiempo real (verificar si ya existe)
+        const emailInput = document.getElementById('email');
+        const emailFeedback = document.getElementById('email-feedback');
+        let emailCheckTimeout;
+        
+        emailInput.addEventListener('input', function() {
+            clearTimeout(emailCheckTimeout);
+            const email = this.value.trim();
+            
+            if (email && email.includes('@') && email.includes('.')) {
+                emailCheckTimeout = setTimeout(() => {
+                    // Verificar si el email ya existe
+                    fetch('{% url "check_email" %}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'X-CSRFToken': '{{ csrf_token }}'
+                        },
+                        body: 'email=' + encodeURIComponent(email)
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.exists) {
+                            emailInput.classList.add('field-error');
+                            emailFeedback.textContent = '✗ Este email ya está registrado';
+                            emailFeedback.className = 'text-xs mt-1 text-red-600';
+                            emailFeedback.classList.remove('hidden');
+                        } else {
+                            emailInput.classList.remove('field-error');
+                            emailFeedback.textContent = '✓ Email disponible';
+                            emailFeedback.className = 'text-xs mt-1 text-green-600';
+                            emailFeedback.classList.remove('hidden');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error checking email:', error);
+                    });
+                }, 500);
+            } else {
+                emailFeedback.classList.add('hidden');
+            }
+        });
+        
+        // Validar fortaleza de contraseña en tiempo real
+        const password1Input = document.getElementById('password1');
+        const passwordStrengthDiv = document.getElementById('password-strength');
+        const strengthText = document.getElementById('password-strength-text');
+        const strengthBars = [
+            document.getElementById('strength-bar-1'),
+            document.getElementById('strength-bar-2'),
+            document.getElementById('strength-bar-3'),
+            document.getElementById('strength-bar-4')
+        ];
+        
+        const reqLength = document.getElementById('req-length');
+        const reqLowercase = document.getElementById('req-lowercase');
+        const reqUppercase = document.getElementById('req-uppercase');
+        const reqNumber = document.getElementById('req-number');
+        
+        password1Input.addEventListener('input', function() {
+            const password = this.value;
+            
+            if (password.length > 0) {
+                passwordStrengthDiv.classList.remove('hidden');
+                
+                // Verificar requisitos
+                const hasLength = password.length >= 8;
+                const hasLowercase = /[a-z]/.test(password);
+                const hasUppercase = /[A-Z]/.test(password);
+                const hasNumber = /[0-9]/.test(password);
+                
+                // Actualizar indicadores de requisitos
+                reqLength.textContent = hasLength ? '✓ Mínimo 8 caracteres' : '✗ Mínimo 8 caracteres';
+                reqLength.className = hasLength ? 'text-green-600' : 'text-gray-500';
+                
+                reqLowercase.textContent = hasLowercase ? '✓ Una letra minúscula' : '✗ Una letra minúscula';
+                reqLowercase.className = hasLowercase ? 'text-green-600' : 'text-gray-500';
+                
+                reqUppercase.textContent = hasUppercase ? '✓ Una letra mayúscula' : '✗ Una letra mayúscula';
+                reqUppercase.className = hasUppercase ? 'text-green-600' : 'text-gray-500';
+                
+                reqNumber.textContent = hasNumber ? '✓ Un número' : '✗ Un número';
+                reqNumber.className = hasNumber ? 'text-green-600' : 'text-gray-500';
+                
+                // Calcular fortaleza
+                let strength = 0;
+                if (hasLength) strength++;
+                if (hasLowercase) strength++;
+                if (hasUppercase) strength++;
+                if (hasNumber) strength++;
+                
+                // Actualizar barras de fortaleza
+                strengthBars.forEach((bar, index) => {
+                    if (index < strength) {
+                        if (strength === 1) bar.style.backgroundColor = '#ef4444'; // Rojo
+                        else if (strength === 2) bar.style.backgroundColor = '#f59e0b'; // Naranja
+                        else if (strength === 3) bar.style.backgroundColor = '#eab308'; // Amarillo
+                        else bar.style.backgroundColor = '#22c55e'; // Verde
+                    } else {
+                        bar.style.backgroundColor = '#e5e7eb'; // Gris
+                    }
+                });
+                
+                // Actualizar texto de fortaleza
+                if (strength === 1) {
+                    strengthText.textContent = 'Contraseña débil';
+                    strengthText.className = 'text-xs text-red-600';
+                } else if (strength === 2) {
+                    strengthText.textContent = 'Contraseña regular';
+                    strengthText.className = 'text-xs text-orange-600';
+                } else if (strength === 3) {
+                    strengthText.textContent = 'Contraseña buena';
+                    strengthText.className = 'text-xs text-yellow-600';
+                } else if (strength === 4) {
+                    strengthText.textContent = 'Contraseña fuerte';
+                    strengthText.className = 'text-xs text-green-600';
+                }
+            } else {
+                passwordStrengthDiv.classList.add('hidden');
+            }
+        });
+        
+        // Validar que las contraseñas coincidan
+        const password2Input = document.getElementById('password2');
+        const passwordMatch = document.getElementById('password-match');
+        
+        password2Input.addEventListener('input', function() {
+            const password1 = password1Input.value;
+            const password2 = this.value;
+            
+            if (password2.length > 0) {
+                if (password1 === password2) {
+                    password2Input.classList.remove('field-error');
+                    passwordMatch.textContent = '✓ Las contraseñas coinciden';
+                    passwordMatch.className = 'text-xs mt-1 text-green-600';
+                    passwordMatch.classList.remove('hidden');
+                } else {
+                    password2Input.classList.add('field-error');
+                    passwordMatch.textContent = '✗ Las contraseñas no coinciden';
+                    passwordMatch.className = 'text-xs mt-1 text-red-600';
+                    passwordMatch.classList.remove('hidden');
+                }
+            } else {
+                passwordMatch.classList.add('hidden');
+            }
+        });
+
+        // Mobile menu toggle
+        const menuToggle = document.getElementById('menu-toggle');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        if (menuToggle && mobileMenu) {
+            menuToggle.addEventListener('click', () => {
+                mobileMenu.classList.toggle('active');
+            });
+        }
+    </script>
+</body>
+
+</html>

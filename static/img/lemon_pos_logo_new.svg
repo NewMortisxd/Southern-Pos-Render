@@ -1,0 +1,18 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Forma de limón con puntas suavizadas (más orgánico, menos rombo) -->
+  <path d="M 100 35 C 103 35, 106 36, 109 39 C 126 45, 155 70, 155 100 C 155 130, 126 155, 109 161 C 106 164, 103 165, 100 165 C 97 165, 94 164, 91 161 C 74 155, 45 130, 45 100 C 45 70, 74 45, 91 39 C 94 36, 97 35, 100 35 Z" fill="#20B558" stroke="#16A34A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Puntito superior integrado (más suave) -->
+  <circle cx="100" cy="35" r="2.5" fill="#16A34A"/>
+  
+  <!-- Puntito inferior integrado (más suave) -->
+  <circle cx="100" cy="165" r="2.5" fill="#16A34A"/>
+  
+  <!-- Líneas de ticket con variación (simulando texto real) -->
+  <line x1="72" y1="88" x2="118" y2="88" stroke="#FFFFFF" stroke-width="2.3" stroke-linecap="round" opacity="0.95"/>
+  <line x1="72" y1="100" x2="108" y2="100" stroke="#FFFFFF" stroke-width="2.3" stroke-linecap="round" opacity="0.95"/>
+  <line x1="72" y1="112" x2="122" y2="112" stroke="#FFFFFF" stroke-width="2.3" stroke-linecap="round" opacity="0.95"/>
+  
+  <!-- Símbolo $ más pequeño y alineado (mismo grosor visual) -->
+  <text x="126" y="103" fill="#FFFFFF" font-family="Arial, sans-serif" font-size="12" font-weight="600" opacity="0.95">$</text>
+</svg>

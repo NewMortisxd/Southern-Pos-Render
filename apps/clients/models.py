@@ -56,6 +56,12 @@ class Cliente(models.Model):
     ciudad = models.CharField(max_length=100, blank=True, null=True)
     comentarios = models.TextField(blank=True, null=True)
     
+    # Campos adicionales para mejoras profesionales
+    es_favorito = models.BooleanField(default=False, verbose_name="Cliente Favorito")
+    total_gastado = models.DecimalField(max_digits=12, decimal_places=2, default=0, verbose_name="Total Gastado")
+    total_compras = models.IntegerField(default=0, verbose_name="Total de Compras")
+    ultima_compra = models.DateTimeField(null=True, blank=True, verbose_name="Última Compra")
+    
     class Meta:
         verbose_name = "Cliente"
         verbose_name_plural = "Clientes"
@@ -64,3 +70,86 @@ class Cliente(models.Model):
     # Representación en cadena del objeto
     def __str__(self):
         return self.nombre
+    
+    def get_iniciales(self):
+        """Retorna las iniciales del nombre del cliente"""
+        palabras = self.nombre.split()
+        if len(palabras) >= 2:
+            return f"{palabras[0][0]}{palabras[1][0]}".upper()
+        elif len(palabras) == 1:
+            return palabras[0][:2].upper()
+        return "CL"
+    
+    def get_credito_disponible(self):
+        """Calcula el crédito disponible del cliente"""
+        # Aquí podrías calcular el crédito usado vs el cupo
+        return self.cupo - self.total_gastado if self.cupo > 0 else 0
+    
+    @staticmethod
+    def get_consumidor_final(usuario):
+        """
+        Obtiene o crea el cliente Consumidor Final para el usuario.
+        Usa el cliente del sistema con identificación 9999999999.
+        """
+        consumidor_final, created = Cliente.objects.get_or_create(
+            identificacion='9999999999',
+            defaults={
+                'codigo': 'CF-001',
+                'nombre': 'Consumidor Final',
+                'razon_social': 'CONSUMIDOR FINAL',
+                'direccion': 'N/A',
+                'ciudad': 'N/A',
+                'grupo': 'regular',
+                'estado': 'activo',
+                'credito': 0,
+                'cupo': 0,
+                'tasa_descuento': 0,
+                'tasa_recargo': 0,
+                'comentarios': 'Cliente por defecto para ventas sin identificación. NO ELIMINAR.',
+                'es_favorito': False,
+                'usuario_creador': usuario
+            }
+        )
+        return consumidor_final
+    
+    def es_consumidor_final(self):
+        """Verifica si este cliente es el Consumidor Final del sistema"""
+        return self.identificacion == '9999999999'
+    
+    def puede_comprar_a_credito(self, monto_venta=None):
+        """
+        Verifica si el cliente puede comprar a crédito.
+        Consumidor Final NO puede comprar a crédito.
+        Si se proporciona monto_venta, verifica que el cupo sea suficiente.
+        """
+        if self.es_consumidor_final():
+            return False
+        
+        # Verificar condiciones básicas
+        if self.estado != 'activo' or self.credito <= 0:
+            return False
+        
+        # Si no se proporciona monto, solo verificar que tenga cupo
+        if monto_venta is None:
+            return self.cupo > 0
+        
+        # Si se proporciona monto, verificar que el cupo sea suficiente
+        return self.cupo >= monto_venta
+    
+    def actualizar_estadisticas_compra(self, monto_venta):
+        """
+        Actualiza las estadísticas del cliente después de una compra.
+        - Incrementa total_gastado
+        - Incrementa total_compras
+        - Actualiza ultima_compra
+        """
+        from decimal import Decimal
+        from django.utils import timezone
+        
+        if isinstance(monto_venta, (int, float)):
+            monto_venta = Decimal(str(monto_venta))
+        
+        self.total_gastado += monto_venta
+        self.total_compras += 1
+        self.ultima_compra = timezone.now()
+        self.save(update_fields=['total_gastado', 'total_compras', 'ultima_compra'])

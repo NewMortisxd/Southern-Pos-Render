@@ -1,0 +1,315 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Logo - Lemon POS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e9f0 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            text-align: center;
+            padding: 3rem;
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            max-width: 1200px;
+        }
+
+        .logo-showcase {
+            margin-bottom: 2rem;
+        }
+
+        .logo-main {
+            margin-bottom: 3rem;
+        }
+
+        .logo-variants {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 2px solid #e5e7eb;
+        }
+
+        .variant {
+            padding: 1.5rem;
+            border-radius: 12px;
+            transition: transform 0.2s;
+        }
+
+        .variant:hover {
+            transform: translateY(-4px);
+        }
+
+        .variant.white {
+            background: white;
+            border: 2px solid #e5e7eb;
+        }
+
+        .variant.dark {
+            background: #1f2937;
+        }
+
+        .variant.green {
+            background: #22C55E;
+        }
+
+        .variant-label {
+            margin-top: 0.5rem;
+            font-size: 0.75rem;
+            color: #6b7280;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .variant.dark .variant-label {
+            color: #9ca3af;
+        }
+
+        .variant.green .variant-label {
+            color: #ffffff;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: #6b7280;
+            font-size: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .specs {
+            display: inline-block;
+            background: #f3f4f6;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            color: #4b5563;
+            margin-top: 1rem;
+        }
+
+        .specs strong {
+            color: #166534;
+        }
+
+        .logo-full-section {
+            margin-top: 4rem;
+            padding-top: 3rem;
+            border-top: 2px solid #e5e7eb;
+        }
+
+        .full-logo-variants {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .full-variant {
+            padding: 2rem;
+            border-radius: 12px;
+            transition: transform 0.2s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .full-variant:hover {
+            transform: translateY(-4px);
+        }
+
+        .full-variant.white {
+            background: white;
+            border: 2px solid #e5e7eb;
+        }
+
+        .full-variant.dark {
+            background: #1f2937;
+        }
+
+        .full-variant.green {
+            background: #166534;
+        }
+
+        .comparison-section {
+            margin-top: 4rem;
+            padding-top: 3rem;
+            border-top: 2px solid #e5e7eb;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 3rem;
+            margin-top: 2rem;
+        }
+
+        .comparison-item {
+            text-align: center;
+        }
+
+        .comparison-box {
+            background: #f9fafb;
+            padding: 2rem;
+            border-radius: 16px;
+            border: 2px solid #e5e7eb;
+            transition: all 0.3s;
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .comparison-box:hover {
+            border-color: #16A34A;
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(22, 163, 74, 0.15);
+        }
+
+        .comparison-label {
+            margin-top: 1rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #1f2937;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="logo-showcase">
+            <h1>Lemon POS</h1>
+            <p class="subtitle">Logo Final - Concepto 3 Refinado</p>
+        </div>
+
+        <div class="logo-main">
+            <img src="{% static 'img/lemon_pos_logo_horizontal_pro.svg' %}" alt="Lemon POS Logo" width="200"
+                height="200">
+        </div>
+
+        <div class="logo-variants">
+            <div class="variant white">
+                <img src="{% static 'img/lemon_pos_logo_horizontal_pro.svg' %}" alt="Logo en fondo blanco" width="120"
+                    height="120">
+                <div class="variant-label">Fondo Blanco</div>
+            </div>
+
+            <div class="variant dark">
+                <img src="{% static 'img/lemon_pos_logo_horizontal_pro.svg' %}" alt="Logo en fondo oscuro" width="120"
+                    height="120">
+                <div class="variant-label">Fondo Oscuro</div>
+            </div>
+
+            <div class="variant green">
+                <img src="{% static 'img/lemon_pos_logo_horizontal_pro.svg' %}" alt="Logo en fondo verde" width="120"
+                    height="120">
+                <div class="variant-label">Fondo Verde</div>
+            </div>
+        </div>
+
+        <div class="specs">
+            <strong>Diseño:</strong> Minimalista | <strong>Escalable:</strong> 16px - ∞ | <strong>Formato:</strong> SVG
+        </div>
+
+        <!-- Logo completo con texto -->
+        <div class="logo-full-section">
+            <h2 style="font-size: 1.5rem; font-weight: 700; color: #1f2937; margin-bottom: 0.5rem;">Logo Completo</h2>
+            <p class="subtitle">Símbolo + Texto (Lemon POS)</p>
+
+            <div class="full-logo-variants">
+                <div class="full-variant white">
+                    <img src="{% static 'img/lemon_pos_logo_full.svg' %}" alt="Logo completo en fondo blanco"
+                        style="max-width: 100%; height: auto;">
+                </div>
+
+                <div class="full-variant dark">
+                    <img src="{% static 'img/lemon_pos_logo_full.svg' %}" alt="Logo completo en fondo oscuro"
+                        style="max-width: 100%; height: auto;">
+                </div>
+
+                <div class="full-variant green">
+                    <img src="{% static 'img/lemon_pos_logo_full.svg' %}" alt="Logo completo en fondo verde"
+                        style="max-width: 100%; height: auto;">
+                </div>
+            </div>
+        </div>
+
+        <!-- Comparación: Símbolo vs Logo Completo -->
+        <div class="comparison-section">
+            <h2 style="font-size: 1.5rem; font-weight: 700; color: #1f2937; margin-bottom: 0.5rem;">Comparación de Uso</h2>
+            <p class="subtitle">Símbolo solo vs Logo completo</p>
+
+            <div class="comparison-grid">
+                <div class="comparison-item">
+                    <div class="comparison-box">
+                        <img src="{% static 'img/lemon_pos_logo_horizontal_pro.svg' %}" alt="Símbolo solo" width="140"
+                            height="140">
+                    </div>
+                    <div class="comparison-label">Símbolo (Apps, Favicon, Redes)</div>
+                </div>
+
+                <div class="comparison-item">
+                    <div class="comparison-box">
+                        <img src="{% static 'img/lemon_pos_logo_full.svg' %}" alt="Logo completo"
+                            style="max-width: 90%; height: auto;">
+                    </div>
+                    <div class="comparison-label">Logo Completo (Web, Documentos, Marketing)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Favicon Test -->
+        <div class="comparison-section">
+            <h2 style="font-size: 1.5rem; font-weight: 700; color: #1f2937; margin-bottom: 0.5rem;">Favicon (Icono de Página)</h2>
+            <p class="subtitle">Optimizado para pestañas de navegador</p>
+
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; margin-top: 2rem;">
+                <div style="text-align: center;">
+                    <div style="background: #f9fafb; padding: 2rem; border-radius: 16px; border: 2px solid #e5e7eb;">
+                        <img src="{% static 'img/favicon.svg' %}" alt="Favicon 32px" width="32" height="32" style="image-rendering: crisp-edges;">
+                    </div>
+                    <div style="margin-top: 1rem; font-size: 0.875rem; font-weight: 600; color: #1f2937;">32×32px</div>
+                </div>
+
+                <div style="text-align: center;">
+                    <div style="background: #f9fafb; padding: 2rem; border-radius: 16px; border: 2px solid #e5e7eb;">
+                        <img src="{% static 'img/favicon.svg' %}" alt="Favicon 16px" width="16" height="16" style="image-rendering: crisp-edges;">
+                    </div>
+                    <div style="margin-top: 1rem; font-size: 0.875rem; font-weight: 600; color: #1f2937;">16×16px (pestaña)</div>
+                </div>
+
+                <div style="text-align: center;">
+                    <div style="background: #1f2937; padding: 2rem; border-radius: 16px; border: 2px solid #374151;">
+                        <img src="{% static 'img/favicon.svg' %}" alt="Favicon oscuro" width="32" height="32" style="image-rendering: crisp-edges;">
+                    </div>
+                    <div style="margin-top: 1rem; font-size: 0.875rem; font-weight: 600; color: #1f2937;">Fondo oscuro</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

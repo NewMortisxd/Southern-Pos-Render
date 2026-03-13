@@ -51,6 +51,20 @@
 {% endblock %}
 
 {% block content %}
+<!-- Convertir mensajes de Django a notificaciones universales -->
+{% if messages %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            {% for message in messages %}
+                showNotification(
+                    '{{ message|escapejs }}', 
+                    '{% if message.tags == "success" %}success{% elif message.tags == "error" %}error{% elif message.tags == "warning" %}warning{% else %}info{% endif %}'
+                );
+            {% endfor %}
+        });
+    </script>
+{% endif %}
+
 <div class="container mx-auto px-4 py-6">
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden transition-colors duration-200 border border-gray-100 dark:border-gray-700">
         
@@ -453,7 +467,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const vistaAplicada = sessionStorage.getItem('vistaAplicada');
     
     if (vistaAplicada) {
-        mostrarNotificacion(`✓ Vista "${vistaAplicada}" aplicada`, 'success');
+        showNotification(`✓ Vista "${vistaAplicada}" aplicada`, 'success');
         sessionStorage.removeItem('vistaAplicada');
     }
     
@@ -484,15 +498,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 const data = await response.json();
                 
                 if (data.success) {
-                    mostrarNotificacion('✓ Vista guardada exitosamente', 'success');
+                    showNotification('✓ Vista guardada exitosamente', 'success');
                     cerrarModalGuardarVista();
                     // Recargar página para mostrar la nueva vista
                     setTimeout(() => window.location.reload(), 1000);
                 } else {
-                    mostrarNotificacion(data.message || 'Error al guardar vista', 'error');
+                    showNotification(data.message || 'Error al guardar vista', 'error');
                 }
             } catch (error) {
-                mostrarNotificacion('Error al guardar vista', 'error');
+                showNotification('Error al guardar vista', 'error');
                 console.error(error);
             }
         });
@@ -507,7 +521,7 @@ document.addEventListener('DOMContentLoaded', function() {
             'table': 'Tabla'
         };
         
-        mostrarNotificacion(`Vista ${vistaNames[vista]} guardada`, 'success');
+        showNotification(`Vista ${vistaNames[vista]} guardada`, 'success');
     }
     
     // Verificar si se cambió el tamaño de grid
@@ -519,49 +533,14 @@ document.addEventListener('DOMContentLoaded', function() {
             'large': 'Grande'
         };
         
-        mostrarNotificacion(`Tamaño ${tamanoNames[tamano]} guardado`, 'success');
+        showNotification(`Tamaño ${tamanoNames[tamano]} guardado`, 'success');
     }
     
     // Verificar si se cambió el orden
     if (urlParams.has('orden') && !urlParams.has('page')) {
-        mostrarNotificacion('Orden guardado', 'success');
+        showNotification('Orden guardado', 'success');
     }
 });
-
-function mostrarNotificacion(mensaje, tipo) {
-    const notif = document.createElement('div');
-    notif.className = `fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-auto px-4 py-3 rounded-lg shadow-xl z-50 transition-all transform backdrop-blur-sm ${
-        tipo === 'success' ? 'bg-emerald-600/95 text-white' : tipo === 'error' ? 'bg-red-600/95 text-white' : 'bg-slate-800/95 text-white'
-    }`;
-    notif.style.opacity = '0';
-    notif.style.transform = 'translateY(20px)';
-    notif.innerHTML = `
-        <div class="flex items-center space-x-2.5">
-            <i data-lucide="${tipo === 'success' ? 'check-circle' : tipo === 'error' ? 'alert-circle' : 'info'}" class="w-4 h-4 flex-shrink-0"></i>
-            <span class="text-sm font-medium">${mensaje}</span>
-        </div>
-    `;
-    
-    document.body.appendChild(notif);
-    
-    // Inicializar iconos de lucide
-    if (typeof lucide !== 'undefined') {
-        lucide.createIcons();
-    }
-    
-    // Animar entrada
-    requestAnimationFrame(() => {
-        notif.style.opacity = '1';
-        notif.style.transform = 'translateY(0)';
-    });
-    
-    // Remover después de 3 segundos con animación
-    setTimeout(() => {
-        notif.style.opacity = '0';
-        notif.style.transform = 'translateY(20px)';
-        setTimeout(() => notif.remove(), 300);
-    }, 3000);
-}
 
 // Cerrar modal al hacer click fuera
 document.addEventListener('click', function(e) {
@@ -574,6 +553,38 @@ document.addEventListener('click', function(e) {
 // Prevenir zoom en inputs en iOS
 document.querySelectorAll('input, select, textarea').forEach(element => {
     element.style.fontSize = '16px';
+});
+
+// Manejar eliminación de productos con modal profesional
+document.addEventListener('click', function(e) {
+    if (e.target.closest('.delete-product-btn')) {
+        e.preventDefault();
+        const btn = e.target.closest('.delete-product-btn');
+        const productName = btn.dataset.productName;
+        const formAction = btn.dataset.formAction;
+        
+        showConfirm(
+            'Eliminar Producto',
+            `¿Estás seguro que deseas eliminar "${productName}"? Esta acción no se puede deshacer.`,
+            function() {
+                // Crear y enviar formulario
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = formAction;
+                
+                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                const csrfInput = document.createElement('input');
+                csrfInput.type = 'hidden';
+                csrfInput.name = 'csrfmiddlewaretoken';
+                csrfInput.value = csrfToken;
+                
+                form.appendChild(csrfInput);
+                document.body.appendChild(form);
+                form.submit();
+            },
+            { type: 'danger', confirmText: 'Eliminar', cancelText: 'Cancelar' }
+        );
+    }
 });
 </script>
 {% endblock %}

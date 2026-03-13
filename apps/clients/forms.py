@@ -54,9 +54,8 @@ class ClienteForm(forms.ModelForm):
                 'class': 'w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all',
             }),
             # Campo Crédito
-            'credito': forms.NumberInput(attrs={
+            'credito': forms.Select(attrs={
                 'class': 'w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all',
-                'placeholder': 'Ingrese los días de crédito...'
             }),
             # Campo Estado
             'estado': forms.Select(attrs={
@@ -86,3 +85,24 @@ class ClienteForm(forms.ModelForm):
                 'placeholder': 'Ingrese comentarios adicionales sobre el cliente...'
             }),
         }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # 🎯 Hacer campos opcionales con valores por defecto
+        self.fields['grupo'].required = False
+        self.fields['grupo'].initial = 'regular'
+        
+        self.fields['estado'].required = False
+        self.fields['estado'].initial = 'activo'
+        
+        self.fields['credito'].required = False
+        self.fields['credito'].initial = 0
+        
+        self.fields['cupo'].required = False
+        self.fields['cupo'].initial = 0
+        
+        self.fields['tasa_descuento'].required = False
+        self.fields['tasa_descuento'].initial = 0
+        
+        self.fields['tasa_recargo'].required = False
+        self.fields['tasa_recargo'].initial = 0

@@ -10,11 +10,10 @@
 {% endblock %}
 
 {% block content %}
-<div class="p-6">
-    <!-- Sección para mostrar notificaciones/mensajes -->
+<div class="p-4 lg:p-6">
+    <!-- Mensajes -->
     {% if messages %}
         {% for message in messages %}
-            <!-- Notificación dinámica según tipo (éxito, error, info) -->
             <div id="notification-{{ forloop.counter }}" class="{% if message.tags == 'success' %}bg-emerald-50 border-l-4 border-emerald-500{% elif message.tags == 'error' %}bg-red-50 border-l-4 border-red-500{% else %}bg-blue-50 border-l-4 border-blue-500{% endif %} p-4 mb-6 transition-opacity duration-300">
                 <p class="{% if message.tags == 'success' %}text-emerald-700{% elif message.tags == 'error' %}text-red-700{% else %}text-blue-700{% endif %} font-medium flex items-center">
                     <i data-lucide="{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}alert-circle{% else %}info{% endif %}" class="w-5 h-5 mr-2"></i>
@@ -24,444 +23,744 @@
         {% endfor %}
     {% endif %}
     
-    <div class="bg-gray-50 p-5 rounded-lg">
-        <h2 class="text-lg font-medium text-gray-800 mb-5">
-            {% if object %}Editar Producto{% else %}Nuevo Producto{% endif %}
-        </h2>
-        
-        <form method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            
-            <!-- Nombre del producto -->
-            <div class="mb-4">
-                <label for="{{ form.nombre.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
-                    Nombre del producto *
-                </label>
-                <input type="text" name="{{ form.nombre.name }}" id="{{ form.nombre.id_for_label }}" 
-                       value="{{ form.nombre.value|default_if_none:'' }}"
-                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-emerald-500" required>
-                {% if form.nombre.errors %}
-                    <p class="text-red-500 text-xs mt-1">{{ form.nombre.errors.0 }}</p>
-                {% endif %}
-            </div>
-            
-            <!-- Categoría -->
-            <div class="mb-4">
-                <label for="{{ form.categoria.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
-                    Categoría *
-                </label>
-                <select name="{{ form.categoria.name }}" id="{{ form.categoria.id_for_label }}" 
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-emerald-500" required>
-                    <option value="">---------</option>
-                    {% for choice in form.categoria.field.choices %}
-                        <option value="{{ choice.0 }}" {% if form.categoria.value|stringformat:"s" == choice.0|stringformat:"s" %}selected{% endif %}>
-                            {{ choice.1 }}
-                        </option>
-                    {% endfor %}
-                </select>
-                {% if form.categoria.errors %}
-                    <p class="text-red-500 text-xs mt-1">{{ form.categoria.errors.0 }}</p>
-                {% endif %}
-                <a href="{% url 'productos:categoria_create' %}" class="text-xs text-emerald-600 hover:underline mt-1 inline-block">
-                    + Crear nueva categoría
-                </a>
-            </div>
-            
-            <!-- Descripción -->
-            <div class="mb-4">
-                <label for="{{ form.descripcion.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
-                    Descripción
-                </label>
-                <textarea name="{{ form.descripcion.name }}" id="{{ form.descripcion.id_for_label }}" rows="4" 
-                          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-emerald-500">{{ form.descripcion.value|default_if_none:'' }}</textarea>
-                {% if form.descripcion.errors %}
-                    <p class="text-red-500 text-xs mt-1">{{ form.descripcion.errors.0 }}</p>
-                {% endif %}
-            </div>
-            
-            <!-- Precio y Stock en horizontal -->
-            <div class="flex flex-wrap -mx-2 mb-4">
-                <!-- Precio -->
-                <div class="w-1/2 px-2">
-                    <label for="{{ form.precio.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
-                        Precio *
-                    </label>
-                    <input type="number" step="0.01" name="{{ form.precio.name }}" id="{{ form.precio.id_for_label }}" 
-                           value="{{ form.precio.value|default_if_none:'' }}"
-                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-emerald-500" required>
-                    {% if form.precio.errors %}
-                        <p class="text-red-500 text-xs mt-1">{{ form.precio.errors.0 }}</p>
-                    {% endif %}
-                </div>
+    <!-- Layout de 2 columnas en desktop -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Columna del formulario (2/3 en desktop) -->
+        <div class="lg:col-span-2">
+            <div class="bg-white p-6 rounded-lg shadow-sm">
+                <h2 class="text-xl font-semibold text-gray-800 mb-6">
+                    {% if object %}Editar Producto{% else %}Nuevo Producto{% endif %}
+                </h2>
                 
-                <!-- Stock -->
-                <div class="w-1/2 px-2">
-                    <label for="{{ form.stock.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
-                        Stock *
-                    </label>
-                    <input type="number" name="{{ form.stock.name }}" id="{{ form.stock.id_for_label }}" 
-                           value="{{ form.stock.value|default_if_none:'0' }}" 
-                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-emerald-500" required>
-                    {% if form.stock.errors %}
-                        <p class="text-red-500 text-xs mt-1">{{ form.stock.errors.0 }}</p>
-                    {% endif %}
-                </div>
-            </div>
-            
-            <!-- Imagen con checkbox alineado a la derecha -->
-            <div class="mb-4">
-                <div class="flex justify-between items-center mb-2">
-                    <label class="block text-sm font-medium text-gray-700">
-                        Imagen del producto
-                    </label>
-                    <div class="flex items-center">
-                        <input type="checkbox" name="no_imagen" id="no_imagen" class="mr-1" 
-                               {% if modo_operacion == 'retail' %}
-                                   {% if not form.imagen.value and not object.imagen %}checked{% endif %}
-                               {% endif %}>
-                        <label for="no_imagen" class="text-sm text-gray-600">
-                            No tiene imagen
+                <form method="post" enctype="multipart/form-data" id="product-form">
+                    {% csrf_token %}
+                    
+                    <!-- Nombre -->
+                    <div class="mb-5">
+                        <label for="id_nombre" class="block text-sm font-medium text-gray-700 mb-2">
+                            Nombre del producto <span class="text-red-500">*</span>
                         </label>
+                        <input type="text" name="nombre" id="id_nombre" 
+                               value="{{ form.nombre.value|default_if_none:'' }}"
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all text-base" 
+                               required
+                               placeholder="Ej: Tío Clásico">
+                        {% if form.nombre.errors %}
+                            <p class="text-red-500 text-sm mt-1">{{ form.nombre.errors.0 }}</p>
+                        {% endif %}
                     </div>
-                </div>
-                
-                <!-- Zona de carga de imagen mejorada -->
-                <div id="image-upload-area" class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center transition-all duration-200 hover:border-emerald-500 hover:bg-emerald-50 cursor-pointer"
-                     {% if modo_operacion == 'retail' and not form.imagen.value and not object.imagen %}style="opacity: 0.5; pointer-events: none;"{% endif %}>
-                    <input type="file" name="{{ form.imagen.name }}" id="{{ form.imagen.id_for_label }}" 
-                           class="hidden" accept="image/*"
-                           {% if modo_operacion == 'retail' and not form.imagen.value and not object.imagen %}disabled{% endif %}>
                     
-                    <div id="upload-placeholder">
-                        <i data-lucide="image" class="w-12 h-12 mx-auto text-gray-400 mb-2"></i>
-                        <p class="text-sm text-gray-600 mb-1">
-                            <span class="text-emerald-600 font-medium">Haz clic para seleccionar</span> o arrastra una imagen aquí
+                    <!-- Categoría -->
+                    <div class="mb-5">
+                        <label for="id_categoria" class="block text-sm font-medium text-gray-700 mb-2">
+                            Categoría <span class="text-red-500">*</span>
+                        </label>
+                        <select name="categoria" id="id_categoria" 
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all text-base" 
+                                required>
+                            <option value="">Selecciona una categoría</option>
+                            {% for choice in form.categoria.field.choices %}
+                                <option value="{{ choice.0 }}" {% if form.categoria.value|stringformat:"s" == choice.0|stringformat:"s" %}selected{% endif %}>
+                                    {{ choice.1 }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        {% if form.categoria.errors %}
+                            <p class="text-red-500 text-sm mt-1">{{ form.categoria.errors.0 }}</p>
+                        {% endif %}
+                        <a href="{% url 'productos:categoria_create' %}" class="text-sm text-emerald-600 hover:underline mt-2 inline-block">
+                            + Crear nueva categoría
+                        </a>
+                    </div>
+                    
+                    <!-- Tipo de Producto -->
+                    <div class="mb-5">
+                        <label for="id_tipo_producto" class="block text-sm font-medium text-gray-700 mb-2">
+                            Tipo de producto <span class="text-red-500">*</span>
+                        </label>
+                        <select name="tipo_producto" id="id_tipo_producto" 
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all text-base" 
+                                required>
+                            {% for value, label in form.tipo_producto.field.choices %}
+                                <option value="{{ value }}" {% if form.tipo_producto.value == value %}selected{% endif %}>
+                                    {{ label }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        {% if form.tipo_producto.errors %}
+                            <p class="text-red-500 text-sm mt-1">{{ form.tipo_producto.errors.0 }}</p>
+                        {% endif %}
+                        <p class="text-xs text-gray-500 mt-1.5">
+                            <svg class="w-3.5 h-3.5 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            Define el comportamiento del producto en el sistema
                         </p>
-                        <p class="text-xs text-gray-500">PNG, JPG, JPEG hasta 10MB</p>
                     </div>
                     
-                    <div id="image-preview" class="hidden">
-                        <img id="preview-img" src="" alt="Vista previa" class="max-h-48 mx-auto rounded-lg shadow-md mb-3">
-                        <p id="file-name" class="text-sm text-gray-700 font-medium mb-2"></p>
-                        <button type="button" id="remove-image" class="text-sm text-red-600 hover:text-red-700 font-medium">
-                            <i data-lucide="x-circle" class="w-4 h-4 inline mr-1"></i>
-                            Eliminar imagen
+                    <!-- Descripción -->
+                    <div class="mb-5">
+                        <label for="id_descripcion" class="block text-sm font-medium text-gray-700 mb-2">
+                            Descripción
+                        </label>
+                        <textarea name="descripcion" id="id_descripcion" rows="3" 
+                                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all text-base resize-none"
+                                  placeholder="Descripción del producto...">{{ form.descripcion.value|default_if_none:'' }}</textarea>
+                        {% if form.descripcion.errors %}
+                            <p class="text-red-500 text-sm mt-1">{{ form.descripcion.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Precio -->
+                    <div class="mb-5">
+                        <label for="id_precio_base" class="block text-sm font-medium text-gray-700 mb-2">
+                            Precio final (con IVA incluido) <span class="text-red-500">*</span>
+                        </label>
+                        
+                        <!-- Calculadora opcional -->
+                        <div class="mb-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                            <button type="button" id="toggle-calculator" class="text-sm text-blue-600 hover:text-blue-800 font-medium flex items-center">
+                                <i data-lucide="calculator" class="w-4 h-4 mr-1"></i>
+                                <span id="calculator-toggle-text">¿No sabes el precio con IVA? Usa la calculadora</span>
+                            </button>
+                            
+                            <div id="price-calculator" class="mt-3 hidden">
+                                <p class="text-sm text-gray-600 mb-2">Ingresa el precio SIN IVA y te calculamos el precio final:</p>
+                                <div class="flex gap-2 items-center">
+                                    <div class="relative flex-1">
+                                        <span class="absolute left-3 top-2.5 text-gray-500">$</span>
+                                        <input type="number" step="0.01" id="precio-sin-iva" 
+                                               class="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg text-sm" 
+                                               placeholder="Precio sin IVA">
+                                    </div>
+                                    <button type="button" id="calcular-con-iva" 
+                                            class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 transition-colors">
+                                        Calcular →
+                                    </button>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-1">Ejemplo: Si ingresas $10.00, el precio final será $11.50</p>
+                            </div>
+                        </div>
+                        
+                        <div class="relative">
+                            <span class="absolute left-4 top-3.5 text-gray-500 font-medium">$</span>
+                            <input type="number" step="0.01" name="precio_base" id="id_precio_base" 
+                                   value="{{ form.precio_base.value|default_if_none:'' }}"
+                                   class="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all text-base" 
+                                   required
+                                   placeholder="0.00">
+                        </div>
+                        {% if form.precio_base.errors %}
+                            <p class="text-red-500 text-sm mt-1">{{ form.precio_base.errors.0 }}</p>
+                        {% endif %}
+                        
+                        <!-- Campo oculto para incluye_iva (siempre True) -->
+                        <input type="hidden" name="incluye_iva" value="on">
+                        
+                        <!-- Desglose de IVA -->
+                        <div class="mt-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                            <div class="text-sm space-y-1">
+                                <div class="flex justify-between text-gray-600">
+                                    <span>Precio base (sin IVA):</span>
+                                    <span class="font-medium" id="precio-base-display">$0.00</span>
+                                </div>
+                                <div class="flex justify-between text-gray-600">
+                                    <span>IVA ({{ iva_porcentaje }}%):</span>
+                                    <span class="font-medium" id="iva-display">$0.00</span>
+                                </div>
+                                <div class="flex justify-between pt-2 border-t border-gray-300">
+                                    <span class="font-semibold text-gray-800">Total a cobrar:</span>
+                                    <span class="font-bold text-emerald-600 text-lg" id="precio-final-display">$0.00</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Costo del Producto (Opcional) -->
+                    <div class="mb-5">
+                        <label for="id_costo" class="block text-sm font-medium text-gray-700 mb-2">
+                            Costo del producto <span class="text-gray-400 text-xs">(opcional)</span>
+                        </label>
+                        <div class="relative">
+                            <span class="absolute left-4 top-3.5 text-gray-500 font-medium">$</span>
+                            <input type="number" step="0.01" name="costo" id="id_costo" 
+                                   value="{{ form.costo.value|default_if_none:'' }}"
+                                   class="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-base" 
+                                   placeholder="0.00">
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1.5">
+                            <svg class="w-3.5 h-3.5 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            Usado para calcular utilidad y valor real de inventario
+                        </p>
+                        {% if form.costo.errors %}
+                            <p class="text-red-500 text-sm mt-1">{{ form.costo.errors.0 }}</p>
+                        {% endif %}
+                        
+                        <!-- Indicador de Utilidad (solo si hay costo) -->
+                        <div id="utilidad-indicator" class="mt-3 p-3 bg-gradient-to-r from-blue-50 to-green-50 rounded-lg border border-blue-200 hidden">
+                            <div class="text-sm space-y-1">
+                                <div class="flex justify-between text-gray-700">
+                                    <span class="font-medium">Utilidad estimada:</span>
+                                    <span class="font-bold text-green-600" id="utilidad-display">$0.00</span>
+                                </div>
+                                <div class="flex justify-between text-gray-700">
+                                    <span class="font-medium">Margen:</span>
+                                    <span class="font-bold text-blue-600" id="margen-display">0%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Controlar Stock (Checkbox) -->
+                    <div class="mb-5">
+                        <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                            <div class="flex items-center">
+                                <input type="checkbox" name="controla_stock" id="id_controla_stock" 
+                                       class="w-5 h-5 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500"
+                                       {% if form.controla_stock.value or form.controla_stock.value is None %}checked{% endif %}>
+                                <label for="id_controla_stock" class="ml-3 text-base font-medium text-gray-700">
+                                    Controlar stock de inventario
+                                </label>
+                            </div>
+                            <p class="text-sm text-gray-500 mt-2 ml-8">
+                                Desmarca si es un servicio o producto sin control de inventario
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <!-- Stock (se muestra/oculta según checkbox) -->
+                    <div id="stock-field" class="mb-5">
+                        <label for="id_stock" class="block text-sm font-medium text-gray-700 mb-2">
+                            Cantidad en stock <span class="text-red-500">*</span>
+                        </label>
+                        <input type="number" name="stock" id="id_stock" 
+                               value="{{ form.stock.value|default_if_none:'0' }}" 
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all text-base"
+                               placeholder="0">
+                        {% if form.stock.errors %}
+                            <p class="text-red-500 text-sm mt-1">{{ form.stock.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Stock Mínimo (se muestra/oculta según checkbox) -->
+                    <div id="stock-minimo-field" class="mb-5">
+                        <label for="id_stock_minimo" class="block text-sm font-medium text-gray-700 mb-2">
+                            Stock mínimo
+                        </label>
+                        <input type="number" name="stock_minimo" id="id_stock_minimo" 
+                               value="{{ form.stock_minimo.value|default_if_none:'5' }}" 
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all text-base"
+                               placeholder="5">
+                        <p class="text-xs text-gray-500 mt-1.5">
+                            <svg class="w-3.5 h-3.5 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                            </svg>
+                            Recibirás alertas cuando el stock esté por debajo de este valor
+                        </p>
+                        {% if form.stock_minimo.errors %}
+                            <p class="text-red-500 text-sm mt-1">{{ form.stock_minimo.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Unidad de Medida (se muestra/oculta según checkbox) -->
+                    <div id="unidad-medida-field" class="mb-5">
+                        <label for="id_unidad_medida" class="block text-sm font-medium text-gray-700 mb-2">
+                            Unidad de medida
+                        </label>
+                        <select name="unidad_medida" id="id_unidad_medida" 
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all text-base">
+                            {% for value, label in form.unidad_medida.field.choices %}
+                                <option value="{{ value }}" {% if form.unidad_medida.value == value %}selected{% endif %}>
+                                    {{ label }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        {% if form.unidad_medida.errors %}
+                            <p class="text-red-500 text-sm mt-1">{{ form.unidad_medida.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- SKU / Código Interno -->
+                    <div class="mb-5">
+                        <label for="id_sku" class="block text-sm font-medium text-gray-700 mb-2">
+                            SKU / Código interno <span class="text-gray-400 text-xs">(opcional)</span>
+                        </label>
+                        <input type="text" name="sku" id="id_sku" 
+                               value="{{ form.sku.value|default_if_none:'' }}" 
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all text-base"
+                               placeholder="Ej: PRD-001">
+                        <p class="text-xs text-gray-500 mt-1.5">
+                            Código interno para identificación y control de inventario
+                        </p>
+                        {% if form.sku.errors %}
+                            <p class="text-red-500 text-sm mt-1">{{ form.sku.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Imagen -->
+                    <div class="mb-5">
+                        <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-3">
+                            <div class="flex items-center">
+                                <input type="checkbox" name="no_imagen" id="id_no_imagen" 
+                                       class="w-5 h-5 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500"
+                                       {% if modo_operacion == 'retail' %}checked{% endif %}>
+                                <label for="id_no_imagen" class="ml-3 text-base font-medium text-gray-700">
+                                    No tiene imagen
+                                </label>
+                            </div>
+                            <p class="text-sm text-gray-500 mt-2 ml-8">
+                                Marca si el producto no requiere imagen (servicios, etc.)
+                            </p>
+                        </div>
+                        
+                        <div id="image-field">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Imagen del producto
+                            </label>
+                            <div id="image-upload-area" class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center transition-all duration-200 hover:border-emerald-500 hover:bg-emerald-50 cursor-pointer">
+                                <input type="file" name="imagen" id="id_imagen" class="hidden" accept="image/*">
+                                
+                                <div id="upload-placeholder">
+                                    <i data-lucide="image" class="w-16 h-16 mx-auto text-gray-400 mb-3"></i>
+                                    <p class="text-base text-gray-600 mb-2">
+                                        <span class="text-emerald-600 font-semibold">Haz clic</span> o arrastra una imagen
+                                    </p>
+                                    <p class="text-sm text-gray-500">PNG, JPG hasta 10MB</p>
+                                </div>
+                                
+                                <div id="image-preview" class="hidden">
+                                    <img id="preview-img" src="" alt="Vista previa" class="max-h-64 mx-auto rounded-lg shadow-md mb-3">
+                                    <p id="file-name" class="text-sm text-gray-700 font-medium mb-3"></p>
+                                    <button type="button" id="remove-image" class="text-sm text-red-600 hover:text-red-700 font-medium inline-flex items-center">
+                                        <i data-lucide="x-circle" class="w-4 h-4 mr-1"></i>
+                                        Eliminar
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            {% if object and object.imagen %}
+                                <div class="mt-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                                    <p class="text-sm text-blue-700 font-medium mb-2">Imagen actual:</p>
+                                    <img src="{{ object.imagen.url }}" alt="{{ object.nombre }}" class="h-32 rounded-lg shadow-sm">
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Código de barras -->
+                    <div class="mb-6">
+                        <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-3">
+                            <div class="flex items-center">
+                                <input type="checkbox" name="no_codigo" id="id_no_codigo" 
+                                       class="w-5 h-5 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500"
+                                       {% if modo_operacion == 'restaurante' %}checked{% endif %}>
+                                <label for="id_no_codigo" class="ml-3 text-base font-medium text-gray-700">
+                                    No tiene código de barras
+                                </label>
+                            </div>
+                            <p class="text-sm text-gray-500 mt-2 ml-8">
+                                Marca si el producto no usa código de barras (platos preparados, etc.)
+                            </p>
+                        </div>
+                        
+                        <div id="codigo-field">
+                            <label for="id_codigo_barras" class="block text-sm font-medium text-gray-700 mb-2">
+                                Código de barras
+                            </label>
+                            <input type="text" name="codigo_barras" id="id_codigo_barras" 
+                                   value="{{ form.codigo_barras.value|default_if_none:'' }}"
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all text-base"
+                                   placeholder="Escanea o ingresa el código">
+                            {% if form.codigo_barras.errors %}
+                                <p class="text-red-500 text-sm mt-1">{{ form.codigo_barras.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Botones -->
+                    <div class="flex justify-end space-x-3 pt-4 border-t">
+                        <a href="{% url 'productos:lista' %}" class="px-6 py-3 bg-white border-2 border-gray-300 rounded-lg text-base font-medium text-gray-700 hover:bg-gray-50 transition-all">
+                            Cancelar
+                        </a>
+                        <button type="submit" class="px-6 py-3 bg-emerald-600 border-2 border-emerald-600 rounded-lg text-base font-semibold text-white hover:bg-emerald-700 transition-all shadow-sm">
+                            {% if object %}Actualizar Producto{% else %}Crear Producto{% endif %}
                         </button>
                     </div>
-                </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Vista previa (1/3 en desktop, oculta en móvil) -->
+        <div class="hidden lg:block">
+            <div class="bg-white p-6 rounded-lg shadow-sm sticky top-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">Vista Previa</h3>
                 
-                {% if form.imagen.errors %}
-                    <p class="text-red-500 text-xs mt-1">{{ form.imagen.errors.0 }}</p>
-                {% endif %}
-                
-                {% if object and object.imagen %}
-                    <div id="current-image-container" class="mt-3 p-3 bg-blue-50 rounded-lg border-2 border-blue-200">
-                        <div class="flex justify-between items-center mb-2">
-                            <p class="text-sm text-blue-700 font-medium flex items-center">
-                                <i data-lucide="info" class="w-4 h-4 mr-1"></i>
-                                Imagen actual del producto
-                            </p>
-                            <button type="button" id="change-image-btn" class="text-xs text-emerald-600 hover:text-emerald-700 font-medium flex items-center">
-                                <i data-lucide="refresh-cw" class="w-3 h-3 mr-1"></i>
-                                Cambiar imagen
-                            </button>
-                        </div>
-                        <img src="{{ object.imagen.url }}" alt="{{ object.nombre }}" class="h-32 rounded-lg shadow-sm border border-blue-300">
-                        <p class="text-xs text-blue-600 mt-2">Esta imagen se mantendrá si no subes una nueva</p>
+                <div class="border-2 border-gray-200 rounded-lg overflow-hidden">
+                    <!-- Imagen preview -->
+                    <div id="preview-product-image" class="h-48 bg-gray-100 flex items-center justify-center">
+                        {% if object and object.imagen %}
+                            <img src="{{ object.imagen.url }}" alt="Preview" class="w-full h-full object-cover">
+                        {% else %}
+                            <i data-lucide="image" class="w-16 h-16 text-gray-300"></i>
+                        {% endif %}
                     </div>
                     
-                    <!-- Mensaje de nueva imagen seleccionada -->
-                    <div id="new-image-alert" class="hidden mt-3 p-3 bg-emerald-50 rounded-lg border-2 border-emerald-500 animate-pulse">
-                        <p class="text-sm text-emerald-700 font-medium flex items-center">
-                            <i data-lucide="check-circle" class="w-4 h-4 mr-1"></i>
-                            Nueva imagen seleccionada - Se reemplazará al guardar
+                    <!-- Info preview -->
+                    <div class="p-4">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 id="preview-nombre" class="font-semibold text-lg text-gray-800">
+                                {% if object %}{{ object.nombre }}{% else %}Nombre del producto{% endif %}
+                            </h4>
+                            <span id="preview-categoria" class="bg-emerald-50 text-emerald-700 text-xs font-medium px-2 py-1 rounded">
+                                {% if object and object.categoria %}{{ object.categoria.nombre }}{% else %}Categoría{% endif %}
+                            </span>
+                        </div>
+                        <p id="preview-descripcion" class="text-gray-600 text-sm mb-3">
+                            {% if object and object.descripcion %}{{ object.descripcion|truncatechars:60 }}{% else %}Descripción del producto...{% endif %}
                         </p>
-                    </div>
-                {% endif %}
-            </div>
-            
-            <!-- Código de barras con checkbox alineado a la derecha -->
-            <div class="mb-5">
-                <div class="flex justify-between items-center mb-1">
-                    <label for="{{ form.codigo_barras.id_for_label }}" class="block text-sm font-medium text-gray-700">
-                        Código de barras
-                    </label>
-                    <div class="flex items-center">
-                        <input type="checkbox" name="no_codigo" id="no_codigo" class="mr-1" 
-                               {% if modo_operacion == 'restaurante' %}
-                                   {% if not form.codigo_barras.value and not object.codigo_barras %}checked{% endif %}
-                               {% endif %}>
-                        <label for="no_codigo" class="text-sm text-gray-600">
-                            No tiene código
-                        </label>
+                        <div class="flex justify-between items-center">
+                            <span id="preview-precio" class="text-emerald-600 font-bold text-xl">
+                                ${% if object %}{{ object.precio }}{% else %}0.00{% endif %}
+                            </span>
+                            <button class="bg-emerald-500 text-white px-4 py-2 rounded-lg text-sm font-medium cursor-default">
+                                <i data-lucide="plus" class="w-4 h-4 inline mr-1"></i>
+                                Agregar
+                            </button>
+                        </div>
+                        <div id="preview-stock-badge" class="mt-3 text-sm text-gray-600">
+                            <i data-lucide="package" class="w-4 h-4 inline mr-1"></i>
+                            Stock: <span id="preview-stock">{% if object %}{{ object.stock }}{% else %}0{% endif %}</span>
+                        </div>
                     </div>
                 </div>
-                <input type="text" name="{{ form.codigo_barras.name }}" id="{{ form.codigo_barras.id_for_label }}" 
-                       value="{{ form.codigo_barras.value|default_if_none:'' }}"
-                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-emerald-500"
-                       {% if modo_operacion == 'restaurante' and not form.codigo_barras.value and not object.codigo_barras %}disabled{% endif %}>
-                {% if form.codigo_barras.errors %}
-                    <p class="text-red-500 text-xs mt-1">{{ form.codigo_barras.errors.0 }}</p>
-                {% endif %}
             </div>
-            
-            <!-- Botones de acción alineados a la derecha -->
-            <div class="flex justify-end space-x-2">
-                <a href="{% url 'productos:lista' %}" class="px-4 py-2 bg-white border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
-                    Cancelar
-                </a>
-                <button type="submit" class="px-4 py-2 bg-emerald-500 border border-transparent rounded-md text-sm font-medium text-white hover:bg-emerald-600">
-                    {% if object %}Actualizar{% else %}Crear{% endif %}
-                </button>
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Obtener el modo de operación desde el template
-        const modoOperacion = '{{ modo_operacion|default:"restaurante" }}';
-        
-        // Elementos del DOM
-        const noImagenCheckbox = document.getElementById('no_imagen');
-        const imagenInput = document.getElementById('{{ form.imagen.id_for_label }}');
-        const imageUploadArea = document.getElementById('image-upload-area');
-        const uploadPlaceholder = document.getElementById('upload-placeholder');
-        const imagePreview = document.getElementById('image-preview');
-        const previewImg = document.getElementById('preview-img');
-        const fileName = document.getElementById('file-name');
-        const removeImageBtn = document.getElementById('remove-image');
-        const currentImageContainer = document.getElementById('current-image-container');
-        const newImageAlert = document.getElementById('new-image-alert');
-        const changeImageBtn = document.getElementById('change-image-btn');
-        
-        // Variable para rastrear si hay una nueva imagen
-        let hasNewImage = false;
-        
-        // Función para mostrar notificación temporal
-        function showFeedback(message, type = 'success') {
-            const feedbackDiv = document.createElement('div');
-            feedbackDiv.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transition-all duration-300 ${
-                type === 'success' ? 'bg-emerald-500' : 
-                type === 'info' ? 'bg-blue-500' : 'bg-red-500'
-            } text-white flex items-center space-x-2`;
-            feedbackDiv.innerHTML = `
-                <i data-lucide="${type === 'success' ? 'check-circle' : type === 'info' ? 'info' : 'alert-circle'}" class="w-5 h-5"></i>
-                <span class="font-medium">${message}</span>
-            `;
-            document.body.appendChild(feedbackDiv);
-            
-            // Inicializar icono
-            if (typeof lucide !== 'undefined') {
-                lucide.createIcons();
-            }
-            
-            // Animar entrada
-            setTimeout(() => feedbackDiv.style.transform = 'translateX(0)', 10);
-            
-            // Remover después de 3 segundos
-            setTimeout(() => {
-                feedbackDiv.style.opacity = '0';
-                feedbackDiv.style.transform = 'translateX(100%)';
-                setTimeout(() => feedbackDiv.remove(), 300);
-            }, 3000);
+document.addEventListener('DOMContentLoaded', function() {
+    lucide.createIcons();
+    
+    console.log('Form loaded');
+    
+    // Control de stock checkbox
+    const controlaStockCheckbox = document.getElementById('id_controla_stock');
+    const stockField = document.getElementById('stock-field');
+    const stockMinimoField = document.getElementById('stock-minimo-field');
+    const unidadMedidaField = document.getElementById('unidad-medida-field');
+    const stockInput = document.getElementById('id_stock');
+    const previewStockBadge = document.getElementById('preview-stock-badge');
+    
+    console.log('Stock checkbox:', controlaStockCheckbox);
+    console.log('Stock field:', stockField);
+    
+    function toggleStockField() {
+        console.log('Toggle stock, checked:', controlaStockCheckbox.checked);
+        if (controlaStockCheckbox.checked) {
+            stockField.style.display = 'block';
+            stockMinimoField.style.display = 'block';
+            unidadMedidaField.style.display = 'block';
+            stockInput.required = true;
+            if (previewStockBadge) previewStockBadge.style.display = 'block';
+        } else {
+            stockField.style.display = 'none';
+            stockMinimoField.style.display = 'none';
+            unidadMedidaField.style.display = 'none';
+            stockInput.required = false;
+            stockInput.value = '';
+            if (previewStockBadge) previewStockBadge.style.display = 'none';
         }
-        
-        // Función para mostrar vista previa de imagen
-        function showImagePreview(file) {
-            if (file && file.type.startsWith('image/')) {
-                // Validar tamaño (10MB)
-                if (file.size > 10 * 1024 * 1024) {
-                    showFeedback('La imagen es muy grande. Máximo 10MB', 'error');
-                    imagenInput.value = '';
-                    return;
-                }
-                
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    previewImg.src = e.target.result;
-                    fileName.textContent = file.name;
-                    uploadPlaceholder.classList.add('hidden');
-                    imagePreview.classList.remove('hidden');
-                    hasNewImage = true;
-                    
-                    // Mostrar feedback
-                    showFeedback('✓ Imagen cargada correctamente', 'success');
-                    
-                    // Si estamos editando, mostrar alerta de nueva imagen
-                    if (currentImageContainer && newImageAlert) {
-                        currentImageContainer.classList.add('opacity-50');
-                        newImageAlert.classList.remove('hidden');
-                        setTimeout(() => {
-                            newImageAlert.classList.remove('animate-pulse');
-                        }, 2000);
-                    }
-                    
-                    // Animar el área de preview
-                    imagePreview.style.opacity = '0';
-                    imagePreview.style.transform = 'scale(0.9)';
-                    setTimeout(() => {
-                        imagePreview.style.transition = 'all 0.3s ease';
-                        imagePreview.style.opacity = '1';
-                        imagePreview.style.transform = 'scale(1)';
-                    }, 10);
-                };
-                reader.readAsDataURL(file);
-            } else {
-                showFeedback('Por favor selecciona un archivo de imagen válido', 'error');
-                imagenInput.value = '';
-            }
-        }
-        
-        // Función para limpiar vista previa
-        function clearImagePreview() {
-            previewImg.src = '';
-            fileName.textContent = '';
+    }
+    
+    if (controlaStockCheckbox && stockField) {
+        controlaStockCheckbox.addEventListener('change', toggleStockField);
+        toggleStockField(); // Initial state
+    }
+    
+    // Checkbox "No tiene imagen"
+    const noImagenCheckbox = document.getElementById('id_no_imagen');
+    const imageField = document.getElementById('image-field');
+    const imagenInput = document.getElementById('id_imagen');
+    
+    console.log('Imagen checkbox:', noImagenCheckbox);
+    console.log('Image field:', imageField);
+    
+    function toggleImageField() {
+        console.log('Toggle image, checked:', noImagenCheckbox.checked);
+        if (noImagenCheckbox.checked) {
+            // No tiene imagen - ocultar campo
+            imageField.style.display = 'none';
+            imagenInput.required = false;
+            // Limpiar imagen si hay una cargada
+            imagenInput.value = '';
             uploadPlaceholder.classList.remove('hidden');
             imagePreview.classList.add('hidden');
-            imagenInput.value = '';
-            hasNewImage = false;
-            
-            // Restaurar estado original si estamos editando
-            if (currentImageContainer && newImageAlert) {
-                currentImageContainer.classList.remove('opacity-50');
-                newImageAlert.classList.add('hidden');
-                newImageAlert.classList.add('animate-pulse');
-            }
-            
-            showFeedback('Imagen removida', 'info');
+            // Actualizar preview
+            previewProductImage.innerHTML = '<i data-lucide="image" class="w-16 h-16 text-gray-300"></i>';
+            lucide.createIcons();
+        } else {
+            // Tiene imagen - mostrar campo (pero no es requerido)
+            imageField.style.display = 'block';
+            imagenInput.required = false;  // La imagen es opcional
         }
-        
-        // Click en el área de carga
-        imageUploadArea.addEventListener('click', function(e) {
-            if (!noImagenCheckbox.checked && e.target.id !== 'remove-image') {
-                imagenInput.click();
+    }
+    
+    if (noImagenCheckbox && imageField) {
+        noImagenCheckbox.addEventListener('change', toggleImageField);
+        toggleImageField(); // Initial state
+    }
+    
+    // Checkbox "No tiene código"
+    const noCodigoCheckbox = document.getElementById('id_no_codigo');
+    const codigoField = document.getElementById('codigo-field');
+    const codigoInput = document.getElementById('id_codigo_barras');
+    
+    console.log('Codigo checkbox:', noCodigoCheckbox);
+    console.log('Codigo field:', codigoField);
+    
+    function toggleCodigoField() {
+        console.log('Toggle codigo, checked:', noCodigoCheckbox.checked);
+        if (noCodigoCheckbox.checked) {
+            codigoField.style.display = 'none';
+            codigoInput.required = false;
+            codigoInput.value = '';
+        } else {
+            codigoField.style.display = 'block';
+            codigoInput.required = false;
+        }
+    }
+    
+    if (noCodigoCheckbox && codigoField) {
+        noCodigoCheckbox.addEventListener('change', toggleCodigoField);
+        toggleCodigoField(); // Initial state
+    }
+    
+    // Cálculo de precio con IVA en tiempo real
+    const precioBaseInput = document.getElementById('id_precio_base');
+    const ivaPorcentaje = {{ iva_porcentaje|default:15 }};  // Viene del contexto de Django
+    const precioBaseDisplay = document.getElementById('precio-base-display');
+    const ivaDisplay = document.getElementById('iva-display');
+    const precioFinalDisplay = document.getElementById('precio-final-display');
+    
+    // Calculadora opcional
+    const toggleCalculator = document.getElementById('toggle-calculator');
+    const priceCalculator = document.getElementById('price-calculator');
+    const precioSinIvaInput = document.getElementById('precio-sin-iva');
+    const calcularConIvaBtn = document.getElementById('calcular-con-iva');
+    const calculatorToggleText = document.getElementById('calculator-toggle-text');
+    
+    if (toggleCalculator && priceCalculator) {
+        toggleCalculator.addEventListener('click', function() {
+            priceCalculator.classList.toggle('hidden');
+            if (priceCalculator.classList.contains('hidden')) {
+                calculatorToggleText.textContent = '¿No sabes el precio con IVA? Usa la calculadora';
+            } else {
+                calculatorToggleText.textContent = 'Ocultar calculadora';
+            }
+        });
+    }
+    
+    if (calcularConIvaBtn && precioSinIvaInput) {
+        calcularConIvaBtn.addEventListener('click', function() {
+            const precioSinIva = parseFloat(precioSinIvaInput.value) || 0;
+            if (precioSinIva > 0) {
+                const precioConIva = precioSinIva * (1 + ivaPorcentaje / 100);
+                precioBaseInput.value = precioConIva.toFixed(2);
+                calcularPrecio(); // Actualizar el desglose
+                // Limpiar el campo de la calculadora
+                precioSinIvaInput.value = '';
+                // Ocultar la calculadora
+                priceCalculator.classList.add('hidden');
+                calculatorToggleText.textContent = '¿No sabes el precio con IVA? Usa la calculadora';
             }
         });
         
-        // Botón "Cambiar imagen" en modo edición
-        if (changeImageBtn) {
-            changeImageBtn.addEventListener('click', function(e) {
+        // También permitir calcular con Enter
+        precioSinIvaInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
                 e.preventDefault();
-                imagenInput.click();
-            });
+                calcularConIvaBtn.click();
+            }
+        });
+    }
+    
+    // Vista previa en tiempo real - definir antes de calcularPrecio()
+    const nombreInput = document.getElementById('id_nombre');
+    const categoriaSelect = document.getElementById('id_categoria');
+    const descripcionInput = document.getElementById('id_descripcion');
+    // stockInput ya está definido arriba
+    
+    const previewNombre = document.getElementById('preview-nombre');
+    const previewCategoria = document.getElementById('preview-categoria');
+    const previewDescripcion = document.getElementById('preview-descripcion');
+    const previewPrecio = document.getElementById('preview-precio');
+    const previewStock = document.getElementById('preview-stock');
+    const previewProductImage = document.getElementById('preview-product-image');
+    
+    function calcularPrecio() {
+        const precioFinal = parseFloat(precioBaseInput.value) || 0;
+        
+        // El precio ingresado es el precio final (con IVA)
+        // Calcular el precio base y el IVA
+        const precioBase = precioFinal / (1 + ivaPorcentaje / 100);
+        const montoIva = precioFinal - precioBase;
+        
+        precioBaseDisplay.textContent = '$' + precioBase.toFixed(2);
+        ivaDisplay.textContent = '$' + montoIva.toFixed(2);
+        precioFinalDisplay.textContent = '$' + precioFinal.toFixed(2);
+        
+        // Actualizar preview
+        if (previewPrecio) {
+            previewPrecio.textContent = '$' + precioFinal.toFixed(2);
         }
         
-        // Cambio en el input de archivo
-        imagenInput.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                showImagePreview(file);
-            }
-        });
+        // Calcular utilidad si hay costo
+        calcularUtilidad();
+    }
+    
+    // Cálculo de utilidad en tiempo real
+    const costoInput = document.getElementById('id_costo');
+    const utilidadIndicator = document.getElementById('utilidad-indicator');
+    const utilidadDisplay = document.getElementById('utilidad-display');
+    const margenDisplay = document.getElementById('margen-display');
+    
+    function calcularUtilidad() {
+        const precioFinal = parseFloat(precioBaseInput.value) || 0;
+        const costo = parseFloat(costoInput.value) || 0;
         
-        // Botón para eliminar imagen
-        removeImageBtn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            clearImagePreview();
-        });
-        
-        // Drag and drop
-        imageUploadArea.addEventListener('dragover', function(e) {
-            e.preventDefault();
-            if (!noImagenCheckbox.checked) {
-                this.classList.add('border-emerald-500', 'bg-emerald-50', 'scale-105');
-                this.style.transition = 'all 0.2s ease';
-            }
-        });
-        
-        imageUploadArea.addEventListener('dragleave', function(e) {
-            e.preventDefault();
-            this.classList.remove('border-emerald-500', 'bg-emerald-50', 'scale-105');
-        });
-        
-        imageUploadArea.addEventListener('drop', function(e) {
-            e.preventDefault();
-            this.classList.remove('border-emerald-500', 'bg-emerald-50', 'scale-105');
+        if (costo > 0 && precioFinal > 0) {
+            // Calcular precio base (sin IVA) para comparar con costo
+            const precioBase = precioFinal / (1 + ivaPorcentaje / 100);
+            const utilidad = precioBase - costo;
+            const margen = (utilidad / costo) * 100;
             
-            if (!noImagenCheckbox.checked) {
-                const file = e.dataTransfer.files[0];
-                if (file && file.type.startsWith('image/')) {
-                    // Crear un nuevo DataTransfer para asignar el archivo al input
-                    const dataTransfer = new DataTransfer();
-                    dataTransfer.items.add(file);
-                    imagenInput.files = dataTransfer.files;
-                    showImagePreview(file);
-                    showFeedback('Imagen arrastrada correctamente', 'success');
-                } else {
-                    showFeedback('Por favor arrastra un archivo de imagen', 'error');
-                }
-            }
-        });
-        
-        // Checkbox "No tiene imagen"
-        noImagenCheckbox.addEventListener('change', function() {
-            imagenInput.disabled = this.checked;
-            imagenInput.required = !this.checked;
+            utilidadDisplay.textContent = '$' + utilidad.toFixed(2);
+            margenDisplay.textContent = margen.toFixed(1) + '%';
             
-            if(this.checked) {
-                imageUploadArea.style.opacity = '0.5';
-                imageUploadArea.style.pointerEvents = 'none';
-                clearImagePreview();
-                showFeedback('Campo de imagen deshabilitado', 'info');
+            // Mostrar indicador
+            utilidadIndicator.classList.remove('hidden');
+            
+            // Cambiar color según margen
+            if (margen < 20) {
+                utilidadDisplay.classList.remove('text-green-600');
+                utilidadDisplay.classList.add('text-yellow-600');
             } else {
-                imageUploadArea.style.opacity = '1';
-                imageUploadArea.style.pointerEvents = 'auto';
-                showFeedback('Campo de imagen habilitado', 'info');
-            }
-        });
-        
-        // Para el código de barras
-        const noCodigoCheckbox = document.getElementById('no_codigo');
-        const codigoInput = document.getElementById('{{ form.codigo_barras.id_for_label }}');
-        
-        noCodigoCheckbox.addEventListener('change', function() {
-            codigoInput.disabled = this.checked;
-            if(this.checked) {
-                codigoInput.classList.add('opacity-50', 'bg-gray-100');
-                codigoInput.value = '';
-                showFeedback('Campo de código deshabilitado', 'info');
-            } else {
-                codigoInput.classList.remove('opacity-50', 'bg-gray-100');
-                showFeedback('Campo de código habilitado', 'info');
-            }
-        });
-
-        // Configurar estado inicial según el modo de operación
-        if (modoOperacion === 'retail') {
-            // Modo Retail: código habilitado por defecto, imagen deshabilitada por defecto
-            if (noImagenCheckbox.checked) {
-                imageUploadArea.style.opacity = '0.5';
-                imageUploadArea.style.pointerEvents = 'none';
-            }
-            if (noCodigoCheckbox.checked) {
-                codigoInput.classList.add('opacity-50', 'bg-gray-100');
+                utilidadDisplay.classList.remove('text-yellow-600');
+                utilidadDisplay.classList.add('text-green-600');
             }
         } else {
-            // Modo Restaurante: imagen habilitada por defecto, código deshabilitado por defecto
-            if (noImagenCheckbox.checked) {
-                imageUploadArea.style.opacity = '0.5';
-                imageUploadArea.style.pointerEvents = 'none';
-            }
-            if (noCodigoCheckbox.checked) {
-                codigoInput.classList.add('opacity-50', 'bg-gray-100');
-            }
+            // Ocultar indicador si no hay costo
+            utilidadIndicator.classList.add('hidden');
         }
-
-        // Make notifications disappear after 3 seconds
-        const notifications = document.querySelectorAll('[id^="notification-"]');
-        notifications.forEach(notification => {
-            setTimeout(() => {
-                notification.style.opacity = '0';
-                setTimeout(() => notification.remove(), 300);
-            }, 3000);
+    }
+    
+    if (costoInput) {
+        costoInput.addEventListener('input', calcularUtilidad);
+        calcularUtilidad(); // Initial calculation
+    }
+    
+    if (precioBaseInput) {
+        precioBaseInput.addEventListener('input', calcularPrecio);
+        calcularPrecio(); // Initial calculation
+    }
+    
+    nombreInput.addEventListener('input', function() {
+        previewNombre.textContent = this.value || 'Nombre del producto';
+    });
+    
+    categoriaSelect.addEventListener('change', function() {
+        const selectedText = this.options[this.selectedIndex].text;
+        previewCategoria.textContent = selectedText !== '---------' ? selectedText : 'Categoría';
+    });
+    
+    descripcionInput.addEventListener('input', function() {
+        const text = this.value || 'Descripción del producto...';
+        previewDescripcion.textContent = text.length > 60 ? text.substring(0, 60) + '...' : text;
+    });
+    
+    // El precio se actualiza automáticamente en la función calcularPrecio()
+    
+    if (stockInput) {
+        stockInput.addEventListener('input', function() {
+            previewStock.textContent = this.value || '0';
         });
-        
-        // Inicializar iconos de Lucide
-        if (typeof lucide !== 'undefined') {
-            lucide.createIcons();
+    }
+    
+    // Manejo de imagen
+    const imageUploadArea = document.getElementById('image-upload-area');
+    const uploadPlaceholder = document.getElementById('upload-placeholder');
+    const imagePreview = document.getElementById('image-preview');
+    const previewImg = document.getElementById('preview-img');
+    const fileName = document.getElementById('file-name');
+    const removeImageBtn = document.getElementById('remove-image');
+    
+    imageUploadArea.addEventListener('click', () => imagenInput.click());
+    
+    imagenInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file && file.type.startsWith('image/')) {
+            if (file.size > 10 * 1024 * 1024) {
+                showNotification('La imagen es muy grande. Máximo 10MB', 'error');
+                imagenInput.value = '';
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewImg.src = e.target.result;
+                fileName.textContent = file.name;
+                uploadPlaceholder.classList.add('hidden');
+                imagePreview.classList.remove('hidden');
+                
+                // Update preview card
+                previewProductImage.innerHTML = `<img src="${e.target.result}" class="w-full h-full object-cover">`;
+            };
+            reader.readAsDataURL(file);
         }
     });
+    
+    removeImageBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        imagenInput.value = '';
+        uploadPlaceholder.classList.remove('hidden');
+        imagePreview.classList.add('hidden');
+        previewProductImage.innerHTML = '<i data-lucide="image" class="w-16 h-16 text-gray-300"></i>';
+        lucide.createIcons();
+    });
+    
+    // Drag and drop
+    imageUploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        imageUploadArea.classList.add('border-emerald-500', 'bg-emerald-50');
+    });
+    
+    imageUploadArea.addEventListener('dragleave', () => {
+        imageUploadArea.classList.remove('border-emerald-500', 'bg-emerald-50');
+    });
+    
+    imageUploadArea.addEventListener('drop', function(e) {
+        e.preventDefault();
+        imageUploadArea.classList.remove('border-emerald-500', 'bg-emerald-50');
+        
+        const file = e.dataTransfer.files[0];
+        if (file && file.type.startsWith('image/')) {
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+            imagenInput.files = dataTransfer.files;
+            imagenInput.dispatchEvent(new Event('change'));
+        }
+    });
+    
+    // Auto-hide notifications
+    document.querySelectorAll('[id^="notification-"]').forEach(notif => {
+        setTimeout(() => {
+            notif.style.opacity = '0';
+            setTimeout(() => notif.remove(), 300);
+        }, 3000);
+    });
+});
 </script>
 {% endblock %}

@@ -33,3 +33,7 @@ daphne>=4.0.0
 
 # lxml para procesamiento XML (facturación electrónica)
 lxml>=4.9.0
+
+# Exportación de reportes
+openpyxl>=3.1.0  # Para Excel
+reportlab>=4.0.0  # Para PDF

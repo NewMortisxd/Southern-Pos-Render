@@ -1,18 +1,20 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="es" {% if dark_mode %}class="dark"{% endif %}>
+<html lang="es" {% if dark_mode %}class="dark" {% endif %}>
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>{{ brand_name|default:"SouthernPOS" }} - {% block title %}Dashboard{% endblock %}</title>
+    <title>{{ brand_name|default:"Lemon POS" }} - {% block title %}Dashboard{% endblock %}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-    <link rel="icon" type="image/png" href="{% static 'img/logo.png' %}">
-    <link rel="shortcut icon" type="image/png" href="{% static 'img/logo.png' %}">
+    <link rel="icon" type="image/png" href="{% static 'img/favicon.svg' %}">
+    <link rel="shortcut icon" type="image/png" href="{% static 'img/favicon.svg' %}">
 
-    
+    {% block extra_css %}{% endblock %}
+
     <!-- Tailwind Dark Mode Configuration -->
     <script>
         tailwind.config = {
@@ -26,293 +28,858 @@
             }
         }
     </script>
-    
-    <!-- Dynamic Theme Colors -->
+
+    <!-- Lemon POS Brand System v1.0 -->
     <style>
         :root {
-            --primary-color: {{ theme_settings.primary_color|default:'#10b981' }};
-            --primary-color-rgb: {{ theme_settings.primary_color_rgb|default:'16, 185, 129' }};
-            --secondary-color: {{ theme_settings.secondary_color|default:'#6366f1' }};
-            --secondary-color-rgb: {{ theme_settings.secondary_color_rgb|default:'99, 102, 241' }};
+            /* Lemon POS Official Colors */
+            --color-primary: #22c55e;
+            --color-primary-dark: #16a34a;
+            --color-primary-light: #84cc16;
+            --color-primary-bg: #f0fdf4;
+
+            /* Legacy support */
+            --primary-color: #22c55e;
+            --primary-color-rgb: 34, 197, 94;
+            --secondary-color: #6366f1;
+            --secondary-color-rgb: 99, 102, 241;
+
+            /* Typography */
+            --font-system: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+
+            /* Spacing */
+            --section-padding: 80px;
+            --card-padding: 32px;
+
+            /* Border Radius */
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+
+            /* Transitions */
+            --transition-base: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
-                /* Secondary color overrides - all variants */
-                .bg-indigo-50 { background-color: color-mix(in srgb, var(--secondary-color) 5%, white) !important; }
-        .bg-indigo-100 { background-color: color-mix(in srgb, var(--secondary-color) 10%, white) !important; }
-        .bg-indigo-200 { background-color: color-mix(in srgb, var(--secondary-color) 20%, white) !important; }
-        .bg-indigo-300 { background-color: color-mix(in srgb, var(--secondary-color) 30%, white) !important; }
-        .bg-indigo-400 { background-color: color-mix(in srgb, var(--secondary-color) 40%, white) !important; }
-        .bg-indigo-500 { background-color: color-mix(in srgb, var(--secondary-color) 10%, black) !important; }
-        .bg-indigo-600 { background-color: var(--secondary-color) !important; }
-        .bg-indigo-700 { background-color: color-mix(in srgb, var(--secondary-color) 80%, black) !important; }
-        .bg-indigo-800 { background-color: color-mix(in srgb, var(--secondary-color) 60%, black) !important; }
-        .bg-indigo-900 { background-color: color-mix(in srgb, var(--secondary-color) 40%, black) !important; }
-        
-        .text-indigo-50 { color: color-mix(in srgb, var(--secondary-color) 5%, white) !important; }
-        .text-indigo-100 { color: color-mix(in srgb, var(--secondary-color) 10%, white) !important; }
-        .text-indigo-200 { color: color-mix(in srgb, var(--secondary-color) 20%, white) !important; }
-        .text-indigo-300 { color: color-mix(in srgb, var(--secondary-color) 30%, white) !important; }
-        .text-indigo-400 { color: color-mix(in srgb, var(--secondary-color) 40%, white) !important; }
-        .text-indigo-500 { color: color-mix(in srgb, var(--secondary-color) 10%, black) !important; }
-        .text-indigo-600 { color: var(--secondary-color) !important; }
-        .text-indigo-700 { color: color-mix(in srgb, var(--secondary-color) 80%, black) !important; }
-        .text-indigo-800 { color: color-mix(in srgb, var(--secondary-color) 60%, black) !important; }
-        .text-indigo-900 { color: color-mix(in srgb, var(--secondary-color) 40%, black) !important; }
-        
-        .border-indigo-50 { border-color: color-mix(in srgb, var(--secondary-color) 5%, white) !important; }
-        .border-indigo-100 { border-color: color-mix(in srgb, var(--secondary-color) 10%, white) !important; }
-        .border-indigo-200 { border-color: color-mix(in srgb, var(--secondary-color) 20%, white) !important; }
-        .border-indigo-300 { border-color: color-mix(in srgb, var(--secondary-color) 30%, white) !important; }
-        .border-indigo-400 { border-color: color-mix(in srgb, var(--secondary-color) 40%, white) !important; }
-        .border-indigo-500 { border-color: color-mix(in srgb, var(--secondary-color) 10%, black) !important; }
-        .border-indigo-600 { border-color: var(--secondary-color) !important; }
-        .border-indigo-700 { border-color: color-mix(in srgb, var(--secondary-color) 80%, black) !important; }
-        .border-indigo-800 { border-color: color-mix(in srgb, var(--secondary-color) 60%, black) !important; }
-        .border-indigo-900 { border-color: color-mix(in srgb, var(--secondary-color) 40%, black) !important; }
-        
+
+        /* Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            font-family: var(--font-system);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Secondary color overrides - all variants */
+        .bg-indigo-50 {
+            background-color: color-mix(in srgb, var(--secondary-color) 5%, white) !important;
+        }
+
+        .bg-indigo-100 {
+            background-color: color-mix(in srgb, var(--secondary-color) 10%, white) !important;
+        }
+
+        .bg-indigo-200 {
+            background-color: color-mix(in srgb, var(--secondary-color) 20%, white) !important;
+        }
+
+        .bg-indigo-300 {
+            background-color: color-mix(in srgb, var(--secondary-color) 30%, white) !important;
+        }
+
+        .bg-indigo-400 {
+            background-color: color-mix(in srgb, var(--secondary-color) 40%, white) !important;
+        }
+
+        .bg-indigo-500 {
+            background-color: color-mix(in srgb, var(--secondary-color) 10%, black) !important;
+        }
+
+        .bg-indigo-600 {
+            background-color: var(--secondary-color) !important;
+        }
+
+        .bg-indigo-700 {
+            background-color: color-mix(in srgb, var(--secondary-color) 80%, black) !important;
+        }
+
+        .bg-indigo-800 {
+            background-color: color-mix(in srgb, var(--secondary-color) 60%, black) !important;
+        }
+
+        .bg-indigo-900 {
+            background-color: color-mix(in srgb, var(--secondary-color) 40%, black) !important;
+        }
+
+        .text-indigo-50 {
+            color: color-mix(in srgb, var(--secondary-color) 5%, white) !important;
+        }
+
+        .text-indigo-100 {
+            color: color-mix(in srgb, var(--secondary-color) 10%, white) !important;
+        }
+
+        .text-indigo-200 {
+            color: color-mix(in srgb, var(--secondary-color) 20%, white) !important;
+        }
+
+        .text-indigo-300 {
+            color: color-mix(in srgb, var(--secondary-color) 30%, white) !important;
+        }
+
+        .text-indigo-400 {
+            color: color-mix(in srgb, var(--secondary-color) 40%, white) !important;
+        }
+
+        .text-indigo-500 {
+            color: color-mix(in srgb, var(--secondary-color) 10%, black) !important;
+        }
+
+        .text-indigo-600 {
+            color: var(--secondary-color) !important;
+        }
+
+        .text-indigo-700 {
+            color: color-mix(in srgb, var(--secondary-color) 80%, black) !important;
+        }
+
+        .text-indigo-800 {
+            color: color-mix(in srgb, var(--secondary-color) 60%, black) !important;
+        }
+
+        .text-indigo-900 {
+            color: color-mix(in srgb, var(--secondary-color) 40%, black) !important;
+        }
+
+        .border-indigo-50 {
+            border-color: color-mix(in srgb, var(--secondary-color) 5%, white) !important;
+        }
+
+        .border-indigo-100 {
+            border-color: color-mix(in srgb, var(--secondary-color) 10%, white) !important;
+        }
+
+        .border-indigo-200 {
+            border-color: color-mix(in srgb, var(--secondary-color) 20%, white) !important;
+        }
+
+        .border-indigo-300 {
+            border-color: color-mix(in srgb, var(--secondary-color) 30%, white) !important;
+        }
+
+        .border-indigo-400 {
+            border-color: color-mix(in srgb, var(--secondary-color) 40%, white) !important;
+        }
+
+        .border-indigo-500 {
+            border-color: color-mix(in srgb, var(--secondary-color) 10%, black) !important;
+        }
+
+        .border-indigo-600 {
+            border-color: var(--secondary-color) !important;
+        }
+
+        .border-indigo-700 {
+            border-color: color-mix(in srgb, var(--secondary-color) 80%, black) !important;
+        }
+
+        .border-indigo-800 {
+            border-color: color-mix(in srgb, var(--secondary-color) 60%, black) !important;
+        }
+
+        .border-indigo-900 {
+            border-color: color-mix(in srgb, var(--secondary-color) 40%, black) !important;
+        }
+
         /* Hover states for secondary color */
-        .hover\:bg-indigo-50:hover { background-color: color-mix(in srgb, var(--secondary-color) 5%, white) !important; }
-        .hover\:bg-indigo-100:hover { background-color: color-mix(in srgb, var(--secondary-color) 10%, white) !important; }
-        .hover\:bg-indigo-200:hover { background-color: color-mix(in srgb, var(--secondary-color) 20%, white) !important; }
-        .hover\:bg-indigo-300:hover { background-color: color-mix(in srgb, var(--secondary-color) 30%, white) !important; }
-        .hover\:bg-indigo-400:hover { background-color: color-mix(in srgb, var(--secondary-color) 40%, white) !important; }
-        .hover\:bg-indigo-500:hover { background-color: color-mix(in srgb, var(--secondary-color) 10%, black) !important; }
-        .hover\:bg-indigo-600:hover { background-color: var(--secondary-color) !important; }
-        .hover\:bg-indigo-700:hover { background-color: color-mix(in srgb, var(--secondary-color) 80%, black) !important; }
-        .hover\:bg-indigo-800:hover { background-color: color-mix(in srgb, var(--secondary-color) 60%, black) !important; }
-        .hover\:bg-indigo-900:hover { background-color: color-mix(in srgb, var(--secondary-color) 40%, black) !important; }
-        
-        .hover\:text-indigo-50:hover { color: color-mix(in srgb, var(--secondary-color) 5%, white) !important; }
-        .hover\:text-indigo-100:hover { color: color-mix(in srgb, var(--secondary-color) 10%, white) !important; }
-        .hover\:text-indigo-200:hover { color: color-mix(in srgb, var(--secondary-color) 20%, white) !important; }
-        .hover\:text-indigo-300:hover { color: color-mix(in srgb, var(--secondary-color) 30%, white) !important; }
-        .hover\:text-indigo-400:hover { color: color-mix(in srgb, var(--secondary-color) 40%, white) !important; }
-        .hover\:text-indigo-500:hover { color: color-mix(in srgb, var(--secondary-color) 10%, black) !important; }
-        .hover\:text-indigo-600:hover { color: var(--secondary-color) !important; }
-        .hover\:text-indigo-700:hover { color: color-mix(in srgb, var(--secondary-color) 80%, black) !important; }
-        .hover\:text-indigo-800:hover { color: color-mix(in srgb, var(--secondary-color) 60%, black) !important; }
-        .hover\:text-indigo-900:hover { color: color-mix(in srgb, var(--secondary-color) 40%, black) !important; }
-        
+        .hover\:bg-indigo-50:hover {
+            background-color: color-mix(in srgb, var(--secondary-color) 5%, white) !important;
+        }
+
+        .hover\:bg-indigo-100:hover {
+            background-color: color-mix(in srgb, var(--secondary-color) 10%, white) !important;
+        }
+
+        .hover\:bg-indigo-200:hover {
+            background-color: color-mix(in srgb, var(--secondary-color) 20%, white) !important;
+        }
+
+        .hover\:bg-indigo-300:hover {
+            background-color: color-mix(in srgb, var(--secondary-color) 30%, white) !important;
+        }
+
+        .hover\:bg-indigo-400:hover {
+            background-color: color-mix(in srgb, var(--secondary-color) 40%, white) !important;
+        }
+
+        .hover\:bg-indigo-500:hover {
+            background-color: color-mix(in srgb, var(--secondary-color) 10%, black) !important;
+        }
+
+        .hover\:bg-indigo-600:hover {
+            background-color: var(--secondary-color) !important;
+        }
+
+        .hover\:bg-indigo-700:hover {
+            background-color: color-mix(in srgb, var(--secondary-color) 80%, black) !important;
+        }
+
+        .hover\:bg-indigo-800:hover {
+            background-color: color-mix(in srgb, var(--secondary-color) 60%, black) !important;
+        }
+
+        .hover\:bg-indigo-900:hover {
+            background-color: color-mix(in srgb, var(--secondary-color) 40%, black) !important;
+        }
+
+        .hover\:text-indigo-50:hover {
+            color: color-mix(in srgb, var(--secondary-color) 5%, white) !important;
+        }
+
+        .hover\:text-indigo-100:hover {
+            color: color-mix(in srgb, var(--secondary-color) 10%, white) !important;
+        }
+
+        .hover\:text-indigo-200:hover {
+            color: color-mix(in srgb, var(--secondary-color) 20%, white) !important;
+        }
+
+        .hover\:text-indigo-300:hover {
+            color: color-mix(in srgb, var(--secondary-color) 30%, white) !important;
+        }
+
+        .hover\:text-indigo-400:hover {
+            color: color-mix(in srgb, var(--secondary-color) 40%, white) !important;
+        }
+
+        .hover\:text-indigo-500:hover {
+            color: color-mix(in srgb, var(--secondary-color) 10%, black) !important;
+        }
+
+        .hover\:text-indigo-600:hover {
+            color: var(--secondary-color) !important;
+        }
+
+        .hover\:text-indigo-700:hover {
+            color: color-mix(in srgb, var(--secondary-color) 80%, black) !important;
+        }
+
+        .hover\:text-indigo-800:hover {
+            color: color-mix(in srgb, var(--secondary-color) 60%, black) !important;
+        }
+
+        .hover\:text-indigo-900:hover {
+            color: color-mix(in srgb, var(--secondary-color) 40%, black) !important;
+        }
+
         /* Focus states for secondary color */
-        .focus\:ring-indigo-200:focus { --tw-ring-color: color-mix(in srgb, var(--secondary-color) 20%, white) !important; }
-        .focus\:ring-indigo-500:focus { --tw-ring-color: color-mix(in srgb, var(--secondary-color) 10%, black) !important; }
-        .focus\:border-indigo-500:focus { border-color: color-mix(in srgb, var(--secondary-color) 10%, black) !important; }
-        
+        .focus\:ring-indigo-200:focus {
+            --tw-ring-color: color-mix(in srgb, var(--secondary-color) 20%, white) !important;
+        }
+
+        .focus\:ring-indigo-500:focus {
+            --tw-ring-color: color-mix(in srgb, var(--secondary-color) 10%, black) !important;
+        }
+
+        .focus\:border-indigo-500:focus {
+            border-color: color-mix(in srgb, var(--secondary-color) 10%, black) !important;
+        }
+
         /* Dark mode overrides for secondary color */
-        .dark .bg-indigo-50 { background-color: color-mix(in srgb, var(--secondary-color) 5%, #2a2a2a) !important; }
-        .dark .bg-indigo-100 { background-color: color-mix(in srgb, var(--secondary-color) 10%, #2a2a2a) !important; }
-        .dark .hover\:bg-indigo-50:hover { background-color: color-mix(in srgb, var(--secondary-color) 5%, #2a2a2a) !important; }
-        .dark .hover\:bg-indigo-100:hover { background-color: color-mix(in srgb, var(--secondary-color) 10%, #2a2a2a) !important; }
-        .dark .hover\:text-indigo-50:hover { color: color-mix(in srgb, var(--secondary-color) 5%, #2a2a2a) !important; }
-        .dark .hover\:text-indigo-100:hover { color: color-mix(in srgb, var(--secondary-color) 10%, #2a2a2a) !important; }
-        .dark .hover\:text-indigo-600:hover { color: var(--secondary-color) !important; }
-        
+        .dark .bg-indigo-50 {
+            background-color: color-mix(in srgb, var(--secondary-color) 5%, #2a2a2a) !important;
+        }
+
+        .dark .bg-indigo-100 {
+            background-color: color-mix(in srgb, var(--secondary-color) 10%, #2a2a2a) !important;
+        }
+
+        .dark .hover\:bg-indigo-50:hover {
+            background-color: color-mix(in srgb, var(--secondary-color) 5%, #2a2a2a) !important;
+        }
+
+        .dark .hover\:bg-indigo-100:hover {
+            background-color: color-mix(in srgb, var(--secondary-color) 10%, #2a2a2a) !important;
+        }
+
+        .dark .hover\:text-indigo-50:hover {
+            color: color-mix(in srgb, var(--secondary-color) 5%, #2a2a2a) !important;
+        }
+
+        .dark .hover\:text-indigo-100:hover {
+            color: color-mix(in srgb, var(--secondary-color) 10%, #2a2a2a) !important;
+        }
+
+        .dark .hover\:text-indigo-600:hover {
+            color: var(--secondary-color) !important;
+        }
+
         /* Secondary color overrides */
-        .bg-indigo-600 { background-color: var(--secondary-color) !important; }
-        .text-indigo-600 { color: var(--secondary-color) !important; }
-        .border-indigo-600 { border-color: var(--secondary-color) !important; }
-        .hover\:bg-indigo-700:hover { background-color: color-mix(in srgb, var(--secondary-color) 80%, black) !important; }
-        .hover\:text-indigo-600:hover { color: var(--secondary-color) !important; }
+        .bg-indigo-600 {
+            background-color: var(--secondary-color) !important;
+        }
+
+        .text-indigo-600 {
+            color: var(--secondary-color) !important;
+        }
+
+        .border-indigo-600 {
+            border-color: var(--secondary-color) !important;
+        }
+
+        .hover\:bg-indigo-700:hover {
+            background-color: color-mix(in srgb, var(--secondary-color) 80%, black) !important;
+        }
+
+        .hover\:text-indigo-600:hover {
+            color: var(--secondary-color) !important;
+        }
+
         /* Primary color overrides - all variants */
-        .bg-emerald-50 { background-color: color-mix(in srgb, var(--primary-color) 5%, white) !important; }
-        .bg-emerald-100 { background-color: color-mix(in srgb, var(--primary-color) 10%, white) !important; }
-        .bg-emerald-200 { background-color: color-mix(in srgb, var(--primary-color) 20%, white) !important; }
-        .bg-emerald-300 { background-color: color-mix(in srgb, var(--primary-color) 30%, white) !important; }
-        .bg-emerald-400 { background-color: color-mix(in srgb, var(--primary-color) 40%, white) !important; }
-        .bg-emerald-500 { background-color: color-mix(in srgb, var(--primary-color) 10%, black) !important; }
-        .bg-emerald-600 { background-color: var(--primary-color) !important; }
-        .bg-emerald-700 { background-color: color-mix(in srgb, var(--primary-color) 80%, black) !important; }
-        .bg-emerald-800 { background-color: color-mix(in srgb, var(--primary-color) 60%, black) !important; }
-        .bg-emerald-900 { background-color: color-mix(in srgb, var(--primary-color) 40%, black) !important; }
-        
-        .text-emerald-50 { color: color-mix(in srgb, var(--primary-color) 5%, white) !important; }
-        .text-emerald-100 { color: color-mix(in srgb, var(--primary-color) 10%, white) !important; }
-        .text-emerald-200 { color: color-mix(in srgb, var(--primary-color) 20%, white) !important; }
-        .text-emerald-300 { color: color-mix(in srgb, var(--primary-color) 30%, white) !important; }
-        .text-emerald-400 { color: color-mix(in srgb, var(--primary-color) 40%, white) !important; }
-        .text-emerald-500 { color: color-mix(in srgb, var(--primary-color) 10%, black) !important; }
-        .text-emerald-600 { color: var(--primary-color) !important; }
-        .text-emerald-700 { color: color-mix(in srgb, var(--primary-color) 80%, black) !important; }
-        .text-emerald-800 { color: color-mix(in srgb, var(--primary-color) 60%, black) !important; }
-        .text-emerald-900 { color: color-mix(in srgb, var(--primary-color) 40%, black) !important; }
-        
-        .border-emerald-50 { border-color: color-mix(in srgb, var(--primary-color) 5%, white) !important; }
-        .border-emerald-100 { border-color: color-mix(in srgb, var(--primary-color) 10%, white) !important; }
-        .border-emerald-200 { border-color: color-mix(in srgb, var(--primary-color) 20%, white) !important; }
-        .border-emerald-300 { border-color: color-mix(in srgb, var(--primary-color) 30%, white) !important; }
-        .border-emerald-400 { border-color: color-mix(in srgb, var(--primary-color) 40%, white) !important; }
-        .border-emerald-500 { border-color: color-mix(in srgb, var(--primary-color) 10%, black) !important; }
-        .border-emerald-600 { border-color: var(--primary-color) !important; }
-        .border-emerald-700 { border-color: color-mix(in srgb, var(--primary-color) 80%, black) !important; }
-        .border-emerald-800 { border-color: color-mix(in srgb, var(--primary-color) 60%, black) !important; }
-        .border-emerald-900 { border-color: color-mix(in srgb, var(--primary-color) 40%, black) !important; }
-        
+        .bg-emerald-50 {
+            background-color: color-mix(in srgb, var(--primary-color) 5%, white) !important;
+        }
+
+        .bg-emerald-100 {
+            background-color: color-mix(in srgb, var(--primary-color) 10%, white) !important;
+        }
+
+        .bg-emerald-200 {
+            background-color: color-mix(in srgb, var(--primary-color) 20%, white) !important;
+        }
+
+        .bg-emerald-300 {
+            background-color: color-mix(in srgb, var(--primary-color) 30%, white) !important;
+        }
+
+        .bg-emerald-400 {
+            background-color: color-mix(in srgb, var(--primary-color) 40%, white) !important;
+        }
+
+        .bg-emerald-500 {
+            background-color: color-mix(in srgb, var(--primary-color) 10%, black) !important;
+        }
+
+        .bg-emerald-600 {
+            background-color: var(--primary-color) !important;
+        }
+
+        .bg-emerald-700 {
+            background-color: color-mix(in srgb, var(--primary-color) 80%, black) !important;
+        }
+
+        .bg-emerald-800 {
+            background-color: color-mix(in srgb, var(--primary-color) 60%, black) !important;
+        }
+
+        .bg-emerald-900 {
+            background-color: color-mix(in srgb, var(--primary-color) 40%, black) !important;
+        }
+
+        .text-emerald-50 {
+            color: color-mix(in srgb, var(--primary-color) 5%, white) !important;
+        }
+
+        .text-emerald-100 {
+            color: color-mix(in srgb, var(--primary-color) 10%, white) !important;
+        }
+
+        .text-emerald-200 {
+            color: color-mix(in srgb, var(--primary-color) 20%, white) !important;
+        }
+
+        .text-emerald-300 {
+            color: color-mix(in srgb, var(--primary-color) 30%, white) !important;
+        }
+
+        .text-emerald-400 {
+            color: color-mix(in srgb, var(--primary-color) 40%, white) !important;
+        }
+
+        .text-emerald-500 {
+            color: color-mix(in srgb, var(--primary-color) 10%, black) !important;
+        }
+
+        .text-emerald-600 {
+            color: var(--primary-color) !important;
+        }
+
+        .text-emerald-700 {
+            color: color-mix(in srgb, var(--primary-color) 80%, black) !important;
+        }
+
+        .text-emerald-800 {
+            color: color-mix(in srgb, var(--primary-color) 60%, black) !important;
+        }
+
+        .text-emerald-900 {
+            color: color-mix(in srgb, var(--primary-color) 40%, black) !important;
+        }
+
+        .border-emerald-50 {
+            border-color: color-mix(in srgb, var(--primary-color) 5%, white) !important;
+        }
+
+        .border-emerald-100 {
+            border-color: color-mix(in srgb, var(--primary-color) 10%, white) !important;
+        }
+
+        .border-emerald-200 {
+            border-color: color-mix(in srgb, var(--primary-color) 20%, white) !important;
+        }
+
+        .border-emerald-300 {
+            border-color: color-mix(in srgb, var(--primary-color) 30%, white) !important;
+        }
+
+        .border-emerald-400 {
+            border-color: color-mix(in srgb, var(--primary-color) 40%, white) !important;
+        }
+
+        .border-emerald-500 {
+            border-color: color-mix(in srgb, var(--primary-color) 10%, black) !important;
+        }
+
+        .border-emerald-600 {
+            border-color: var(--primary-color) !important;
+        }
+
+        .border-emerald-700 {
+            border-color: color-mix(in srgb, var(--primary-color) 80%, black) !important;
+        }
+
+        .border-emerald-800 {
+            border-color: color-mix(in srgb, var(--primary-color) 60%, black) !important;
+        }
+
+        .border-emerald-900 {
+            border-color: color-mix(in srgb, var(--primary-color) 40%, black) !important;
+        }
+
         /* Hover states for primary color */
-        .hover\:bg-emerald-50:hover { background-color: color-mix(in srgb, var(--primary-color) 5%, white) !important; }
-        .hover\:bg-emerald-100:hover { background-color: color-mix(in srgb, var(--primary-color) 10%, white) !important; }
-        .hover\:bg-emerald-200:hover { background-color: color-mix(in srgb, var(--primary-color) 20%, white) !important; }
-        .hover\:bg-emerald-300:hover { background-color: color-mix(in srgb, var(--primary-color) 30%, white) !important; }
-        .hover\:bg-emerald-400:hover { background-color: color-mix(in srgb, var(--primary-color) 40%, white) !important; }
-        .hover\:bg-emerald-500:hover { background-color: color-mix(in srgb, var(--primary-color) 10%, black) !important; }
-        .hover\:bg-emerald-600:hover { background-color: var(--primary-color) !important; }
-        .hover\:bg-emerald-700:hover { background-color: color-mix(in srgb, var(--primary-color) 80%, black) !important; }
-        .hover\:bg-emerald-800:hover { background-color: color-mix(in srgb, var(--primary-color) 60%, black) !important; }
-        .hover\:bg-emerald-900:hover { background-color: color-mix(in srgb, var(--primary-color) 40%, black) !important; }
-        
-        .hover\:text-emerald-50:hover { color: color-mix(in srgb, var(--primary-color) 5%, white) !important; }
-        .hover\:text-emerald-100:hover { color: color-mix(in srgb, var(--primary-color) 10%, white) !important; }
-        .hover\:text-emerald-200:hover { color: color-mix(in srgb, var(--primary-color) 20%, white) !important; }
-        .hover\:text-emerald-300:hover { color: color-mix(in srgb, var(--primary-color) 30%, white) !important; }
-        .hover\:text-emerald-400:hover { color: color-mix(in srgb, var(--primary-color) 40%, white) !important; }
-        .hover\:text-emerald-500:hover { color: color-mix(in srgb, var(--primary-color) 10%, black) !important; }
-        .hover\:text-emerald-600:hover { color: var(--primary-color) !important; }
-        .hover\:text-emerald-700:hover { color: color-mix(in srgb, var(--primary-color) 80%, black) !important; }
-        .hover\:text-emerald-800:hover { color: color-mix(in srgb, var(--primary-color) 60%, black) !important; }
-        .hover\:text-emerald-900:hover { color: color-mix(in srgb, var(--primary-color) 40%, black) !important; }
-        
+        .hover\:bg-emerald-50:hover {
+            background-color: color-mix(in srgb, var(--primary-color) 5%, white) !important;
+        }
+
+        .hover\:bg-emerald-100:hover {
+            background-color: color-mix(in srgb, var(--primary-color) 10%, white) !important;
+        }
+
+        .hover\:bg-emerald-200:hover {
+            background-color: color-mix(in srgb, var(--primary-color) 20%, white) !important;
+        }
+
+        .hover\:bg-emerald-300:hover {
+            background-color: color-mix(in srgb, var(--primary-color) 30%, white) !important;
+        }
+
+        .hover\:bg-emerald-400:hover {
+            background-color: color-mix(in srgb, var(--primary-color) 40%, white) !important;
+        }
+
+        .hover\:bg-emerald-500:hover {
+            background-color: color-mix(in srgb, var(--primary-color) 10%, black) !important;
+        }
+
+        .hover\:bg-emerald-600:hover {
+            background-color: var(--primary-color) !important;
+        }
+
+        .hover\:bg-emerald-700:hover {
+            background-color: color-mix(in srgb, var(--primary-color) 80%, black) !important;
+        }
+
+        .hover\:bg-emerald-800:hover {
+            background-color: color-mix(in srgb, var(--primary-color) 60%, black) !important;
+        }
+
+        .hover\:bg-emerald-900:hover {
+            background-color: color-mix(in srgb, var(--primary-color) 40%, black) !important;
+        }
+
+        .hover\:text-emerald-50:hover {
+            color: color-mix(in srgb, var(--primary-color) 5%, white) !important;
+        }
+
+        .hover\:text-emerald-100:hover {
+            color: color-mix(in srgb, var(--primary-color) 10%, white) !important;
+        }
+
+        .hover\:text-emerald-200:hover {
+            color: color-mix(in srgb, var(--primary-color) 20%, white) !important;
+        }
+
+        .hover\:text-emerald-300:hover {
+            color: color-mix(in srgb, var(--primary-color) 30%, white) !important;
+        }
+
+        .hover\:text-emerald-400:hover {
+            color: color-mix(in srgb, var(--primary-color) 40%, white) !important;
+        }
+
+        .hover\:text-emerald-500:hover {
+            color: color-mix(in srgb, var(--primary-color) 10%, black) !important;
+        }
+
+        .hover\:text-emerald-600:hover {
+            color: var(--primary-color) !important;
+        }
+
+        .hover\:text-emerald-700:hover {
+            color: color-mix(in srgb, var(--primary-color) 80%, black) !important;
+        }
+
+        .hover\:text-emerald-800:hover {
+            color: color-mix(in srgb, var(--primary-color) 60%, black) !important;
+        }
+
+        .hover\:text-emerald-900:hover {
+            color: color-mix(in srgb, var(--primary-color) 40%, black) !important;
+        }
+
         /* Focus states for primary color */
-        .focus\:ring-emerald-200:focus { --tw-ring-color: color-mix(in srgb, var(--primary-color) 20%, white) !important; }
-        .focus\:ring-emerald-500:focus { --tw-ring-color: color-mix(in srgb, var(--primary-color) 10%, black) !important; }
-        .focus\:border-emerald-500:focus { border-color: color-mix(in srgb, var(--primary-color) 10%, black) !important; }
-        
+        .focus\:ring-emerald-200:focus {
+            --tw-ring-color: color-mix(in srgb, var(--primary-color) 20%, white) !important;
+        }
+
+        .focus\:ring-emerald-500:focus {
+            --tw-ring-color: color-mix(in srgb, var(--primary-color) 10%, black) !important;
+        }
+
+        .focus\:border-emerald-500:focus {
+            border-color: color-mix(in srgb, var(--primary-color) 10%, black) !important;
+        }
+
         /* Secondary color overrides */
-        .bg-indigo-600 { background-color: var(--secondary-color) !important; }
-        .text-indigo-600 { color: var(--secondary-color) !important; }
-        .border-indigo-600 { border-color: var(--secondary-color) !important; }
-        .hover\:bg-indigo-700:hover { background-color: color-mix(in srgb, var(--secondary-color) 80%, black) !important; }
-        .hover\:text-indigo-600:hover { color: var(--secondary-color) !important; }
+        .bg-indigo-600 {
+            background-color: var(--secondary-color) !important;
+        }
+
+        .text-indigo-600 {
+            color: var(--secondary-color) !important;
+        }
+
+        .border-indigo-600 {
+            border-color: var(--secondary-color) !important;
+        }
+
+        .hover\:bg-indigo-700:hover {
+            background-color: color-mix(in srgb, var(--secondary-color) 80%, black) !important;
+        }
+
+        .hover\:text-indigo-600:hover {
+            color: var(--secondary-color) !important;
+        }
+
         /* Primary color overrides - all variants */
-        .bg-emerald-50 { background-color: color-mix(in srgb, var(--primary-color) 5%, white) !important; }
-        .bg-emerald-100 { background-color: color-mix(in srgb, var(--primary-color) 10%, white) !important; }
-        .bg-emerald-200 { background-color: color-mix(in srgb, var(--primary-color) 20%, white) !important; }
-        .bg-emerald-300 { background-color: color-mix(in srgb, var(--primary-color) 30%, white) !important; }
-        .bg-emerald-400 { background-color: color-mix(in srgb, var(--primary-color) 40%, white) !important; }
-        .bg-emerald-500 { background-color: color-mix(in srgb, var(--primary-color) 10%, black) !important; }
-        .bg-emerald-600 { background-color: var(--primary-color) !important; }
-        .bg-emerald-700 { background-color: color-mix(in srgb, var(--primary-color) 80%, black) !important; }
-        .bg-emerald-800 { background-color: color-mix(in srgb, var(--primary-color) 60%, black) !important; }
-        .bg-emerald-900 { background-color: color-mix(in srgb, var(--primary-color) 40%, black) !important; }
-        
-        .text-emerald-50 { color: color-mix(in srgb, var(--primary-color) 5%, white) !important; }
-        .text-emerald-100 { color: color-mix(in srgb, var(--primary-color) 10%, white) !important; }
-        .text-emerald-200 { color: color-mix(in srgb, var(--primary-color) 20%, white) !important; }
-        .text-emerald-300 { color: color-mix(in srgb, var(--primary-color) 30%, white) !important; }
-        .text-emerald-400 { color: color-mix(in srgb, var(--primary-color) 40%, white) !important; }
-        .text-emerald-500 { color: color-mix(in srgb, var(--primary-color) 10%, black) !important; }
-        .text-emerald-600 { color: var(--primary-color) !important; }
-        .text-emerald-700 { color: color-mix(in srgb, var(--primary-color) 80%, black) !important; }
-        .text-emerald-800 { color: color-mix(in srgb, var(--primary-color) 60%, black) !important; }
-        .text-emerald-900 { color: color-mix(in srgb, var(--primary-color) 40%, black) !important; }
-        
-        .border-emerald-50 { border-color: color-mix(in srgb, var(--primary-color) 5%, white) !important; }
-        .border-emerald-100 { border-color: color-mix(in srgb, var(--primary-color) 10%, white) !important; }
-        .border-emerald-200 { border-color: color-mix(in srgb, var(--primary-color) 20%, white) !important; }
-        .border-emerald-300 { border-color: color-mix(in srgb, var(--primary-color) 30%, white) !important; }
-        .border-emerald-400 { border-color: color-mix(in srgb, var(--primary-color) 40%, white) !important; }
-        .border-emerald-500 { border-color: color-mix(in srgb, var(--primary-color) 10%, black) !important; }
-        .border-emerald-600 { border-color: var(--primary-color) !important; }
-        .border-emerald-700 { border-color: color-mix(in srgb, var(--primary-color) 80%, black) !important; }
-        .border-emerald-800 { border-color: color-mix(in srgb, var(--primary-color) 60%, black) !important; }
-        .border-emerald-900 { border-color: color-mix(in srgb, var(--primary-color) 40%, black) !important; }
-        
+        .bg-emerald-50 {
+            background-color: color-mix(in srgb, var(--primary-color) 5%, white) !important;
+        }
+
+        .bg-emerald-100 {
+            background-color: color-mix(in srgb, var(--primary-color) 10%, white) !important;
+        }
+
+        .bg-emerald-200 {
+            background-color: color-mix(in srgb, var(--primary-color) 20%, white) !important;
+        }
+
+        .bg-emerald-300 {
+            background-color: color-mix(in srgb, var(--primary-color) 30%, white) !important;
+        }
+
+        .bg-emerald-400 {
+            background-color: color-mix(in srgb, var(--primary-color) 40%, white) !important;
+        }
+
+        .bg-emerald-500 {
+            background-color: color-mix(in srgb, var(--primary-color) 10%, black) !important;
+        }
+
+        .bg-emerald-600 {
+            background-color: var(--primary-color) !important;
+        }
+
+        .bg-emerald-700 {
+            background-color: color-mix(in srgb, var(--primary-color) 80%, black) !important;
+        }
+
+        .bg-emerald-800 {
+            background-color: color-mix(in srgb, var(--primary-color) 60%, black) !important;
+        }
+
+        .bg-emerald-900 {
+            background-color: color-mix(in srgb, var(--primary-color) 40%, black) !important;
+        }
+
+        .text-emerald-50 {
+            color: color-mix(in srgb, var(--primary-color) 5%, white) !important;
+        }
+
+        .text-emerald-100 {
+            color: color-mix(in srgb, var(--primary-color) 10%, white) !important;
+        }
+
+        .text-emerald-200 {
+            color: color-mix(in srgb, var(--primary-color) 20%, white) !important;
+        }
+
+        .text-emerald-300 {
+            color: color-mix(in srgb, var(--primary-color) 30%, white) !important;
+        }
+
+        .text-emerald-400 {
+            color: color-mix(in srgb, var(--primary-color) 40%, white) !important;
+        }
+
+        .text-emerald-500 {
+            color: color-mix(in srgb, var(--primary-color) 10%, black) !important;
+        }
+
+        .text-emerald-600 {
+            color: var(--primary-color) !important;
+        }
+
+        .text-emerald-700 {
+            color: color-mix(in srgb, var(--primary-color) 80%, black) !important;
+        }
+
+        .text-emerald-800 {
+            color: color-mix(in srgb, var(--primary-color) 60%, black) !important;
+        }
+
+        .text-emerald-900 {
+            color: color-mix(in srgb, var(--primary-color) 40%, black) !important;
+        }
+
+        .border-emerald-50 {
+            border-color: color-mix(in srgb, var(--primary-color) 5%, white) !important;
+        }
+
+        .border-emerald-100 {
+            border-color: color-mix(in srgb, var(--primary-color) 10%, white) !important;
+        }
+
+        .border-emerald-200 {
+            border-color: color-mix(in srgb, var(--primary-color) 20%, white) !important;
+        }
+
+        .border-emerald-300 {
+            border-color: color-mix(in srgb, var(--primary-color) 30%, white) !important;
+        }
+
+        .border-emerald-400 {
+            border-color: color-mix(in srgb, var(--primary-color) 40%, white) !important;
+        }
+
+        .border-emerald-500 {
+            border-color: color-mix(in srgb, var(--primary-color) 10%, black) !important;
+        }
+
+        .border-emerald-600 {
+            border-color: var(--primary-color) !important;
+        }
+
+        .border-emerald-700 {
+            border-color: color-mix(in srgb, var(--primary-color) 80%, black) !important;
+        }
+
+        .border-emerald-800 {
+            border-color: color-mix(in srgb, var(--primary-color) 60%, black) !important;
+        }
+
+        .border-emerald-900 {
+            border-color: color-mix(in srgb, var(--primary-color) 40%, black) !important;
+        }
+
         /* Hover states for primary color */
-        .hover\:bg-emerald-50:hover { background-color: color-mix(in srgb, var(--primary-color) 5%, white) !important; }
-        .hover\:bg-emerald-100:hover { background-color: color-mix(in srgb, var(--primary-color) 10%, white) !important; }
-        .hover\:bg-emerald-200:hover { background-color: color-mix(in srgb, var(--primary-color) 20%, white) !important; }
-        .hover\:bg-emerald-300:hover { background-color: color-mix(in srgb, var(--primary-color) 30%, white) !important; }
-        .hover\:bg-emerald-400:hover { background-color: color-mix(in srgb, var(--primary-color) 40%, white) !important; }
-        .hover\:bg-emerald-500:hover { background-color: color-mix(in srgb, var(--primary-color) 10%, black) !important; }
-        .hover\:bg-emerald-600:hover { background-color: var(--primary-color) !important; }
-        .hover\:bg-emerald-700:hover { background-color: color-mix(in srgb, var(--primary-color) 80%, black) !important; }
-        .hover\:bg-emerald-800:hover { background-color: color-mix(in srgb, var(--primary-color) 60%, black) !important; }
-        .hover\:bg-emerald-900:hover { background-color: color-mix(in srgb, var(--primary-color) 40%, black) !important; }
-        
-        .hover\:text-emerald-50:hover { color: color-mix(in srgb, var(--primary-color) 5%, white) !important; }
-        .hover\:text-emerald-100:hover { color: color-mix(in srgb, var(--primary-color) 10%, white) !important; }
-        .hover\:text-emerald-200:hover { color: color-mix(in srgb, var(--primary-color) 20%, white) !important; }
-        .hover\:text-emerald-300:hover { color: color-mix(in srgb, var(--primary-color) 30%, white) !important; }
-        .hover\:text-emerald-400:hover { color: color-mix(in srgb, var(--primary-color) 40%, white) !important; }
-        .hover\:text-emerald-500:hover { color: color-mix(in srgb, var(--primary-color) 10%, black) !important; }
-        .hover\:text-emerald-600:hover { color: var(--primary-color) !important; }
-        .hover\:text-emerald-700:hover { color: color-mix(in srgb, var(--primary-color) 80%, black) !important; }
-        .hover\:text-emerald-800:hover { color: color-mix(in srgb, var(--primary-color) 60%, black) !important; }
-        .hover\:text-emerald-900:hover { color: color-mix(in srgb, var(--primary-color) 40%, black) !important; }
-        
+        .hover\:bg-emerald-50:hover {
+            background-color: color-mix(in srgb, var(--primary-color) 5%, white) !important;
+        }
+
+        .hover\:bg-emerald-100:hover {
+            background-color: color-mix(in srgb, var(--primary-color) 10%, white) !important;
+        }
+
+        .hover\:bg-emerald-200:hover {
+            background-color: color-mix(in srgb, var(--primary-color) 20%, white) !important;
+        }
+
+        .hover\:bg-emerald-300:hover {
+            background-color: color-mix(in srgb, var(--primary-color) 30%, white) !important;
+        }
+
+        .hover\:bg-emerald-400:hover {
+            background-color: color-mix(in srgb, var(--primary-color) 40%, white) !important;
+        }
+
+        .hover\:bg-emerald-500:hover {
+            background-color: color-mix(in srgb, var(--primary-color) 10%, black) !important;
+        }
+
+        .hover\:bg-emerald-600:hover {
+            background-color: var(--primary-color) !important;
+        }
+
+        .hover\:bg-emerald-700:hover {
+            background-color: color-mix(in srgb, var(--primary-color) 80%, black) !important;
+        }
+
+        .hover\:bg-emerald-800:hover {
+            background-color: color-mix(in srgb, var(--primary-color) 60%, black) !important;
+        }
+
+        .hover\:bg-emerald-900:hover {
+            background-color: color-mix(in srgb, var(--primary-color) 40%, black) !important;
+        }
+
+        .hover\:text-emerald-50:hover {
+            color: color-mix(in srgb, var(--primary-color) 5%, white) !important;
+        }
+
+        .hover\:text-emerald-100:hover {
+            color: color-mix(in srgb, var(--primary-color) 10%, white) !important;
+        }
+
+        .hover\:text-emerald-200:hover {
+            color: color-mix(in srgb, var(--primary-color) 20%, white) !important;
+        }
+
+        .hover\:text-emerald-300:hover {
+            color: color-mix(in srgb, var(--primary-color) 30%, white) !important;
+        }
+
+        .hover\:text-emerald-400:hover {
+            color: color-mix(in srgb, var(--primary-color) 40%, white) !important;
+        }
+
+        .hover\:text-emerald-500:hover {
+            color: color-mix(in srgb, var(--primary-color) 10%, black) !important;
+        }
+
+        .hover\:text-emerald-600:hover {
+            color: var(--primary-color) !important;
+        }
+
+        .hover\:text-emerald-700:hover {
+            color: color-mix(in srgb, var(--primary-color) 80%, black) !important;
+        }
+
+        .hover\:text-emerald-800:hover {
+            color: color-mix(in srgb, var(--primary-color) 60%, black) !important;
+        }
+
+        .hover\:text-emerald-900:hover {
+            color: color-mix(in srgb, var(--primary-color) 40%, black) !important;
+        }
+
         /* Focus states for primary color */
-        .focus\:ring-emerald-200:focus { --tw-ring-color: color-mix(in srgb, var(--primary-color) 20%, white) !important; }
-        .focus\:ring-emerald-500:focus { --tw-ring-color: color-mix(in srgb, var(--primary-color) 10%, black) !important; }
-        .focus\:border-emerald-500:focus { border-color: color-mix(in srgb, var(--primary-color) 10%, black) !important; }
-        
+        .focus\:ring-emerald-200:focus {
+            --tw-ring-color: color-mix(in srgb, var(--primary-color) 20%, white) !important;
+        }
+
+        .focus\:ring-emerald-500:focus {
+            --tw-ring-color: color-mix(in srgb, var(--primary-color) 10%, black) !important;
+        }
+
+        .focus\:border-emerald-500:focus {
+            border-color: color-mix(in srgb, var(--primary-color) 10%, black) !important;
+        }
+
         /* Secondary color overrides */
-        .bg-indigo-600 { background-color: var(--secondary-color) !important; }
-        .text-indigo-600 { color: var(--secondary-color) !important; }
-        .border-indigo-600 { border-color: var(--secondary-color) !important; }
-        .hover\:bg-indigo-700:hover { background-color: color-mix(in srgb, var(--secondary-color) 80%, black) !important; }
-        .hover\:text-indigo-600:hover { color: var(--secondary-color) !important; }
-        
+        .bg-indigo-600 {
+            background-color: var(--secondary-color) !important;
+        }
+
+        .text-indigo-600 {
+            color: var(--secondary-color) !important;
+        }
+
+        .border-indigo-600 {
+            border-color: var(--secondary-color) !important;
+        }
+
+        .hover\:bg-indigo-700:hover {
+            background-color: color-mix(in srgb, var(--secondary-color) 80%, black) !important;
+        }
+
+        .hover\:text-indigo-600:hover {
+            color: var(--secondary-color) !important;
+        }
+
         /* Form elements */
         .text-emerald-600[type="checkbox"]:checked {
             background-color: var(--primary-color) !important;
             border-color: var(--primary-color) !important;
         }
-        
+
         /* Dark mode styles */
         .dark body {
             background-color: #1a1a1a !important;
             color: #e5e5e5 !important;
         }
-        
+
         .dark .bg-white {
             background-color: #2a2a2a !important;
         }
-        
+
         .dark .bg-gray-50 {
             background-color: #2a2a2a !important;
         }
-        
+
         .dark .bg-gray-100 {
             background-color: #1a1a1a !important;
         }
-        
+
         .dark .bg-gray-200 {
             background-color: #333333 !important;
         }
-        
-        .dark .text-gray-700, 
-        .dark .text-gray-800, 
+
+        .dark .text-gray-700,
+        .dark .text-gray-800,
         .dark .text-gray-900 {
             color: #e5e5e5 !important;
         }
-        
-        .dark .text-gray-500, 
+
+        .dark .text-gray-500,
         .dark .text-gray-600 {
             color: #aaaaaa !important;
         }
-        
+
         .dark .border-gray-200,
         .dark .border-gray-300 {
             border-color: #444444 !important;
         }
-        
+
         .dark .shadow-md,
         .dark .shadow-sm {
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3) !important;
         }
+
         .dark .border-gray-200,
         .dark .border-gray-300 {
             border-color: #444444 !important;
         }
-        
+
         /* Add this new rule for border-gray-100 in dark mode with more emphasis */
         .dark .border-gray-100 {
             border-color: #444444 !important;
             border-width: 1.5px !important;
             box-shadow: 0 0 3px rgba(80, 80, 80, 0.5) !important;
         }
-        
+
         .dark .shadow-md,
         .dark .shadow-sm {
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3) !important;
         }
+
         .dark input,
         .dark select,
         .dark textarea {
@@ -320,28 +887,28 @@
             color: #e5e5e5 !important;
             border-color: #555555 !important;
         }
-        
+
         .dark table th {
             background-color: #333333 !important;
         }
-        
+
         .dark table tr:nth-child(even) {
             background-color: #2a2a2a !important;
         }
-        
+
         .dark table tr:hover {
             background-color: #3a3a3a !important;
         }
-        
+
         .dark .sidebar {
             background-color: #2a2a2a !important;
             border-color: #444444 !important;
         }
-        
+
         .dark .sidebar a {
             color: #e5e5e5 !important;
         }
-        
+
         .dark .sidebar a:hover {
             background-color: #3a3a3a !important;
             color: #ffffff !important;
@@ -372,79 +939,94 @@
             background-color: #444444 !important;
             color: #ffffff !important;
         }
-                .dark .bg-emerald-50:hover {
+
+        .dark .bg-emerald-50:hover {
             background-color: color-mix(in srgb, var(--primary-color) 5%, #2a2a2a) !important;
         }
-        
+
         .dark .bg-emerald-100:hover {
             background-color: color-mix(in srgb, var(--primary-color) 10%, #2a2a2a) !important;
         }
+
         .dark .bg-emerald-50 {
             background-color: color-mix(in srgb, var(--primary-color) 5%, #2a2a2a) !important;
         }
+
         .dark .bg-emerald-100:hover {
             background-color: color-mix(in srgb, var(--primary-color) 10%, #2a2a2a) !important;
         }
+
         .dark .bg-emerald-100 {
             background-color: color-mix(in srgb, var(--primary-color) 10%, #2a2a2a) !important;
         }
+
         .dark .sidebar .toggle-btn:hover {
             background-color: #3a3a3a !important;
             color: #ffffff !important;
         }
-        
+
         .dark .sidebar .active:hover {
             background-color: #3a3a3a !important;
             color: #ffffff !important;
         }
-        
+
         .dark .sidebar .submenu {
             background-color: #333333 !important;
         }
-        
+
         .dark .sidebar .submenu a {
             color: #e5e5e5 !important;
         }
-        
+
         .dark .sidebar .submenu a:hover {
             background-color: #444444 !important;
         }
-        
+
         .dark .sidebar .logo {
             border-color: #444444 !important;
         }
-        
+
         .dark .sidebar .logo-text {
             color: #e5e5e5 !important;
         }
-        
+
         .dark .sidebar .toggle-btn {
             color: #e5e5e5 !important;
         }
-        
+
         .dark .sidebar .toggle-btn:hover {
             background-color: #3a3a3a !important;
         }
+
+        /* Prevenir doble scrollbar - solo scroll en main */
+        html,
+        body {
+            overflow: hidden;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
     </style>
 </head>
+
 <body class="bg-gray-100 dark:bg-gray-900 transition-colors duration-200">
     <!-- Estructura principal con flexbox -->
     <div class="flex h-screen overflow-hidden">
         <!-- Sidebar - incluida como componente -->
         {% include 'sidebar.html' %}
-        
+
         <!-- Contenedor principal - se ajustará cuando la sidebar cambie -->
         <div class="flex-1 flex flex-col overflow-hidden transition-all duration-300" id="mainContentWrapper">
             <!-- Navbar en la parte superior -->
             {% include 'navbar.html' %}
-            
+
             <!-- Área de contenido principal con scroll -->
             <main class="flex-1 overflow-y-auto bg-gray-100 dark:bg-gray-800 p-4 md:p-6">
                 {% block content %}{% endblock %}
             </main>
         </div>
     </div>
-    
+
     <!-- Estilos específicos para el posicionamiento fijo -->
     <style>
         /* Estilos para sidebar y navbar fijos */
@@ -453,18 +1035,19 @@
             top: 0;
             left: 0;
             height: 100vh;
-            width: 16rem; /* 64 = 16rem */
+            width: 16rem;
+            /* 64 = 16rem */
             z-index: 40;
             overflow-y: auto;
             transition: transform 0.3s ease;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
-        
+
         /* Transformación de la sidebar cuando está colapsada */
         body.sidebar-collapsed #desktopSidebar {
             transform: translateX(-100%);
         }
-        
+
         /* Navbar fijo en la parte superior */
         nav {
             position: sticky;
@@ -472,48 +1055,49 @@
             z-index: 30;
             width: 100%;
             transition: all 0.3s ease;
-            display: block !important; /* Asegurar que siempre sea visible */
+            display: block !important;
+            /* Asegurar que siempre sea visible */
         }
-        
+
         /* Ajustes del contenedor principal */
         #mainContentWrapper {
             transition: none;
             width: 100%;
         }
-        
+
         /* En móvil, asegurar que el contenedor ocupe todo el ancho */
         @media (max-width: 767px) {
             #mainContentWrapper {
                 margin-left: 0 !important;
                 width: 100% !important;
             }
-            
+
             nav {
                 display: block !important;
                 position: sticky !important;
                 top: 0 !important;
             }
-            
+
             /* Asegurar que el botón del menú sea visible */
             #sidebarToggle {
                 display: flex !important;
             }
         }
-        
+
         /* Media query para pantallas medianas y grandes */
         @media (min-width: 768px) {
             #mainContentWrapper {
                 margin-left: 16rem;
                 width: calc(100% - 16rem);
             }
-            
+
             body.sidebar-collapsed #mainContentWrapper {
                 margin-left: 0;
                 width: 100%;
                 transition: margin-left 0.3s ease, width 0.3s ease;
             }
         }
-        
+
         /* Botón para expandir la sidebar */
         #expandSidebar {
             position: fixed;
@@ -523,46 +1107,46 @@
             display: none;
             transition: opacity 0.2s ease;
         }
-        
+
         body.sidebar-collapsed #expandSidebar {
             display: block;
         }
-        
+
         /* Ocultar el botón expandSidebar en dispositivos móviles */
         @media (max-width: 767px) {
             #expandSidebar {
                 display: none !important;
             }
         }
-        
+
         /* Ajuste para el contenido principal */
         main {
             min-height: calc(100vh - 64px);
         }
     </style>
-    
+
     <!-- Scripts para manejar la interactividad -->
     <script>
         // Inicializar iconos de Lucide
         if (typeof lucide !== 'undefined') {
             lucide.createIcons();
         }
-        
+
         // Script para manejar el toggle de la sidebar
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // Reinicializar iconos después de que el DOM esté listo
             if (typeof lucide !== 'undefined') {
                 lucide.createIcons();
             }
-            
+
             const desktopSidebar = document.getElementById('desktopSidebar');
             const mainContentWrapper = document.getElementById('mainContentWrapper');
             const collapseSidebar = document.getElementById('collapseSidebar');
             const expandSidebar = document.getElementById('expandSidebar');
-            
+
             // Verificar si hay un estado guardado en localStorage
             const sidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
-            
+
             // Solo aplicar la lógica de colapsar/expandir en dispositivos no móviles
             if (window.innerWidth >= 768) {  // 768px es el breakpoint para md: en Tailwind
                 if (sidebarCollapsed) {
@@ -571,10 +1155,10 @@
                         expandSidebar.classList.remove('hidden');
                     }
                 }
-                
+
                 // Evento para colapsar la sidebar
                 if (collapseSidebar) {
-                    collapseSidebar.addEventListener('click', function() {
+                    collapseSidebar.addEventListener('click', function () {
                         document.body.classList.add('sidebar-collapsed');
                         if (expandSidebar) {
                             expandSidebar.classList.remove('hidden');
@@ -586,10 +1170,10 @@
                         localStorage.setItem('sidebarCollapsed', 'true');
                     });
                 }
-                
+
                 // Evento para expandir la sidebar
                 if (expandSidebar) {
-                    expandSidebar.addEventListener('click', function() {
+                    expandSidebar.addEventListener('click', function () {
                         document.body.classList.remove('sidebar-collapsed');
                         expandSidebar.classList.add('hidden');
                         localStorage.setItem('sidebarCollapsed', 'false');
@@ -601,7 +1185,7 @@
                     expandSidebar.classList.add('hidden');
                 }
             }
-            
+
             // Ajuste inicial basado en el tamaño de la ventana
             function adjustForScreenSize() {
                 if (window.innerWidth < 768 && !document.body.classList.contains('sidebar-collapsed')) {
@@ -609,13 +1193,13 @@
                     localStorage.setItem('sidebarCollapsed', 'true');
                 }
             }
-            
+
             // Ejecutar al cargar y al cambiar el tamaño de la ventana
             adjustForScreenSize();
             window.addEventListener('resize', adjustForScreenSize);
         });
     </script>
-    
+
     <!-- Inicializar Lucide Icons -->
     <script>
         // Inicializar iconos de Lucide cuando el DOM esté listo
@@ -623,25 +1207,353 @@
             lucide.createIcons();
         }
     </script>
-    
+
+    <!-- Sistema de Notificaciones Global -->
+    <div id="notification-container" class="fixed top-20 right-5 z-[9999] flex flex-col gap-3 pointer-events-none">
+    </div>
+
+    <!-- Sistema de Modales Global -->
+    <div id="modal-overlay" class="hidden fixed inset-0 z-[10000] flex items-center justify-center p-4"
+        style="backdrop-filter: blur(6px); background: rgba(0,0,0,0.4);">
+        <div class="modal-box bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-md w-full transform transition-all pointer-events-auto"
+            style="animation: modalSlideIn 0.3s ease;">
+            <div class="p-6">
+                <div class="flex items-start mb-4">
+                    <div id="modal-icon"
+                        class="flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center mr-4">
+                        <i id="modal-icon-svg" class="w-6 h-6"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h3 id="modal-title" class="text-lg font-bold text-gray-900 dark:text-white mb-2"></h3>
+                        <p id="modal-message" class="text-sm text-gray-600 dark:text-gray-300"></p>
+                    </div>
+                </div>
+                <div class="flex gap-3 justify-end mt-6">
+                    <button id="modal-cancel"
+                        class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors">
+                        Cancelar
+                    </button>
+                    <button id="modal-confirm"
+                        class="px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors">
+                        Confirmar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        /* Animaciones para notificaciones - Elegantes y sutiles */
+        @keyframes fadeSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeSlideOut {
+            from {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            to {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+        }
+
+        @keyframes progressBar {
+            from {
+                width: 100%;
+            }
+
+            to {
+                width: 0%;
+            }
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                transform: scale(0.9);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* Notificaciones elegantes y minimalistas - Nivel SaaS Premium */
+        .notification {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 12px 16px;
+            min-width: 320px;
+            max-width: 420px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.03);
+            animation: fadeSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: auto;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: relative;
+            overflow: hidden;
+            border-left: 2px solid;
+        }
+
+        .notification.removing {
+            animation: fadeSlideOut 0.3s cubic-bezier(0.4, 0, 1, 1);
+        }
+
+        /* Barra de progreso sutil */
+        .notification::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 1.5px;
+            background: currentColor;
+            opacity: 0.2;
+            animation: progressBar 3s linear;
+        }
+
+        /* Colores por tipo - Sutiles y elegantes */
+        .notification.success {
+            border-left-color: #059669;
+            color: #065f46;
+        }
+
+        .notification.error {
+            border-left-color: #991b1b;
+            color: #7f1d1d;
+        }
+
+        .notification.warning {
+            border-left-color: #ca8a04;
+            color: #78350f;
+        }
+
+        .notification.info {
+            border-left-color: #1e40af;
+            color: #1e3a8a;
+        }
+
+        /* Iconos con color según tipo */
+        .notification-icon {
+            flex-shrink: 0;
+            width: 16px;
+            height: 16px;
+            opacity: 0.8;
+        }
+
+        .notification.success .notification-icon {
+            color: #059669;
+        }
+
+        .notification.error .notification-icon {
+            color: #991b1b;
+        }
+
+        .notification.warning .notification-icon {
+            color: #ca8a04;
+        }
+
+        .notification.info .notification-icon {
+            color: #1e40af;
+        }
+
+        /* Texto de la notificación */
+        .notification-text {
+            flex: 1;
+            font-size: 13px;
+            font-weight: 500;
+            line-height: 1.5;
+            letter-spacing: -0.01em;
+        }
+
+        /* Hover para pausar auto-close */
+        .notification:hover::after {
+            animation-play-state: paused;
+        }
+
+        /* Dark mode - Igual de sutil y elegante */
+        .dark .notification {
+            background: rgba(42, 42, 42, 0.75);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(0, 0, 0, 0.3);
+        }
+
+        .dark .notification.success {
+            color: #34d399;
+            border-left-color: #10b981;
+        }
+
+        .dark .notification.error {
+            color: #fca5a5;
+            border-left-color: #f87171;
+        }
+
+        .dark .notification.warning {
+            color: #fcd34d;
+            border-left-color: #fbbf24;
+        }
+
+        .dark .notification.info {
+            color: #93c5fd;
+            border-left-color: #60a5fa;
+        }
+    </style>
+
+    <script>
+        // 🔔 SISTEMA DE NOTIFICACIONES GLOBAL - Elegante y Minimalista
+        function showNotification(message, type = "info", duration = 3000) {
+            const container = document.getElementById("notification-container");
+
+            // Limitar a máximo 3 notificaciones visibles
+            const existingNotifs = container.querySelectorAll('.notification:not(.removing)');
+            if (existingNotifs.length >= 3) {
+                // Eliminar la más antigua
+                existingNotifs[0].classList.add('removing');
+                setTimeout(() => existingNotifs[0].remove(), 300);
+            }
+
+            const notif = document.createElement("div");
+            notif.className = `notification ${type}`;
+
+            // Iconos según el tipo - Pequeños y elegantes
+            const icons = {
+                success: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>',
+                error: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>',
+                warning: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>',
+                info: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>'
+            };
+
+            notif.innerHTML = `
+                <div class="notification-icon">${icons[type]}</div>
+                <div class="notification-text">${message}</div>
+            `;
+
+            container.appendChild(notif);
+
+            // Auto-close con posibilidad de pausar en hover
+            let timeoutId = setTimeout(() => {
+                notif.classList.add('removing');
+                setTimeout(() => notif.remove(), 300);
+            }, duration);
+
+            // Pausar en hover
+            notif.addEventListener('mouseenter', () => clearTimeout(timeoutId));
+            notif.addEventListener('mouseleave', () => {
+                timeoutId = setTimeout(() => {
+                    notif.classList.add('removing');
+                    setTimeout(() => notif.remove(), 300);
+                }, 1000);
+            });
+        }
+
+        // 🪟 SISTEMA DE MODALES GLOBAL
+        function showConfirm(title, message, onConfirm, options = {}) {
+            const overlay = document.getElementById("modal-overlay");
+            const modalIcon = document.getElementById("modal-icon");
+            const modalIconSvg = document.getElementById("modal-icon-svg");
+            const confirmBtn = document.getElementById("modal-confirm");
+
+            // Configuración por defecto
+            const config = {
+                type: 'warning', // warning, danger, info
+                confirmText: 'Confirmar',
+                cancelText: 'Cancelar',
+                ...options
+            };
+
+            // Configurar icono y colores según tipo
+            const types = {
+                warning: {
+                    bg: 'bg-amber-100 dark:bg-amber-900/30',
+                    icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-amber-600 dark:text-amber-400"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>',
+                    btnClass: 'bg-amber-600 hover:bg-amber-700'
+                },
+                danger: {
+                    bg: 'bg-red-100 dark:bg-red-900/30',
+                    icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-red-600 dark:text-red-400"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>',
+                    btnClass: 'bg-red-600 hover:bg-red-700'
+                },
+                info: {
+                    bg: 'bg-blue-100 dark:bg-blue-900/30',
+                    icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-600 dark:text-blue-400"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>',
+                    btnClass: 'bg-blue-600 hover:bg-blue-700'
+                }
+            };
+
+            const typeConfig = types[config.type];
+
+            // Actualizar contenido
+            document.getElementById("modal-title").innerText = title;
+            document.getElementById("modal-message").innerText = message;
+            modalIcon.className = `flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center mr-4 ${typeConfig.bg}`;
+            modalIconSvg.innerHTML = typeConfig.icon;
+            confirmBtn.className = `px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors ${typeConfig.btnClass}`;
+            confirmBtn.innerText = config.confirmText;
+            document.getElementById("modal-cancel").innerText = config.cancelText;
+
+            // Mostrar modal
+            overlay.classList.remove("hidden");
+
+            // Handlers
+            const closeModal = () => overlay.classList.add("hidden");
+
+            confirmBtn.onclick = function () {
+                closeModal();
+                if (onConfirm) onConfirm();
+            };
+
+            document.getElementById("modal-cancel").onclick = closeModal;
+
+            // Cerrar con ESC
+            const escHandler = (e) => {
+                if (e.key === 'Escape') {
+                    closeModal();
+                    document.removeEventListener('keydown', escHandler);
+                }
+            };
+            document.addEventListener('keydown', escHandler);
+
+            // Cerrar al hacer click fuera
+            overlay.onclick = function (e) {
+                if (e.target === overlay) closeModal();
+            };
+        }
+
+        // Función de alerta simple (solo información)
+        function showAlert(title, message, type = 'info') {
+            showConfirm(title, message, null, {
+                type: type,
+                confirmText: 'Entendido',
+                cancelText: 'Cerrar'
+            });
+            // Ocultar botón de confirmar si solo es informativo
+            document.getElementById("modal-confirm").style.display = 'none';
+        }
+    </script>
+
     {% block extra_js %}{% endblock %}
 </body>
+
 </html>
-<script>
-    function showNotification(message) {
-        const notification = document.getElementById('notification');
-        const notificationMessage = document.getElementById('notification-message');
-        
-        notificationMessage.textContent = message;
-        notification.classList.remove('hidden');
-        notification.style.display = 'block';
+notification.style.display = 'none';
+}, 3000); // 3 seconds
+}
 
-        setTimeout(() => {
-            notification.classList.add('hidden');
-            notification.style.display = 'none';
-        }, 3000); // 3 seconds
-    }
-
-    // Example usage:
-    // showNotification('This is a notification message!');
+// Example usage:
+// showNotification('This is a notification message!');
 </script>

@@ -5,311 +5,869 @@
     {% load static %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SouthernPOS - Gestión de ventas desde cualquier dispositivo</title>
-    <link rel="icon" type="image/png" href="{% static 'img/logo.png' %}">
-    <link rel="shortcut icon" type="image/png" href="{% static 'img/logo.png' %}">
+    <title>Lemon POS - El punto de venta moderno para restaurantes y retail</title>
+    <meta name="description"
+        content="Controla ventas, inventario y reportes en tiempo real desde cualquier dispositivo. Sistema POS táctil diseñado para restaurantes en crecimiento.">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="{% static 'img/favicon.svg' %}">
+    <link rel="shortcut icon" type="image/svg+xml" href="{% static 'img/favicon.svg' %}">
+    <link rel="apple-touch-icon" href="{% static 'img/favicon.svg' %}">
+
+    <!-- Tailwind CSS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+
+    <!-- Custom CSS - DEBE IR DESPUÉS DE TAILWIND -->
+    <link rel="stylesheet" href="{% static 'css/landing.css' %}">
+
     <style>
-        .hero-gradient {
-            background: linear-gradient(135deg, #4ade80 0%, #ffffff 100%);
+        /* Override crítico para evitar texto tachado */
+        * {
+            text-decoration: none !important;
         }
 
-        .nav-link {
-            position: relative;
+        a {
+            text-decoration: none !important;
         }
 
-        .nav-link::after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background-color: #16a34a;
-            transition: width 0.3s ease;
-        }
-
-        .nav-link:hover::after {
-            width: 100%;
-        }
-
-        .nav-link:hover {
-            color: #16a34a;
-            transition: color 0.3s ease;
-        }
-
-        .feature-card {
-            transition: all 0.3s ease;
-        }
-
-        .feature-card:hover {
-            transform: translateY(-8px) scale(1.02);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-        }
-
-        .feature-icon {
-            transition: transform 0.5s ease;
-        }
-
-        /* Remove the icon scale effect */
-        /* .feature-card:hover .feature-icon {
-            transform: scale(1.2);
-        } */
-        .hamburger-menu {
-            display: none;
-        }
-
-        .mobile-menu {
-            display: none;
-        }
-
-        @media (max-width: 768px) {
-            .desktop-menu {
-                display: none;
-            }
-
-            .hamburger-menu {
-                display: block;
-            }
-
-            .mobile-menu {
-                display: none;
-                position: absolute;
-                top: 70px;
-                right: 0;
-                width: 100%;
-                background: white;
-                padding: 20px;
-                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-                z-index: 100;
-            }
-
-            .mobile-menu.active {
-                display: block;
-            }
-        }
-
-        .cta-button {
-            transition: all 0.3s ease;
-        }
-
-        .cta-button:hover {
-            transform: scale(1.05);
-        }
-
-        .testimonial-card {
-            transition: all 0.3s ease;
-        }
-
-        .testimonial-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .social-icon {
-            transition: all 0.3s ease;
-        }
-
-        .social-icon:hover {
-            transform: translateY(-3px) scale(1.2);
-        }
-
-        /* Animated dots for hero section */
-        @keyframes float {
-            0% {
-                transform: translateY(0px);
-            }
-
-            50% {
-                transform: translateY(-15px);
-            }
-
-            100% {
-                transform: translateY(0px);
-            }
-        }
-
-        .floating {
-            animation: float 5s ease-in-out infinite;
-        }
-
-        .floating-delay-1 {
-            animation-delay: 1s;
-        }
-
-        .floating-delay-2 {
-            animation-delay: 2s;
+        .line-through {
+            text-decoration: none !important;
         }
     </style>
 </head>
 
-<body class="font-sans">
-    <!-- Header -->
-    <header class="bg-white shadow-sm fixed w-full top-0 z-50">
+<body style="opacity: 0; transition: opacity 0.3s;">
+
+    <!-- ============================================
+         NAVBAR
+         ============================================ -->
+    <header class="navbar-scroll bg-white shadow-sm">
         <div class="container mx-auto px-4 py-4 flex justify-between items-center">
-            <div class="flex items-center animate__animated animate__fadeIn">
-                <img src="{% static 'img/logo.png' %}" alt="SouthernPOS Logo" class="h-8 mr-2">
-                <span class="text-xl font-bold">SouthernPOS</span>
+            <!-- Logo -->
+            <div class="flex items-center">
+                <img src="{% static 'img/LemonPosLogo.svg' %}" alt="Lemon POS" class="lemon-icon-svg" width="50"
+                    height="50">
+                <span class="logo-text" style="margin-left: 2px;">
+                    <span class="logo-lemon">Lemon</span> <span class="logo-pos">POS</span>
+                </span>
             </div>
 
             <!-- Desktop Menu -->
-            <nav class="desktop-menu animate__animated animate__fadeIn">
-                <ul class="flex space-x-6">
-                    <li><a href="#" class="nav-link font-medium">Inicio</a></li>
-                    <li><a href="#features" class="nav-link font-medium">Características</a></li>
-                    <li><a href="#pricing" class="nav-link font-medium">Precios</a></li>
-                    <li><a href="#support" class="nav-link font-medium">Soporte</a></li>
-                    <li><a href="{% url 'login' %}" class="nav-link font-medium">Iniciar Sesión</a></li>
-                    <li><a href="{% url 'register' %}"
-                            class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition transform hover:scale-105">Registrarse</a>
-                    </li>
+            <nav class="desktop-menu hidden md:block">
+                <ul class="flex space-x-8 items-center">
+                    <li><a href="#caracteristicas" class="nav-link">Producto</a></li>
+                    <li><a href="#planes" class="nav-link">Planes</a></li>
+                    <li><a href="#testimonios" class="nav-link">Soporte</a></li>
+                    <li><a href="{% url 'login' %}" class="nav-link-login">Iniciar sesión</a></li>
+                    <li><a href="{% url 'register' %}" class="btn-primary-nav">Crear cuenta gratis</a></li>
                 </ul>
             </nav>
 
-            <!-- Hamburger Menu - Only for Mobile -->
-            <div class="hamburger-menu">
+            <!-- Mobile Menu Toggle -->
+            <div class="hamburger-menu md:hidden">
                 <button id="menu-toggle" class="focus:outline-none">
-                    <i class="fas fa-bars text-xl"></i>
+                    <i class="fas fa-bars text-gray-700"></i>
                 </button>
             </div>
         </div>
 
-        <!-- Mobile Menu - Only for Mobile -->
-        <div id="mobile-menu" class="mobile-menu">
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="mobile-menu md:hidden">
             <ul class="space-y-4">
-                <li><a href="#" class="block py-2 hover:text-green-600">Inicio</a></li>
-                <li><a href="#features" class="block py-2 hover:text-green-600">Características</a></li>
-                <li><a href="#pricing" class="block py-2 hover:text-green-600">Precios</a></li>
-                <li><a href="#support" class="block py-2 hover:text-green-600">Soporte</a></li>
-                <li><a href="{% url 'login' %}" class="block py-2 hover:text-green-600">Iniciar Sesión</a></li>
-                <li><a href="{% url 'register' %}"
-                        class="block py-2 bg-green-600 text-white px-4 rounded hover:bg-green-700 text-center">Registrarse</a>
-                </li>
+                <li><a href="#caracteristicas" class="block py-2 hover:text-green-600">Producto</a></li>
+                <li><a href="#planes" class="block py-2 hover:text-green-600">Planes</a></li>
+                <li><a href="#testimonios" class="block py-2 hover:text-green-600">Soporte</a></li>
+                <li><a href="{% url 'login' %}" class="block py-2 hover:text-green-600">Iniciar sesión</a></li>
+                <li><a href="{% url 'register' %}" class="btn-primary-nav block text-center mt-4">Crear cuenta
+                        gratis</a></li>
             </ul>
         </div>
     </header>
 
-    <!-- Hero Section -->
-    <!-- Hero Section -->
-    <!-- Hero Section -->
-    <!-- Hero Section -->
-    <!-- Hero Section -->
-    <section class="hero-gradient pt-24 pb-12 md:pt-32 md:pb-20 overflow-hidden relative">
-        <!-- Background con degradado verde original -->
-        <div class="absolute inset-0 bg-gradient-to-r from-green-400 to-white"></div>
+    <!-- ============================================
+         HERO SECTION
+         ============================================ -->
+    <section id="inicio" class="hero-gradient relative overflow-hidden">
+        <!-- Decorative blur circles -->
+        <div class="hero-blur-circle hero-blur-1"></div>
+        <div class="hero-blur-circle hero-blur-2"></div>
+        <div class="hero-blur-circle hero-blur-3"></div>
 
-        <div class="container mx-auto px-4 relative z-10">
-            <!-- Animated Background Elements -->
-            <div class="absolute top-10 right-10 h-16 w-16 bg-green-400 rounded-full opacity-20 floating"></div>
-            <div
-                class="absolute bottom-20 left-10 h-8 w-8 bg-green-300 rounded-full opacity-20 floating floating-delay-1">
-            </div>
-            <div
-                class="absolute top-40 left-1/4 h-12 w-12 bg-green-500 rounded-full opacity-10 floating floating-delay-2">
-            </div>
+        <!-- Limones decorativos flotantes - más visibles -->
+        <div class="absolute top-20 left-10 opacity-20 animate-float hidden lg:block">
+            <svg width="80" height="80" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path
+                    d="M16 2C15.4477 2 15 2.44772 15 3V4.5C15 5.32843 15.6716 6 16.5 6C17.3284 6 18 5.32843 18 4.5V3C18 2.44772 17.5523 2 17 2H16Z"
+                    fill="#84cc16" />
+                <ellipse cx="16" cy="18" rx="9" ry="11" stroke="#22c55e" stroke-width="2.5" fill="none" />
+            </svg>
+        </div>
+        <div class="absolute bottom-32 right-16 opacity-20 animate-float hidden lg:block" style="animation-delay: 1s;">
+            <svg width="100" height="100" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path
+                    d="M16 2C15.4477 2 15 2.44772 15 3V4.5C15 5.32843 15.6716 6 16.5 6C17.3284 6 18 5.32843 18 4.5V3C18 2.44772 17.5523 2 17 2H16Z"
+                    fill="#84cc16" />
+                <ellipse cx="16" cy="18" rx="9" ry="11" stroke="#22c55e" stroke-width="2.5" fill="none" />
+            </svg>
+        </div>
 
-            <div class="flex flex-col md:flex-row items-center">
-                <div class="md:w-2/5 mb-8 md:mb-0 animate__animated animate__fadeInLeft">
-                    <h1 class="text-4xl md:text-5xl font-bold mb-4">Gestiona tus ventas de forma rápida y segura</h1>
-                    <p class="text-lg mb-6">Accede desde cualquier dispositivo y lleva el control total de tu negocio.
+        <div class="container mx-auto px-4 py-16 md:py-24">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+                <!-- Left Content -->
+                <div class="fade-in space-y-6">
+                    <!-- Emotional tagline con especificidad ecuatoriana -->
+                    <p class="text-sm uppercase tracking-wider font-bold" style="color: var(--color-primary);">
+                        <i class="fas fa-bolt mr-2"></i>
+                        El sistema POS diseñado para restaurantes en Ecuador
                     </p>
-                    <div class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">
+
+                    <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
+                        <span class="gradient-text">Vende más.</span>
+                        <span class="block gradient-text mt-1">Controla todo.</span>
+                        <span class="block text-gray-900 mt-1">Sin complicaciones.</span>
+                    </h1>
+
+                    <div class="space-y-3">
+                        <p class="text-xl text-gray-700 font-medium leading-relaxed">
+                            Ventas, inventario, facturación electrónica y control de equipo en una sola plataforma.
+                        </p>
+                    </div>
+
+                    <!-- Specialization badge -->
+                    <div class="flex flex-wrap gap-3">
+                        <span
+                            class="inline-flex items-center px-5 py-3 rounded-full bg-green-50 text-green-700 font-semibold text-sm border-2 border-green-200 hover:border-green-400 transition-all">
+                            <i class="fas fa-utensils mr-2"></i>Especializado en restaurantes
+                        </span>
+                        <span
+                            class="inline-flex items-center px-5 py-3 rounded-full bg-gray-100 text-gray-700 font-semibold text-sm border-2 border-gray-200 hover:border-gray-400 transition-all">
+                            <i class="fas fa-store mr-2"></i>Compatible con retail
+                        </span>
+                    </div>
+
+                    <!-- CTA Buttons -->
+                    <div class="flex flex-col sm:flex-row gap-4 pt-2">
                         <a href="{% url 'register' %}"
-                            class="cta-button bg-green-600 text-white px-6 py-3 rounded font-medium text-center hover:bg-green-700 transition shadow-md">Registrarse
-                            Gratis</a>
-                        <a href="{% url 'login' %}"
-                            class="cta-button border-2 border-green-600 text-green-600 px-6 py-3 rounded font-medium text-center hover:bg-green-50 transition">Iniciar
-                            Sesión</a>
+                            class="btn-primary text-center text-lg group transform hover:scale-105 transition-all">
+                            <i class="fas fa-rocket mr-2 group-hover:rotate-12 transition-transform"></i>
+                            Empezar gratis ahora
+                        </a>
+                        <a href="#como-funciona"
+                            class="btn-secondary text-center text-lg group transform hover:scale-105 transition-all">
+                            <i class="fas fa-play-circle mr-2 group-hover:scale-110 transition-transform"></i>
+                            Ver Cómo Funciona
+                        </a>
+                    </div>
+
+                    <!-- Trust Indicators - Barra limpia -->
+                    <div class="flex flex-wrap items-center gap-6 pt-4 text-sm text-gray-700">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-check-circle text-green-500"></i>
+                            <span class="font-medium">Sin tarjeta</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-check-circle text-green-500"></i>
+                            <span class="font-medium">Listo en 5 minutos</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-check-circle text-green-500"></i>
+                            <span class="font-medium">Soporte en español</span>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Imagen a la derecha más grande y alineada con el final de la sección -->
-                <div
-                    class="md:w-3/5 flex justify-end md:absolute md:right-0 md:bottom-0 md:top-0 animate__animated animate__fadeInRight">
-                    <img src="{% static 'img/pulbicidad.png' %}" alt="Sistema POS en múltiples dispositivos"
-                        class="h-auto w-full max-w-3xl object-contain opacity-95 transition-all hover:opacity-100"
-                        style="filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));">
+                <!-- Right Mockup -->
+                <div class="fade-in flex justify-center lg:justify-end relative">
+                    <div class="mockup-container">
+                        <img src="{% static 'img/pulbicidad.png' %}" alt="Lemon POS Dashboard"
+                            class="floating-mockup w-full max-w-2xl">
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Features Section -->
-    <section id="features" class="py-16 bg-gray-50">
+    <!-- ============================================
+         STATS SECTION - Métricas honestas
+         ============================================ -->
+    <section class="stats-section py-16 md:py-20 bg-white">
         <div class="container mx-auto px-4">
-            <h2 class="text-3xl font-bold text-center mb-4 animate__animated animate__fadeIn">Todas las herramientas que
-                necesitas</h2>
-            <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto animate__animated animate__fadeIn">Descubre cómo
-                SouthernPOS puede transformar la gestión de tu negocio con estas potentes funcionalidades.</p>
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-6 md:gap-8">
+                <div
+                    class="fade-in stat-item text-center p-4 rounded-2xl hover:bg-gray-50 transition-all transform hover:-translate-y-1">
+                    <div class="text-4xl md:text-5xl font-bold mb-2 gradient-text">99%</div>
+                    <p class="text-gray-600 text-base font-medium">Disponibilidad</p>
+                    <p class="text-xs text-gray-500 mt-1">Infraestructura confiable</p>
+                </div>
+                <div
+                    class="fade-in stat-item text-center p-4 rounded-2xl hover:bg-gray-50 transition-all transform hover:-translate-y-1">
+                    <div class="text-4xl md:text-5xl font-bold mb-2 gradient-text">5 min</div>
+                    <p class="text-gray-600 text-base font-medium">Para configurar</p>
+                    <p class="text-xs text-gray-500 mt-1">Empieza hoy mismo</p>
+                </div>
+                <div
+                    class="fade-in stat-item text-center p-4 rounded-2xl hover:bg-gray-50 transition-all transform hover:-translate-y-1 md:col-span-1 col-span-2">
+                    <div class="text-4xl md:text-5xl font-bold mb-2 gradient-text">24/7</div>
+                    <p class="text-gray-600 text-base font-medium">Soporte</p>
+                    <p class="text-xs text-gray-500 mt-1">En español</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                <!-- Feature 1 -->
-                <div class="feature-card bg-white p-6 rounded-lg shadow-md">
-                    <div class="text-green-500 text-4xl mb-4 feature-icon">
-                        <i class="fas fa-box"></i>
+    <!-- ============================================
+         CÓMO FUNCIONA - 3 Pasos Simples
+         ============================================ -->
+    <section id="como-funciona" class="py-16 md:py-20 bg-gradient-to-b from-white to-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <p class="text-sm uppercase tracking-wider font-bold mb-2" style="color: var(--color-primary);">
+                    <i class="fas fa-rocket mr-2"></i>
+                    Simple y rápido
+                </p>
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
+                    Empieza en <span class="gradient-text">3 pasos</span>
+                </h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                    Sin complicaciones. Sin instalaciones. Sin tarjeta de crédito.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                <!-- Paso 1 -->
+                <div class="text-center group">
+                    <div class="relative mb-6">
+                        <div
+                            class="w-20 h-20 mx-auto rounded-2xl bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center text-white text-3xl font-bold shadow-lg group-hover:scale-110 transition-transform">
+                            1
+                        </div>
+                        <div
+                            class="absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-16 h-1 bg-green-200 rounded-full">
+                        </div>
                     </div>
-                    <h3 class="text-xl font-semibold mb-2">Gestión de productos</h3>
-                    <p class="text-gray-600">Organiza tu inventario con facilidad y mantén el control de tu stock en
-                        tiempo real.</p>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-3">Crea tu cuenta</h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        Regístrate gratis en menos de 2 minutos. Sin tarjeta de crédito.
+                    </p>
+                </div>
+
+                <!-- Paso 2 -->
+                <div class="text-center group">
+                    <div class="relative mb-6">
+                        <div
+                            class="w-20 h-20 mx-auto rounded-2xl bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center text-white text-3xl font-bold shadow-lg group-hover:scale-110 transition-transform">
+                            2
+                        </div>
+                        <div
+                            class="absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-16 h-1 bg-green-200 rounded-full">
+                        </div>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-3">Configura tu menú</h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        Agrega tus productos y categorías en minutos. Interfaz intuitiva.
+                    </p>
+                </div>
+
+                <!-- Paso 3 -->
+                <div class="text-center group">
+                    <div class="relative mb-6">
+                        <div
+                            class="w-20 h-20 mx-auto rounded-2xl bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center text-white text-3xl font-bold shadow-lg group-hover:scale-110 transition-transform">
+                            3
+                        </div>
+                        <div
+                            class="absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-16 h-1 bg-green-200 rounded-full">
+                        </div>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-3">Empieza a vender</h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        Listo. Ya puedes procesar ventas y gestionar tu restaurante.
+                    </p>
+                </div>
+            </div>
+
+            <!-- CTA -->
+            <div class="text-center mt-16">
+                <a href="{% url 'register' %}"
+                    class="btn-primary text-lg inline-block transform hover:scale-105 transition-all">
+                    <i class="fas fa-rocket mr-2"></i>
+                    Crear mi restaurante gratis
+                </a>
+            </div>
+        </div>
+    </section>
+    </section>
+
+    <!-- ============================================
+         RESTAURANT FOCUS SECTION - Fondo alternado
+         ============================================ -->
+    <section class="py-16 md:py-20 bg-gradient-to-br from-green-50 via-lime-50 to-white relative overflow-hidden">
+        <!-- Patrón decorativo -->
+        <div class="absolute top-0 right-0 w-1/3 h-full opacity-5">
+            <svg class="w-full h-full" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <pattern id="lemon-pattern" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+                    <circle cx="10" cy="10" r="2" fill="currentColor" class="text-green-500" />
+                </pattern>
+                <rect width="100" height="100" fill="url(#lemon-pattern)" />
+            </svg>
+        </div>
+
+        <div class="container mx-auto px-4 relative z-10">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+                <!-- Image -->
+                <div class="fade-in">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&q=80"
+                            alt="Restaurante moderno"
+                            class="rounded-3xl shadow-2xl w-full hover:shadow-3xl transition-shadow duration-300">
+                        <!-- Badge flotante -->
+                        <div
+                            class="absolute -bottom-6 -right-6 bg-white rounded-2xl shadow-xl p-6 border-2 border-green-200">
+                            <div class="flex items-center gap-3">
+                                <i class="fas fa-utensils text-green-500 text-3xl"></i>
+                                <div>
+                                    <p class="font-bold text-gray-900 text-lg">+500</p>
+                                    <p class="text-sm text-gray-600">Restaurantes</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Content -->
+                <div class="fade-in space-y-8">
+                    <div>
+                        <p class="text-sm uppercase tracking-wider font-bold mb-3" style="color: var(--color-primary);">
+                            <i class="fas fa-star mr-2"></i>
+                            Diseñado para tu industria
+                        </p>
+                        <h2 class="text-4xl md:text-5xl font-bold mb-6 text-gray-900 leading-tight">
+                            Hecho para <span class="gradient-text">Restaurantes</span>
+                        </h2>
+                        <p class="text-xl text-gray-900 font-semibold leading-relaxed mb-4">
+                            No es un POS genérico. Está construido específicamente para restaurantes.
+                        </p>
+                        <p class="text-lg text-gray-600 leading-relaxed">
+                            Funciones que realmente necesitas para operar y crecer.
+                        </p>
+                    </div>
+
+                    <!-- Dividido en 2 columnas con micro-títulos -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <!-- Columna 1: Operación -->
+                        <div class="space-y-4">
+                            <h4
+                                class="text-sm uppercase tracking-wider font-bold text-green-600 mb-4 flex items-center">
+                                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd"
+                                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                        clip-rule="evenodd" />
+                                </svg>
+                                Operación
+                            </h4>
+                            <div class="flex items-start group">
+                                <div
+                                    class="flex-shrink-0 w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center mr-3 group-hover:bg-green-200 transition-colors">
+                                    <i class="fas fa-check text-green-600"></i>
+                                </div>
+                                <div>
+                                    <p class="font-semibold text-gray-900">Divide cuentas por mesa</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start group">
+                                <div
+                                    class="flex-shrink-0 w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center mr-3 group-hover:bg-green-200 transition-colors">
+                                    <i class="fas fa-check text-green-600"></i>
+                                </div>
+                                <div>
+                                    <p class="font-semibold text-gray-900">Gestión de delivery</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start group">
+                                <div
+                                    class="flex-shrink-0 w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center mr-3 group-hover:bg-green-200 transition-colors">
+                                    <i class="fas fa-check text-green-600"></i>
+                                </div>
+                                <div>
+                                    <p class="font-semibold text-gray-900">Pantalla de cocina (KDS)</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Columna 2: Fiscal & Control -->
+                        <div class="space-y-4">
+                            <h4
+                                class="text-sm uppercase tracking-wider font-bold text-green-600 mb-4 flex items-center">
+                                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd"
+                                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                        clip-rule="evenodd" />
+                                </svg>
+                                Fiscal & Control
+                            </h4>
+                            <div class="flex items-start group">
+                                <div
+                                    class="flex-shrink-0 w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center mr-3 group-hover:bg-green-200 transition-colors">
+                                    <i class="fas fa-check text-green-600"></i>
+                                </div>
+                                <div>
+                                    <p class="font-semibold text-gray-900">Facturación SRI</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start group">
+                                <div
+                                    class="flex-shrink-0 w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center mr-3 group-hover:bg-green-200 transition-colors">
+                                    <i class="fas fa-check text-green-600"></i>
+                                </div>
+                                <div>
+                                    <p class="font-semibold text-gray-900">Permisos por usuario</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start group">
+                                <div
+                                    class="flex-shrink-0 w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center mr-3 group-hover:bg-green-200 transition-colors">
+                                    <i class="fas fa-check text-green-600"></i>
+                                </div>
+                                <div>
+                                    <p class="font-semibold text-gray-900">Control de IVA automático</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+         HÍBRIDO: RESTAURANTE + RETAIL - Paleta verde
+         ============================================ -->
+    <section class="py-16 md:py-20 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="max-w-4xl mx-auto">
+                <div
+                    class="bg-gradient-to-br from-green-50 via-lime-50 to-green-50 rounded-3xl p-8 md:p-12 border-2 border-green-100 relative overflow-hidden">
+                    <!-- Decoración -->
+                    <div class="absolute top-0 right-0 w-64 h-64 bg-lime-200 rounded-full blur-3xl opacity-20"></div>
+
+                    <div class="relative z-10">
+                        <div class="flex items-start gap-6 mb-6">
+                            <div
+                                class="flex-shrink-0 w-16 h-16 rounded-2xl bg-gradient-to-br from-green-500 to-lime-600 flex items-center justify-center shadow-lg">
+                                <i class="fas fa-store text-white text-2xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-3xl font-bold text-gray-900 mb-3">
+                                    ¿También vendes productos físicos?
+                                </h3>
+                                <p class="text-xl text-gray-700 leading-relaxed">
+                                    Activa el <span class="font-bold text-green-600">modo Retail</span> cuando lo
+                                    necesites.
+                                    Un solo sistema para restaurante y tienda.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
+                            <div
+                                class="flex items-center gap-3 bg-white/70 backdrop-blur-sm rounded-xl p-4 border border-green-100">
+                                <i class="fas fa-check-circle text-green-600 text-xl"></i>
+                                <span class="text-gray-700 font-medium">Control de inventario unificado</span>
+                            </div>
+                            <div
+                                class="flex items-center gap-3 bg-white/70 backdrop-blur-sm rounded-xl p-4 border border-green-100">
+                                <i class="fas fa-check-circle text-green-600 text-xl"></i>
+                                <span class="text-gray-700 font-medium">Cambia de modo en segundos</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+         FEATURES SECTION - Fondo gris suave
+         ============================================ -->
+    <section id="caracteristicas" class="py-16 md:py-20 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-20 fade-in">
+                <h2 class="text-4xl md:text-5xl font-bold mb-6 text-gray-900">
+                    Diseñado para la <span class="gradient-text">velocidad</span>
+                </h2>
+                <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+                    Todo lo que necesitas para vender más rápido
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+                <!-- Feature 1 -->
+                <div class="feature-card fade-in text-center bg-white rounded-2xl p-8 hover:shadow-xl transition-all">
+                    <div class="feature-icon mx-auto">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4 text-gray-900">Ventas ultra rápidas</h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        Interfaz táctil optimizada. Completa ventas en segundos.
+                    </p>
                 </div>
 
                 <!-- Feature 2 -->
-                <div class="feature-card bg-white p-6 rounded-lg shadow-md">
-                    <div class="text-green-500 text-4xl mb-4 feature-icon">
-                        <i class="fas fa-credit-card"></i>
+                <div class="feature-card fade-in text-center">
+                    <div class="feature-icon mx-auto">
+                        <i class="fas fa-chart-line"></i>
                     </div>
-                    <h3 class="text-xl font-semibold mb-2">Control de ventas</h3>
-                    <p class="text-gray-600">Registra cada venta en tiempo real y procesa pagos de forma segura y
-                        eficiente.</p>
+                    <h3 class="text-2xl font-bold mb-4 text-gray-900">Reportes accionables</h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        Métricas en tiempo real. Decisiones basadas en datos.
+                    </p>
                 </div>
 
                 <!-- Feature 3 -->
-                <div class="feature-card bg-white p-6 rounded-lg shadow-md">
-                    <div class="text-green-500 text-4xl mb-4 feature-icon">
-                        <i class="fas fa-chart-bar"></i>
+                <div class="feature-card fade-in text-center">
+                    <div class="feature-icon mx-auto">
+                        <i class="fas fa-boxes"></i>
                     </div>
-                    <h3 class="text-xl font-semibold mb-2">Reportes en tiempo real</h3>
-                    <p class="text-gray-600">Visualiza el crecimiento de tu negocio con gráficos intuitivos y
-                        personalizables.</p>
-                </div>
-
-                <!-- Feature 4 -->
-                <div class="feature-card bg-white p-6 rounded-lg shadow-md">
-                    <div class="text-green-500 text-4xl mb-4 feature-icon">
-                        <i class="fas fa-users"></i>
-                    </div>
-                    <h3 class="text-xl font-semibold mb-2">Control de clientes</h3>
-                    <p class="text-gray-600">Administra y fideliza a tus clientes con nuestras herramientas avanzadas.
+                    <h3 class="text-2xl font-bold mb-4 text-gray-900">Inventario inteligente</h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        Control automático. Alertas de stock bajo.
                     </p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Testimonials Section -->
-    <section class="py-16 bg-white">
+    <!-- ============================================
+         RETAIL MODE SECTION (SMALL)
+         ============================================ -->
+    <section class="py-16 bg-gray-50">
         <div class="container mx-auto px-4">
-            <h2 class="text-3xl font-bold text-center mb-4 animate__animated animate__fadeIn">Lo que dicen nuestros
-                clientes</h2>
-            <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto animate__animated animate__fadeIn">Descubre por
-                qué cientos de negocios confían en SouthernPOS para su gestión diaria.</p>
+            <div class="max-w-4xl mx-auto text-center fade-in">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4 text-gray-900">
+                    También perfecto para <span class="gradient-text">Retail</span>
+                </h2>
+                <p class="text-lg text-gray-600 mb-8">
+                    Tiendas, boutiques y negocios físicos también pueden aprovechar Lemon POS
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
+                    <div class="flex items-start">
+                        <i class="fas fa-barcode text-green-500 text-2xl mr-3 mt-1"></i>
+                        <div>
+                            <h4 class="font-bold text-gray-900">Código de barras</h4>
+                            <p class="text-sm text-gray-600">Escaneo rápido de productos</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <i class="fas fa-tags text-green-500 text-2xl mr-3 mt-1"></i>
+                        <div>
+                            <h4 class="font-bold text-gray-900">Gestión de precios</h4>
+                            <p class="text-sm text-gray-600">Promociones y descuentos</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <i class="fas fa-users text-green-500 text-2xl mr-3 mt-1"></i>
+                        <div>
+                            <h4 class="font-bold text-gray-900">Clientes frecuentes</h4>
+                            <p class="text-sm text-gray-600">Programa de fidelización</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+         DEMO SECTION
+         ============================================ -->
+    <section id="demo" class="section-padding bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16 fade-in">
+                <h2 class="text-4xl md:text-5xl font-bold mb-4 text-gray-900">
+                    Así se ve vender con <span class="gradient-text">Lemon POS</span>
+                </h2>
+                <p class="text-xl text-gray-600">
+                    Interfaz moderna, intuitiva y diseñada para la velocidad
+                </p>
+            </div>
+
+            <div class="fade-in max-w-5xl mx-auto">
+                <img src="{% static 'img/pulbicidad.png' %}" alt="Demo Lemon POS" class="demo-mockup w-full">
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+         PRICING SECTION
+         ============================================ -->
+
+    <section id="planes" class="section-padding bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16 fade-in">
+                <h2 class="text-4xl md:text-5xl font-bold mb-4 text-gray-900">
+                    Planes para cada <span class="gradient-text">etapa</span>
+                </h2>
+                <p class="text-xl text-gray-600">
+                    Comienza gratis y escala cuando lo necesites
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                <!-- Starter Plan -->
+                <div class="pricing-card fade-in">
+                    <h3 class="text-2xl font-bold mb-2 text-gray-900">Starter</h3>
+                    <p class="text-sm text-gray-500 mb-6">Para restaurantes pequeños que están comenzando</p>
+                    <div class="mb-6">
+                        <span class="text-5xl font-bold text-gray-900">$0</span>
+                        <span class="text-gray-600">/mes</span>
+                    </div>
+                    <ul class="space-y-3 mb-8">
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-3"></i>
+                            <span class="text-gray-700">1 usuario</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-3"></i>
+                            <span class="text-gray-700">100 productos</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-3"></i>
+                            <span class="text-gray-700">Reportes básicos</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-3"></i>
+                            <span class="text-gray-700">Soporte por email</span>
+                        </li>
+                    </ul>
+                    <a href="{% url 'register' %}" class="btn-secondary w-full text-center block">
+                        Comenzar Gratis
+                    </a>
+                </div>
+
+                <!-- Pro Plan (Featured) - 15% más grande -->
+                <div class="pricing-card featured fade-in transform md:scale-110">
+                    <div
+                        class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-green-500 to-green-600 text-white px-6 py-2 rounded-full text-sm font-bold shadow-lg">
+                        MÁS ELEGIDO
+                    </div>
+                    <h3 class="text-2xl font-bold mb-2 text-gray-900 mt-2">Pro</h3>
+                    <p class="text-sm text-gray-500 mb-6">Para restaurantes con equipo y alto volumen</p>
+                    <div class="mb-6">
+                        <span class="text-5xl font-bold text-gray-900">$19</span>
+                        <span class="text-gray-600">/mes</span>
+                        <p class="text-sm text-gray-600 mt-2">o <span class="font-bold text-green-600">$190/año</span>
+                            (ahorra $38)</p>
+                    </div>
+                    <ul class="space-y-3 mb-8">
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-3"></i>
+                            <span class="text-gray-700">5 usuarios</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-3"></i>
+                            <span class="text-gray-700">Productos ilimitados</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-3"></i>
+                            <span class="text-gray-700">Reportes avanzados</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-3"></i>
+                            <span class="text-gray-700">KDS incluido</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-3"></i>
+                            <span class="text-gray-700">Soporte prioritario</span>
+                        </li>
+                    </ul>
+                    <a href="{% url 'register' %}" class="btn-primary w-full text-center block">
+                        Comenzar Prueba
+                    </a>
+                </div>
+
+                <!-- Business Plan -->
+                <div class="pricing-card fade-in">
+                    <h3 class="text-2xl font-bold mb-2 text-gray-900">Business</h3>
+                    <p class="text-sm text-gray-500 mb-6">Para cadenas o múltiples sucursales</p>
+                    <div class="mb-6">
+                        <span class="text-5xl font-bold text-gray-900">$49</span>
+                        <span class="text-gray-600">/mes</span>
+                    </div>
+                    <ul class="space-y-3 mb-8">
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-3"></i>
+                            <span class="text-gray-700">Usuarios ilimitados</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-3"></i>
+                            <span class="text-gray-700">Multi-sucursal</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-3"></i>
+                            <span class="text-gray-700">API access</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-3"></i>
+                            <span class="text-gray-700">Facturación electrónica</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-3"></i>
+                            <span class="text-gray-700">Soporte 24/7</span>
+                        </li>
+                    </ul>
+                    <a href="{% url 'register' %}" class="btn-secondary w-full text-center block">
+                        Contactar Ventas
+                    </a>
+                </div>
+            </div>
+
+            <p class="text-center text-gray-600 mt-8 fade-in">
+                <i class="fas fa-shield-alt text-green-500 mr-2"></i>
+                Sin permanencia · Cancela cuando quieras · Garantía de 30 días
+            </p>
+        </div>
+    </section>
+
+    <!-- ============================================
+         ¿POR QUÉ CAMBIARTE? - Nueva sección clave
+         ============================================ -->
+    <section class="py-16 md:py-20 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="max-w-5xl mx-auto">
+                <div class="text-center mb-12 fade-in">
+                    <h2 class="text-4xl md:text-5xl font-bold mb-4 text-gray-900">
+                        ¿Usando Excel o un <span class="gradient-text">sistema antiguo</span>?
+                    </h2>
+                    <p class="text-xl text-gray-600">
+                        Es momento de dar el salto
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                    <!-- Problemas actuales -->
+                    <div class="space-y-6 fade-in">
+                        <h3 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+                            <svg class="w-8 h-8 mr-3 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            Problemas comunes
+                        </h3>
+                        <div class="space-y-4">
+                            <div class="flex items-start p-4 bg-red-50 rounded-xl border-l-4 border-red-400">
+                                <i class="fas fa-times-circle text-red-500 text-xl mr-3 mt-1"></i>
+                                <div>
+                                    <p class="font-semibold text-gray-900">Errores en inventario</p>
+                                    <p class="text-sm text-gray-600">Control manual = pérdidas de dinero</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start p-4 bg-red-50 rounded-xl border-l-4 border-red-400">
+                                <i class="fas fa-times-circle text-red-500 text-xl mr-3 mt-1"></i>
+                                <div>
+                                    <p class="font-semibold text-gray-900">Cierres de caja manuales</p>
+                                    <p class="text-sm text-gray-600">Horas perdidas cada semana</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start p-4 bg-red-50 rounded-xl border-l-4 border-red-400">
+                                <i class="fas fa-times-circle text-red-500 text-xl mr-3 mt-1"></i>
+                                <div>
+                                    <p class="font-semibold text-gray-900">Problemas con el SRI</p>
+                                    <p class="text-sm text-gray-600">Multas y dolores de cabeza fiscales</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Solución con Lemon POS - Más brillante y espacioso -->
+                    <div
+                        class="space-y-6 fade-in bg-gradient-to-br from-green-50 to-lime-50 p-6 rounded-2xl border-2 border-green-200 shadow-lg">
+                        <h3 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+                            <svg class="w-8 h-8 mr-3 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            Con Lemon POS
+                        </h3>
+                        <div class="space-y-4">
+                            <div class="flex items-start p-5 bg-white rounded-xl border-l-4 border-green-500 shadow-sm">
+                                <i class="fas fa-check-circle text-green-500 text-xl mr-3 mt-1"></i>
+                                <div>
+                                    <p class="font-semibold text-gray-900">Todo automatizado</p>
+                                    <p class="text-sm text-gray-600">Inventario actualizado en tiempo real</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start p-5 bg-white rounded-xl border-l-4 border-green-500 shadow-sm">
+                                <i class="fas fa-check-circle text-green-500 text-xl mr-3 mt-1"></i>
+                                <div>
+                                    <p class="font-semibold text-gray-900">Reportes en tiempo real</p>
+                                    <p class="text-sm text-gray-600">Decisiones basadas en datos, no intuición</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start p-5 bg-white rounded-xl border-l-4 border-green-500 shadow-sm">
+                                <i class="fas fa-check-circle text-green-500 text-xl mr-3 mt-1"></i>
+                                <div>
+                                    <p class="font-semibold text-gray-900">Cumple normativa ecuatoriana</p>
+                                    <p class="text-sm text-gray-600">Facturación electrónica SRI integrada</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CTA -->
+                <div class="text-center mt-12 fade-in">
+                    <a href="{% url 'register' %}"
+                        class="btn-primary text-lg inline-block transform hover:scale-105 transition-all">
+                        <i class="fas fa-rocket mr-2"></i>
+                        Hacer el cambio ahora
+                    </a>
+                    <p class="text-sm text-gray-500 mt-4">Sin compromiso · Migración gratuita</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+         TESTIMONIALS SECTION - Mejorados
+         ============================================ -->
+    <section id="testimonios" class="section-padding bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16 fade-in">
+                <h2 class="text-4xl md:text-5xl font-bold mb-4 text-gray-900">
+                    Lo que dicen nuestros <span class="gradient-text">clientes</span>
+                </h2>
+                <p class="text-xl text-gray-600">
+                    Historias reales de negocios que crecen con Lemon POS
+                </p>
+            </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <!-- Testimonial 1 -->
-                <div class="testimonial-card bg-gray-50 p-6 rounded-lg">
+                <div class="testimonial-card fade-in">
+                    <div class="flex items-center justify-between mb-3">
+                        <span
+                            class="inline-block px-3 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded-full">Cafetería</span>
+                        <span class="text-xs text-gray-500">Cliente desde 2024</span>
+                    </div>
                     <div class="flex items-center mb-4">
-                        <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Lucía Pérez"
-                            class="w-12 h-12 rounded-full mr-4 object-cover">
+                        <div
+                            class="w-14 h-14 rounded-full mr-4 bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center text-white font-bold text-xl">
+                            MG
+                        </div>
                         <div>
-                            <h4 class="font-semibold">Lucía Pérez</h4>
-                            <p class="text-sm text-gray-600">Dueña de Cafetería</p>
+                            <h4 class="font-bold text-lg text-gray-900">María González</h4>
+                            <p class="text-sm text-gray-600">Café Aroma · Quito</p>
                         </div>
                     </div>
-                    <p class="text-gray-700">"Con SouthernPOS duplicamos nuestras ventas y tenemos todo bajo control
-                        desde el celular. La mejor inversión para mi negocio."</p>
-                    <div class="mt-3 text-yellow-400">
+                    <p class="text-gray-700 mb-4 leading-relaxed">
+                        "Aumentamos nuestras ventas un <span class="font-bold text-green-600">27% en 3 meses</span>.
+                        El control de inventario nos ahorró miles de dólares en desperdicio."
+                    </p>
+                    <div class="text-yellow-400">
                         <i class="fas fa-star"></i>
                         <i class="fas fa-star"></i>
                         <i class="fas fa-star"></i>
@@ -319,39 +877,60 @@
                 </div>
 
                 <!-- Testimonial 2 -->
-                <div class="testimonial-card bg-gray-50 p-6 rounded-lg">
+                <div class="testimonial-card fade-in">
+                    <div class="flex items-center justify-between mb-3">
+                        <span
+                            class="inline-block px-3 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full">Restaurante
+                            Familiar</span>
+                        <span class="text-xs text-gray-500">Cliente desde 2023</span>
+                    </div>
                     <div class="flex items-center mb-4">
-                        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Carlos Rodríguez"
-                            class="w-12 h-12 rounded-full mr-4 object-cover">
+                        <div
+                            class="w-14 h-14 rounded-full mr-4 bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-bold text-xl">
+                            CR
+                        </div>
                         <div>
-                            <h4 class="font-semibold">Carlos Rodríguez</h4>
-                            <p class="text-sm text-gray-600">Tienda de Electrónica</p>
+                            <h4 class="font-bold text-lg text-gray-900">Carlos Ramírez</h4>
+                            <p class="text-sm text-gray-600">Restaurante El Buen Sabor · Guayaquil</p>
                         </div>
                     </div>
-                    <p class="text-gray-700">"La facilidad para gestionar inventario y ventas es impresionante.
-                        Ahorramos tiempo y dinero desde el primer día de uso."</p>
-                    <div class="mt-3 text-yellow-400">
+                    <p class="text-gray-700 mb-4 leading-relaxed">
+                        "Procesamos <span class="font-bold text-green-600">el doble de órdenes</span> con el mismo
+                        equipo.
+                        La interfaz táctil es tan rápida que mis meseros la aman."
+                    </p>
+                    <div class="text-yellow-400">
                         <i class="fas fa-star"></i>
                         <i class="fas fa-star"></i>
                         <i class="fas fa-star"></i>
                         <i class="fas fa-star"></i>
-                        <i class="fas fa-star-half-alt"></i>
+                        <i class="fas fa-star"></i>
                     </div>
                 </div>
 
                 <!-- Testimonial 3 -->
-                <div class="testimonial-card bg-gray-50 p-6 rounded-lg">
+                <div class="testimonial-card fade-in">
+                    <div class="flex items-center justify-between mb-3">
+                        <span
+                            class="inline-block px-3 py-1 bg-purple-100 text-purple-700 text-xs font-semibold rounded-full">Panadería</span>
+                        <span class="text-xs text-gray-500">Cliente desde 2024</span>
+                    </div>
                     <div class="flex items-center mb-4">
-                        <img src="https://randomuser.me/api/portraits/women/63.jpg" alt="Ana García"
-                            class="w-12 h-12 rounded-full mr-4 object-cover">
+                        <div
+                            class="w-14 h-14 rounded-full mr-4 bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center text-white font-bold text-xl">
+                            AM
+                        </div>
                         <div>
-                            <h4 class="font-semibold">Ana García</h4>
-                            <p class="text-sm text-gray-600">Boutique de Ropa</p>
+                            <h4 class="font-bold text-lg text-gray-900">Ana Martínez</h4>
+                            <p class="text-sm text-gray-600">Panadería Dulce Hogar · Cuenca</p>
                         </div>
                     </div>
-                    <p class="text-gray-700">"Los reportes me ayudan a tomar mejores decisiones. Recomiendo SouthernPOS
-                        a todos mis colegas emprendedores."</p>
-                    <div class="mt-3 text-yellow-400">
+                    <p class="text-gray-700 mb-4 leading-relaxed">
+                        "Los reportes me mostraron que <span class="font-bold text-green-600">3 productos generaban el
+                            60% de mis ganancias</span>.
+                        Ahora sé exactamente qué producir más."
+                    </p>
+                    <div class="text-yellow-400">
                         <i class="fas fa-star"></i>
                         <i class="fas fa-star"></i>
                         <i class="fas fa-star"></i>
@@ -363,147 +942,216 @@
         </div>
     </section>
 
-    <!-- CTA Section -->
-    <section class="py-16 bg-green-600 relative overflow-hidden">
-        <!-- Animated Background Elements -->
-        <div class="absolute top-10 right-10 h-32 w-32 bg-white rounded-full opacity-10 floating"></div>
-        <div class="absolute bottom-10 left-20 h-24 w-24 bg-white rounded-full opacity-10 floating floating-delay-1">
-        </div>
+    <!-- ============================================
+         SEGURIDAD Y TECNOLOGÍA - Nueva sección
+         ============================================ -->
+    <section class="py-16 md:py-20 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12 fade-in">
+                <h2 class="text-4xl md:text-5xl font-bold mb-4 text-gray-900">
+                    Infraestructura <span class="gradient-text">confiable</span>
+                </h2>
+                <p class="text-xl text-gray-600">
+                    Tu información segura, siempre disponible
+                </p>
+            </div>
 
-        <div class="container mx-auto px-4 text-center relative z-10">
-            <h2 class="text-3xl font-bold text-white mb-6 animate__animated animate__fadeIn">Únete a cientos de negocios
-                que ya utilizan SouthernPOS</h2>
-            <a href="/register"
-                class="inline-block bg-white text-green-600 px-8 py-4 rounded-lg shadow-lg hover:bg-gray-100 transition font-medium cta-button animate__animated animate__pulse animate__infinite animate__slower">Comenzar
-                ahora</a>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+                <div class="text-center fade-in p-6 rounded-2xl hover:bg-gray-50 transition-all">
+                    <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-green-100 flex items-center justify-center">
+                        <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2 text-gray-900">99% Disponibilidad</h3>
+                    <p class="text-gray-600">Tu negocio siempre operando</p>
+                </div>
+
+                <div class="text-center fade-in p-6 rounded-2xl hover:bg-gray-50 transition-all">
+                    <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-green-100 flex items-center justify-center">
+                        <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2 text-gray-900">Datos en la nube</h3>
+                    <p class="text-gray-600">Accede desde cualquier lugar</p>
+                </div>
+
+                <div class="text-center fade-in p-6 rounded-2xl hover:bg-gray-50 transition-all">
+                    <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-green-100 flex items-center justify-center">
+                        <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2 text-gray-900">Backups automáticos</h3>
+                    <p class="text-gray-600">Nunca pierdas información</p>
+                </div>
+            </div>
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="bg-gray-800 text-gray-300 py-12">
+    <!-- ============================================
+         SUPPORT SECTION
+         ============================================ -->
+    <section class="section-padding bg-gray-50">
         <div class="container mx-auto px-4">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <!-- Column 1 -->
-                <div>
-                    <div class="flex items-center mb-4">
-                        <i class="fas fa-cash-register text-green-400 text-xl mr-2"></i>
-                        <span class="text-lg font-semibold text-white">SouthernPOS</span>
+            <div class="text-center mb-12 fade-in">
+                <h2 class="text-4xl md:text-5xl font-bold mb-4 text-gray-900">
+                    Soporte <span class="gradient-text">rápido y humano</span>
+                </h2>
+                <p class="text-xl text-gray-600">
+                    Estamos aquí para ayudarte a crecer
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+                <div class="text-center fade-in">
+                    <div class="text-5xl text-green-500 mb-4">
+                        <i class="fas fa-comments"></i>
                     </div>
-                    <p class="mb-4">Solución completa para la gestión de ventas de tu negocio desde cualquier
-                        dispositivo.</p>
-                    <p>&copy; 2025 SouthernPOS. Todos los derechos reservados.</p>
+                    <h3 class="text-xl font-bold mb-2 text-gray-900">Chat en vivo</h3>
+                    <p class="text-gray-600">Respuesta en minutos durante horario laboral</p>
                 </div>
 
-                <!-- Column 2 -->
+                <div class="text-center fade-in">
+                    <div class="text-5xl text-green-500 mb-4">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2 text-gray-900">Email</h3>
+                    <p class="text-gray-600">Respuesta en menos de 24 horas</p>
+                </div>
+
+                <div class="text-center fade-in">
+                    <div class="text-5xl text-green-500 mb-4">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2 text-gray-900">Centro de ayuda</h3>
+                    <p class="text-gray-600">Guías y tutoriales detallados</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+         FINAL CTA SECTION - Más emocional
+         ============================================ -->
+    <section class="cta-gradient relative overflow-hidden py-16 md:py-20">
+        <!-- Decoración -->
+        <div class="absolute inset-0 opacity-10">
+            <div class="absolute top-10 left-10 w-32 h-32 bg-white rounded-full blur-3xl"></div>
+            <div class="absolute bottom-10 right-10 w-40 h-40 bg-white rounded-full blur-3xl"></div>
+        </div>
+
+        <div class="container mx-auto px-4 text-center relative z-10">
+            <div class="fade-in max-w-3xl mx-auto">
+                <h2 class="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight">
+                    Deja de perder dinero por falta de control
+                </h2>
+                <p class="text-xl text-white/90 mb-4 leading-relaxed">
+                    Cada día sin un sistema profesional es dinero que se escapa.
+                </p>
+                <p class="text-2xl text-white font-semibold mb-10">
+                    Configúralo hoy. Empieza a vender en menos de 5 minutos.
+                </p>
+                <a href="{% url 'register' %}"
+                    class="inline-block bg-white text-green-600 px-12 py-5 rounded-xl font-bold text-xl hover:bg-gray-100 transition-all transform hover:scale-105 hover:-translate-y-1 shadow-2xl">
+                    <i class="fas fa-rocket mr-2"></i>Empezar gratis ahora
+                </a>
+                <div class="mt-8 flex items-center justify-center gap-8 flex-wrap">
+                    <span class="text-white/90 flex items-center">
+                        <i class="fas fa-check-circle mr-2 text-lime-300"></i>Sin tarjeta
+                    </span>
+                    <span class="text-white/90 flex items-center">
+                        <i class="fas fa-check-circle mr-2 text-lime-300"></i>Sin compromiso
+                    </span>
+                    <span class="text-white/90 flex items-center">
+                        <i class="fas fa-check-circle mr-2 text-lime-300"></i>Listo en 5 minutos
+                    </span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+         FOOTER
+         ============================================ -->
+
+    <footer class="bg-gray-900 text-gray-300">
+        <div class="container mx-auto px-4 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+                <!-- Column 1 - Brand -->
                 <div>
-                    <h3 class="text-lg font-semibold text-white mb-4">Enlaces</h3>
+                    <div class="flex items-center mb-4">
+                        <img src="{% static 'img/LemonPosLogo.svg' %}" alt="Lemon POS" class="h-8 mr-3">
+                        <span class="text-xl font-bold text-white">Lemon POS</span>
+                    </div>
+                    <p class="text-gray-400 mb-4">
+                        El punto de venta moderno para restaurantes y retail en crecimiento.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="social-icon text-gray-400 hover:text-green-400">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="social-icon text-gray-400 hover:text-green-400">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="social-icon text-gray-400 hover:text-green-400">
+                            <i class="fab fa-linkedin"></i>
+                        </a>
+                        <a href="#" class="social-icon text-gray-400 hover:text-green-400">
+                            <i class="fab fa-facebook"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Column 2 - Product -->
+                <div>
+                    <h3 class="text-white font-bold mb-4">Producto</h3>
                     <ul class="space-y-2">
-                        <li><a href="#" class="hover:text-green-400 transition">Política de privacidad</a></li>
-                        <li><a href="#" class="hover:text-green-400 transition">Términos de uso</a></li>
-                        <li><a href="#" class="hover:text-green-400 transition">Contacto</a></li>
-                        <li><a href="#" class="hover:text-green-400 transition">Blog</a></li>
+                        <li><a href="#caracteristicas" class="hover:text-green-400 transition">Características</a></li>
+                        <li><a href="#planes" class="hover:text-green-400 transition">Precios</a></li>
+                        <li><a href="#demo" class="hover:text-green-400 transition">Demo</a></li>
+                        <li><a href="#" class="hover:text-green-400 transition">Actualizaciones</a></li>
                     </ul>
                 </div>
 
-                <!-- Column 3 -->
+                <!-- Column 3 - Company -->
                 <div>
-                    <h3 class="text-lg font-semibold text-white mb-4">Síguenos</h3>
-                    <div class="flex space-x-4">
-                        <a href="#" class="text-2xl hover:text-green-400 transition social-icon"><i
-                                class="fab fa-instagram"></i></a>
-                        <a href="#" class="text-2xl hover:text-green-400 transition social-icon"><i
-                                class="fab fa-twitter"></i></a>
-                        <a href="#" class="text-2xl hover:text-green-400 transition social-icon"><i
-                                class="fab fa-linkedin"></i></a>
-                        <a href="#" class="text-2xl hover:text-green-400 transition social-icon"><i
-                                class="fab fa-facebook"></i></a>
-                    </div>
+                    <h3 class="text-white font-bold mb-4">Empresa</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="hover:text-green-400 transition">Sobre nosotros</a></li>
+                        <li><a href="#" class="hover:text-green-400 transition">Blog</a></li>
+                        <li><a href="#" class="hover:text-green-400 transition">Contacto</a></li>
+                        <li><a href="#" class="hover:text-green-400 transition">Carreras</a></li>
+                    </ul>
                 </div>
+
+                <!-- Column 4 - Legal -->
+                <div>
+                    <h3 class="text-white font-bold mb-4">Legal</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="hover:text-green-400 transition">Privacidad</a></li>
+                        <li><a href="#" class="hover:text-green-400 transition">Términos</a></li>
+                        <li><a href="#" class="hover:text-green-400 transition">Cookies</a></li>
+                        <li><a href="#" class="hover:text-green-400 transition">Licencias</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Bottom Bar -->
+            <div class="border-t border-gray-800 pt-8 text-center text-gray-500">
+                <p>&copy; 2026 Lemon POS. Todos los derechos reservados.</p>
+                <p class="mt-2 text-sm">Hecho con <i class="fas fa-heart text-red-500"></i> para negocios en crecimiento
+                </p>
             </div>
         </div>
     </footer>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Hamburger menu toggle for mobile only
-            const menuToggle = document.getElementById('menu-toggle');
-            const mobileMenu = document.getElementById('mobile-menu');
-
-            if (menuToggle) {
-                menuToggle.addEventListener('click', function () {
-                    mobileMenu.classList.toggle('active');
-                });
-            }
-
-            // Intersection Observer for scroll animations
-            const observerOptions = {
-                threshold: 0.1
-            };
-
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        if (entry.target.classList.contains('feature-card')) {
-                            entry.target.classList.add('animate__animated', 'animate__fadeInUp');
-                        }
-                        if (entry.target.classList.contains('testimonial-card')) {
-                            entry.target.classList.add('animate__animated', 'animate__fadeIn');
-                        }
-                    }
-                });
-            }, observerOptions);
-
-            // Observe all feature cards
-            document.querySelectorAll('.feature-card').forEach(card => {
-                observer.observe(card);
-            });
-
-            // Observe all testimonial cards
-            document.querySelectorAll('.testimonial-card').forEach(card => {
-                observer.observe(card);
-            });
-
-            // Smooth scrolling for navigation links
-            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function (e) {
-                    e.preventDefault();
-
-                    const targetId = this.getAttribute('href');
-                    if (targetId === '#') return;
-
-                    const targetElement = document.querySelector(targetId);
-                    if (targetElement) {
-                        window.scrollTo({
-                            top: targetElement.offsetTop - 80,
-                            behavior: 'smooth'
-                        });
-
-                        // Close mobile menu if open
-                        if (mobileMenu && mobileMenu.classList.contains('active')) {
-                            mobileMenu.classList.remove('active');
-                        }
-                    }
-                });
-            });
-        });
-    </script>
+    <!-- JavaScript -->
+    <script src="{% static 'js/landing.js' %}"></script>
 </body>
 
 </html>
-
-// Add this CSS to your existing style section
-<style>
-    .image-container {
-        position: relative;
-        overflow: hidden;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    .image-container img {
-        transition: transform 0.3s ease;
-    }
-
-    .image-container:hover img {
-        transform: scale(1.1);
-    }
-</style>

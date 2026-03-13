@@ -60,12 +60,13 @@
                                 <i class="fas fa-edit mr-1"></i> Editar
                             </a>
                             <form method="post" action="{% url 'productos:eliminar_categoria' categoria.pk %}"
-                                class="inline"
-                                onsubmit="return confirm('¿Estás seguro de que deseas eliminar esta categoría? Los productos asociados quedarán sin categoría.');">
+                                class="inline delete-category-form">
                                 {% csrf_token %}
-                                <button type="submit" 
-                                    class="inline-flex items-center px-3 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors"
-                                    title="Eliminar">
+                                <button type="button" 
+                                    class="inline-flex items-center px-3 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors delete-category-btn"
+                                    title="Eliminar"
+                                    data-category-name="{{ categoria.nombre }}"
+                                    data-form-action="{% url 'productos:eliminar_categoria' categoria.pk %}">
                                     <i class="fas fa-trash mr-1"></i> Eliminar
                                 </button>
                             </form>
@@ -87,4 +88,38 @@
     </div>
     {% endif %}
 </div>
+
+<script>
+// Manejar eliminación de categorías con modal profesional
+document.addEventListener('click', function(e) {
+    if (e.target.closest('.delete-category-btn')) {
+        e.preventDefault();
+        const btn = e.target.closest('.delete-category-btn');
+        const categoryName = btn.dataset.categoryName;
+        const formAction = btn.dataset.formAction;
+        
+        showConfirm(
+            'Eliminar Categoría',
+            `¿Estás seguro que deseas eliminar la categoría "${categoryName}"? Los productos asociados quedarán sin categoría.`,
+            function() {
+                // Crear y enviar formulario
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = formAction;
+                
+                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                const csrfInput = document.createElement('input');
+                csrfInput.type = 'hidden';
+                csrfInput.name = 'csrfmiddlewaretoken';
+                csrfInput.value = csrfToken;
+                
+                form.appendChild(csrfInput);
+                document.body.appendChild(form);
+                form.submit();
+            },
+            { type: 'warning', confirmText: 'Eliminar', cancelText: 'Cancelar' }
+        );
+    }
+});
+</script>
 {% endblock %}

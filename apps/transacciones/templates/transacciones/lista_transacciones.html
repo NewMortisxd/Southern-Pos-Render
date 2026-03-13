@@ -1,158 +1,154 @@
 {% extends 'base.html' %}
 
-{% block title %}Transacciones{% endblock %}
-{% block section_title %}Transacciones{% endblock %}
+{% block title %}Historial de Ventas{% endblock %}
+{% block section_title %}Historial de Ventas{% endblock %}
 
 {% block content %}
 <div class="container mx-auto p-4">
     <div class="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-        <h2 class="text-3xl font-bold mb-6 text-gray-800 border-b pb-3 flex items-center">
-            <i data-lucide="receipt" class="w-7 h-7 mr-3 text-emerald-600"></i>
-            Historial de Transacciones
-        </h2>
+        <!-- Header compacto -->
+        <div class="mb-4 flex items-center justify-between">
+            <div>
+                <h2 class="text-2xl font-bold text-gray-800 flex items-center">
+                    <i data-lucide="receipt" class="w-6 h-6 mr-2 text-emerald-600"></i>
+                    Historial de Ventas
+                </h2>
+                <p class="text-xs text-gray-500 mt-1">{{ transacciones|length }} ventas encontradas</p>
+            </div>
+        </div>
 
-        <!-- Search and Filters -->
-        <div class="mb-6">
-            <div class="flex flex-col md:flex-row gap-4">
+        <!-- Búsqueda + Filtros en una línea -->
+        <div class="mb-4">
+            <div class="flex gap-3">
+                <!-- Búsqueda protagonista -->
                 <div class="flex-grow">
                     <div class="relative">
-                        <i data-lucide="search" class="absolute left-3 top-2.5 w-5 h-5 text-gray-400"></i>
+                        <i data-lucide="search" class="absolute left-3 top-3 w-5 h-5 text-gray-400"></i>
                         <input type="text" id="search-input"
-                            placeholder="Buscar por ID, Factura ID, cliente o identificación"
-                            class="pl-10 w-full border rounded-xl py-2.5" value="{{ query }}">
+                            placeholder="Buscar por ID, factura, orden, fecha, cliente, monto..."
+                            class="pl-10 w-full border-2 border-gray-200 focus:border-emerald-500 rounded-xl py-2.5 text-sm transition-all duration-300"
+                            style="transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);"
+                            value="{{ query }}">
                     </div>
                 </div>
-                <div>
-                    <button id="filter-button"
-                        class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2.5 px-4 rounded-xl flex items-center">
-                        <i data-lucide="filter" class="w-5 h-5 mr-2"></i>
-                        Filtros
-                    </button>
-                </div>
+                <button id="filter-button"
+                    class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2.5 px-5 rounded-xl flex items-center transition-all duration-300 whitespace-nowrap"
+                    style="transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
+                    <i data-lucide="filter" class="w-4 h-4 mr-2"></i>
+                    Filtros
+                </button>
             </div>
 
-            <!-- Filters Panel (hidden by default) -->
-            <div id="filters-panel" class="mt-4 bg-gray-50 p-4 rounded-xl border border-gray-200 hidden">
-                <form id="filters-form" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- Panel de filtros colapsable -->
+            <div id="filters-panel" class="mt-3 bg-gray-50 p-4 rounded-xl border border-gray-200 hidden">
+                <form id="filters-form" class="grid grid-cols-1 md:grid-cols-4 gap-3">
                     <div>
-                        <label for="fecha-inicio" class="block text-sm font-medium text-gray-700 mb-1">Fecha
-                            Inicio</label>
-                        <input type="date" id="fecha-inicio" name="fecha_inicio" class="w-full border rounded-lg py-2"
-                            value="{{ fecha_inicio }}">
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Fecha Inicio</label>
+                        <input type="date" id="fecha-inicio" name="fecha_inicio" class="w-full border rounded-lg py-1.5 text-sm" value="{{ fecha_inicio }}">
                     </div>
                     <div>
-                        <label for="fecha-fin" class="block text-sm font-medium text-gray-700 mb-1">Fecha Fin</label>
-                        <input type="date" id="fecha-fin" name="fecha_fin" class="w-full border rounded-lg py-2"
-                            value="{{ fecha_fin }}">
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Fecha Fin</label>
+                        <input type="date" id="fecha-fin" name="fecha_fin" class="w-full border rounded-lg py-1.5 text-sm" value="{{ fecha_fin }}">
                     </div>
                     <div>
-                        <label for="metodo-pago" class="block text-sm font-medium text-gray-700 mb-1">Método de
-                            Pago</label>
-                        <select id="metodo-pago" name="metodo_pago" class="w-full border rounded-lg py-2">
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Método de Pago</label>
+                        <select id="metodo-pago" name="metodo_pago" class="w-full border rounded-lg py-1.5 text-sm">
                             <option value="">Todos</option>
                             <option value="cash" {% if metodo_pago == 'cash' %}selected{% endif %}>Efectivo</option>
                             <option value="card" {% if metodo_pago == 'card' %}selected{% endif %}>Tarjeta</option>
-                            <option value="transfer" {% if metodo_pago == 'transfer' %}selected{% endif %}>Transferencia
-                            </option>
+                            <option value="transfer" {% if metodo_pago == 'transfer' %}selected{% endif %}>Transferencia</option>
                         </select>
                     </div>
-                    <div class="md:col-span-3 flex justify-end">
+                    <div class="flex items-end gap-2">
                         <button type="button" id="clear-filters"
-                            class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2 px-4 rounded-lg mr-2">
-                            Limpiar Filtros
+                            class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-1.5 px-3 rounded-lg text-sm transition-all duration-300">
+                            Limpiar
                         </button>
                         <button type="submit"
-                            class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 px-4 rounded-lg">
-                            Aplicar Filtros
+                            class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-1.5 px-3 rounded-lg text-sm transition-all duration-300">
+                            Aplicar
                         </button>
                     </div>
                 </form>
             </div>
         </div>
 
-        <!-- Transactions Table -->
-        <div class="overflow-x-auto">
-            <!-- Desktop Table (hidden on mobile) -->
+        <!-- Tabla compacta y escaneable -->
+        <div class="overflow-x-auto relative">
+            <!-- Loading Overlay -->
+            <div id="loading-overlay" class="hidden absolute inset-0 bg-white bg-opacity-90 flex items-center justify-center z-10 rounded-xl">
+                <div class="text-center">
+                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-emerald-500 border-t-transparent"></div>
+                    <p class="mt-3 text-sm font-medium text-gray-600">Buscando...</p>
+                </div>
+            </div>
+
             <table class="min-w-full bg-white rounded-xl overflow-hidden hidden md:table">
                 <thead class="bg-gray-50 border-b">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID
-                        </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Factura #</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Orden
-                            #</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha
-                        </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Cliente</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total
-                        </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Método de Pago</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Acciones</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Fecha y Hora</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Cliente</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Total</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Método</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Estado</th>
+                        <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Acciones</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-200" id="transactions-table-body">
+                <tbody class="divide-y divide-gray-100" id="transactions-table-body">
                     {% for t in transacciones %}
-                    {% if t.procesado_pago %} <!-- Only show processed transactions -->
-                    <tr class="hover:bg-gray-50 transition-colors">
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                            {{ t.transaction_id }}
-                            <span class="ml-2 bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">Pagado</span>
+                    {% if t.procesado_pago %}
+                    <tr class="hover:bg-gray-50 transition-colors duration-200">
+                        <td class="px-4 py-3 whitespace-nowrap">
+                            <div class="text-sm font-medium text-gray-900">{{ t.fecha|date:"d/m/Y" }}</div>
+                            <div class="text-xs text-gray-400">{{ t.fecha|date:"H:i" }}</div>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                            {{ t.factuID }}
+                        <td class="px-4 py-3 whitespace-nowrap">
+                            <div class="text-sm text-gray-700">
+                                {% if t.venta.cliente %}
+                                {{ t.venta.cliente.nombre }}
+                                {% else %}
+                                <span class="text-gray-400">Consumidor Final</span>
+                                {% endif %}
+                            </div>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {% if t.venta.order %}
-                            <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
-                                #{{ t.venta.order.order_number }}
-                            </span>
-                            {% else %}
-                            <span class="text-gray-400">-</span>
-                            {% endif %}
+                        <td class="px-4 py-3 whitespace-nowrap">
+                            <div class="text-base font-bold text-emerald-600">{{ currency_symbol }}{{ t.monto|floatformat:2 }}</div>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ t.fecha|date:"d/m/Y H:i" }}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {% if t.venta.cliente %}
-                            {{ t.venta.cliente.nombre }}
-                            {% else %}
-                            Consumidor Final
-                            {% endif %}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-emerald-600">{{ currency_symbol }}{{ t.monto|floatformat:2 }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <td class="px-4 py-3 whitespace-nowrap">
                             {% if t.metodo_pago == 'cash' %}
-                            <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">Efectivo</span>
+                            <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded-lg text-xs font-medium">Efectivo</span>
                             {% elif t.metodo_pago == 'card' %}
-                            <span class="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-xs">Tarjeta</span>
+                            <span class="bg-purple-100 text-purple-700 px-2 py-1 rounded-lg text-xs font-medium">Tarjeta</span>
                             {% elif t.metodo_pago == 'transfer' %}
-                            <span
-                                class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs">Transferencia</span>
+                            <span class="bg-yellow-100 text-yellow-700 px-2 py-1 rounded-lg text-xs font-medium">Transfer</span>
                             {% else %}
-                            <span class="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs">{{ t.metodo_pago
-                                }}</span>
+                            <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded-lg text-xs font-medium">{{ t.metodo_pago }}</span>
                             {% endif %}
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <a href="{% url 'transacciones:detalle_transaccion' t.transaction_id %}"
-                                class="text-emerald-600 hover:text-emerald-900 mr-3">
-                                <i data-lucide="eye" class="w-5 h-5"></i>
-                            </a>
-                            <a href="{% url 'ventas:descargar_factura' t.transaction_id %}"
-                                class="text-blue-600 hover:text-blue-900">
-                                <i data-lucide="download" class="w-5 h-5"></i>
-                            </a>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                            <span class="bg-green-100 text-green-700 px-2 py-1 rounded-lg text-xs font-semibold">Pagado</span>
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap text-center">
+                            <div class="flex items-center justify-center gap-1">
+                                <a href="{% url 'transacciones:detalle_transaccion' t.transaction_id %}"
+                                    class="text-emerald-600 hover:text-emerald-900 p-1.5 hover:bg-emerald-50 rounded-lg transition-all duration-300"
+                                    title="Ver detalle">
+                                    <i data-lucide="eye" class="w-4 h-4"></i>
+                                </a>
+                                <a href="{% url 'ventas:descargar_factura' t.transaction_id %}"
+                                    class="text-blue-600 hover:text-blue-900 p-1.5 hover:bg-blue-50 rounded-lg transition-all duration-300"
+                                    title="Descargar">
+                                    <i data-lucide="download" class="w-4 h-4"></i>
+                                </a>
+                            </div>
                         </td>
                     </tr>
                     {% endif %}
                     {% empty %}
                     <tr>
-                        <td colspan="8" class="px-6 py-4 text-center text-gray-500">
-                            No se encontraron transacciones
+                        <td colspan="6" class="px-4 py-8 text-center text-gray-500">
+                            <i data-lucide="inbox" class="w-10 h-10 mx-auto mb-2 text-gray-300"></i>
+                            <p class="text-sm">No se encontraron ventas</p>
                         </td>
                     </tr>
                     {% endfor %}
@@ -160,35 +156,23 @@
             </table>
 
             <!-- Mobile Cards (visible only on mobile) -->
-            <div class="md:hidden space-y-4">
+            <div class="md:hidden space-y-3">
                 {% for t in transacciones %}
                 {% if t.procesado_pago %}
-                <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-4">
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="text-sm font-semibold text-gray-700">Trans #{{ t.transaction_id }}</span>
-                        <span class="text-sm font-semibold text-gray-700">Factura #{{ t.factuID }}</span>
-                        {% if t.procesado_pago %}
-                        <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">Pagado</span>
-                        {% else %}
-                        <span class="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs">Pendiente</span>
-                        {% endif %}
-                        <span class="text-sm text-gray-500">{{ t.fecha|date:"d/m/Y H:i" }}</span>
+                <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-4">
+                    <!-- Fecha y Estado -->
+                    <div class="flex justify-between items-start mb-3">
+                        <div>
+                            <div class="text-sm font-semibold text-gray-900">{{ t.fecha|date:"d/m/Y" }}</div>
+                            <div class="text-xs text-gray-500">{{ t.fecha|date:"H:i" }}</div>
+                        </div>
+                        <span class="bg-green-100 text-green-700 px-2 py-1 rounded-lg text-xs font-semibold">Pagado</span>
                     </div>
 
-                    {% if t.venta.order %}
+                    <!-- Cliente -->
                     <div class="mb-2">
-                        <p class="text-sm text-gray-700">
-                            <span class="font-medium">Orden:</span>
-                            <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
-                                #{{ t.venta.order.order_number }}
-                            </span>
-                        </p>
-                    </div>
-                    {% endif %}
-
-                    <div class="mb-2">
-                        <p class="text-sm text-gray-700">
-                            <span class="font-medium">Cliente:</span>
+                        <span class="text-xs text-gray-500">Cliente:</span>
+                        <p class="text-sm font-medium text-gray-900">
                             {% if t.venta.cliente %}
                             {{ t.venta.cliente.nombre }}
                             {% else %}
@@ -197,67 +181,74 @@
                         </p>
                     </div>
 
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="text-lg font-bold text-emerald-600">{{ currency_symbol }}{{ t.monto|floatformat:2 }}</span>
+                    <!-- Total y Método -->
+                    <div class="flex justify-between items-center mb-3 pb-3 border-b border-gray-100">
+                        <div class="text-xl font-bold text-emerald-600">{{ currency_symbol }}{{ t.monto|floatformat:2 }}</div>
                         {% if t.metodo_pago == 'cash' %}
-                        <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">Efectivo</span>
+                        <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded-lg text-xs font-medium">Efectivo</span>
                         {% elif t.metodo_pago == 'card' %}
-                        <span class="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-xs">Tarjeta</span>
+                        <span class="bg-purple-100 text-purple-700 px-2 py-1 rounded-lg text-xs font-medium">Tarjeta</span>
                         {% elif t.metodo_pago == 'transfer' %}
-                        <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs">Transferencia</span>
+                        <span class="bg-yellow-100 text-yellow-700 px-2 py-1 rounded-lg text-xs font-medium">Transfer</span>
                         {% else %}
-                        <span class="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs">{{ t.metodo_pago }}</span>
+                        <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded-lg text-xs font-medium">{{ t.metodo_pago }}</span>
                         {% endif %}
                     </div>
 
-                    <div class="flex justify-end space-x-2 pt-2 border-t border-gray-100">
-                        {% if t.transaction_id %}
+                    <!-- Acciones -->
+                    <div class="flex justify-end gap-2">
                         <a href="{% url 'transacciones:detalle_transaccion' t.transaction_id %}"
-                            class="bg-emerald-50 text-emerald-600 hover:bg-emerald-100 p-2 rounded-lg">
-                            <i data-lucide="eye" class="w-5 h-5"></i>
+                            class="bg-emerald-50 text-emerald-600 hover:bg-emerald-100 p-2 rounded-lg transition-all duration-300">
+                            <i data-lucide="eye" class="w-4 h-4"></i>
                         </a>
-                        {% else %}
-                        <span class="bg-gray-50 text-gray-600 p-2 rounded-lg cursor-not-allowed">
-                            <i data-lucide="eye-off" class="w-5 h-5"></i>
-                        </span>
-                        {% endif %}
                         <a href="{% url 'ventas:descargar_factura' t.transaction_id %}"
-                            class="bg-blue-50 text-blue-600 hover:bg-blue-100 p-2 rounded-lg">
-                            <i data-lucide="download" class="w-5 h-5"></i>
+                            class="bg-blue-50 text-blue-600 hover:bg-blue-100 p-2 rounded-lg transition-all duration-300">
+                            <i data-lucide="download" class="w-4 h-4"></i>
                         </a>
                     </div>
                 </div>
                 {% endif %}
                 {% empty %}
                 <div class="text-center py-8 text-gray-500">
-                    No se encontraron transacciones
+                    <i data-lucide="inbox" class="w-10 h-10 mx-auto mb-2 text-gray-300"></i>
+                    <p class="text-sm">No se encontraron ventas</p>
                 </div>
                 {% endfor %}
             </div>
         </div>
 
-        <!-- Pagination (if implemented) -->
+        <!-- Pagination moderna y profesional -->
         {% if transacciones.has_other_pages %}
         <div class="mt-6 flex justify-center">
-            <nav class="flex items-center space-x-1">
+            <div class="inline-flex items-center gap-1 bg-white border border-gray-200 rounded-xl p-1 shadow-sm">
                 {% if transacciones.has_previous %}
                 <a href="?page={{ transacciones.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if fecha_inicio %}&fecha_inicio={{ fecha_inicio }}{% endif %}{% if fecha_fin %}&fecha_fin={{ fecha_fin }}{% endif %}{% if metodo_pago %}&metodo_pago={{ metodo_pago }}{% endif %}"
-                    class="px-3 py-2 rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200">
-                    <i data-lucide="chevron-left" class="w-5 h-5"></i>
+                    class="px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-all duration-300 flex items-center"
+                    title="Página anterior">
+                    <i data-lucide="chevron-left" class="w-4 h-4"></i>
                 </a>
+                {% else %}
+                <span class="px-3 py-2 rounded-lg text-gray-300 cursor-not-allowed flex items-center">
+                    <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                </span>
                 {% endif %}
 
-                <span class="px-3 py-2 text-gray-700">
-                    Página {{ transacciones.number }} de {{ transacciones.paginator.num_pages }}
-                </span>
+                <div class="px-4 py-2 text-sm font-medium text-gray-700">
+                    {{ transacciones.number }} <span class="text-gray-400">de</span> {{ transacciones.paginator.num_pages }}
+                </div>
 
                 {% if transacciones.has_next %}
                 <a href="?page={{ transacciones.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if fecha_inicio %}&fecha_inicio={{ fecha_inicio }}{% endif %}{% if fecha_fin %}&fecha_fin={{ fecha_fin }}{% endif %}{% if metodo_pago %}&metodo_pago={{ metodo_pago }}{% endif %}"
-                    class="px-3 py-2 rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200">
-                    <i data-lucide="chevron-right" class="w-5 h-5"></i>
+                    class="px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-all duration-300 flex items-center"
+                    title="Página siguiente">
+                    <i data-lucide="chevron-right" class="w-4 h-4"></i>
                 </a>
+                {% else %}
+                <span class="px-3 py-2 rounded-lg text-gray-300 cursor-not-allowed flex items-center">
+                    <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                </span>
                 {% endif %}
-            </nav>
+            </div>
         </div>
         {% endif %}
     </div>
@@ -288,12 +279,11 @@
                 document.getElementById('fecha-fin').value = '';
                 document.getElementById('metodo-pago').value = '';
                 document.getElementById('search-input').value = '';
-                // Apply the cleared filters immediately
-                applyFilters();
+                applyFiltersAjax();
             });
         }
 
-        // Search input
+        // Search input con AJAX
         const searchInput = document.getElementById('search-input');
         let searchTimeout;
 
@@ -301,34 +291,39 @@
             searchInput.addEventListener('input', function () {
                 clearTimeout(searchTimeout);
                 searchTimeout = setTimeout(function () {
-                    applyFilters();
-                }, 500);
+                    applyFiltersAjax();
+                }, 300); // Búsqueda más rápida
             });
 
-            // Also trigger search on Enter key
             searchInput.addEventListener('keypress', function (e) {
                 if (e.key === 'Enter') {
                     e.preventDefault();
-                    applyFilters();
+                    applyFiltersAjax();
                 }
             });
         }
 
-        // Apply filters form
+        // Apply filters form con AJAX
         const filtersForm = document.getElementById('filters-form');
         if (filtersForm) {
             filtersForm.addEventListener('submit', function (e) {
                 e.preventDefault();
-                applyFilters();
+                applyFiltersAjax();
             });
         }
 
-        // Function to apply filters and search
-        function applyFilters() {
+        // Función AJAX para aplicar filtros
+        function applyFiltersAjax() {
             const searchQuery = document.getElementById('search-input').value;
             const fechaInicio = document.getElementById('fecha-inicio').value;
             const fechaFin = document.getElementById('fecha-fin').value;
             const metodoPago = document.getElementById('metodo-pago').value;
+            const loadingOverlay = document.getElementById('loading-overlay');
+
+            // Mostrar loader
+            if (loadingOverlay) {
+                loadingOverlay.classList.remove('hidden');
+            }
 
             // Build query string
             let queryParams = [];
@@ -337,8 +332,40 @@
             if (fechaFin) queryParams.push(`fecha_fin=${encodeURIComponent(fechaFin)}`);
             if (metodoPago) queryParams.push(`metodo_pago=${encodeURIComponent(metodoPago)}`);
 
-            // Redirect with query params
-            window.location.href = `?${queryParams.join('&')}`;
+            // Hacer petición AJAX
+            fetch(`?${queryParams.join('&')}`, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Actualizar tabla
+                const tbody = document.getElementById('transactions-table-body');
+                if (tbody) {
+                    tbody.innerHTML = data.html;
+                    
+                    // Reinicializar iconos de Lucide
+                    if (typeof lucide !== 'undefined') {
+                        lucide.createIcons();
+                    }
+                    
+                    // Actualizar contador
+                    const countElement = document.querySelector('.text-xs.text-gray-500');
+                    if (countElement) {
+                        countElement.textContent = `${data.count} ventas encontradas`;
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error al buscar:', error);
+            })
+            .finally(() => {
+                // Ocultar loader
+                if (loadingOverlay) {
+                    loadingOverlay.classList.add('hidden');
+                }
+            });
         }
     });
 </script>

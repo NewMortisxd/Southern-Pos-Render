@@ -5,6 +5,9 @@ from .forms import LoginForm, RegistrationForm
 from django.http import JsonResponse
 from .models import Usuario, Business
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_http_methods
+from django.views.decorators.csrf import csrf_exempt
+import json
 
 
 def login_view(request):
@@ -65,6 +68,13 @@ def register_view(request):
             business.regimen_rimpe = request.POST.get('regimen_rimpe', '') or None
             business.establecimiento = request.POST.get('establecimiento', '').strip() or None
             business.punto_emision = request.POST.get('punto_emision', '').strip() or None
+            
+            # Guardar secuencial actual (convertir a entero, por defecto 1)
+            secuencial_str = request.POST.get('secuencial_actual', '1').strip()
+            try:
+                business.secuencial_actual = int(secuencial_str) if secuencial_str else 1
+            except ValueError:
+                business.secuencial_actual = 1
             
             business.save()
             
@@ -189,3 +199,28 @@ def dashboard_view(request):
     View for the main dashboard page
     """
     return render(request, 'dashboard.html')
+from django.views.decorators.http import require_http_methods
+from django.views.decorators.csrf import csrf_exempt
+import json
+
+
+@require_http_methods(["POST"])
+def check_email(request):
+    """
+    Endpoint para verificar si un email ya está registrado
+    """
+    try:
+        email = request.POST.get('email', '').strip()
+        
+        if not email:
+            return JsonResponse({'error': 'Email is required'}, status=400)
+        
+        # Verificar si el email existe (optimizado)
+        exists = Usuario.objects.filter(email=email).exists()
+        
+        return JsonResponse({
+            'exists': exists,
+            'email': email
+        })
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)

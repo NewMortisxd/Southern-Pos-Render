@@ -12,26 +12,32 @@
     
     <div class="p-5 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
         <div class="flex items-center">
-            <!-- Logo y texto -->
-            <div class="flex items-center flex-1">
+            <!-- Logo y texto alineados a la izquierda -->
+            <div class="flex items-center">
                 <!-- Logo a la izquierda -->
                 <div class="flex-shrink-0">
-                    <div class="w-10 h-10 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 rounded-lg flex items-center justify-center">
                         {% if request.user.business.use_custom_logo and request.user.business.logo %}
-                            <img src="{{ request.user.business.logo.url }}" alt="Custom Logo" class="w-10 h-10 object-contain">
+                            <img src="{{ request.user.business.logo.url }}" alt="Custom Logo" class="w-12 h-12 object-contain">
                         {% else %}
-                            <img src="{% static 'img/logo.png' %}" alt="SouthernPOS Logo" class="w-10 h-10 object-contain">
+                            <!-- Logo SVG de Lemon POS - Refinado -->
+                            <img src="{% static 'img/LemonPosLogo.svg' %}" alt="Lemon POS" class="w-12 h-12" style="filter: drop-shadow(0 2px 8px rgba(34, 197, 94, 0.2));">
                         {% endif %}
                     </div>
                 </div>
                 <!-- Texto junto al logo -->
-                <div class="ml-3 pr-8">
-                    <h2 class="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
-                        {% if request.user.is_authenticated and request.user.business.use_custom_brand_name and request.user.business.custom_brand_name %}{{ request.user.business.custom_brand_name }}{% else %}SouthernPOS{% endif %}
-                    </h2>
-                    <div class="text-sm text-gray-500 dark:text-gray-400 mt-1 truncate">
-                        {{ request.user.email }}
-                    </div>
+                <div style="margin-left: -3px;">
+                    {% if request.user.business.use_custom_brand_name and request.user.business.custom_brand_name %}
+                        <h2 class="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
+                            {{ request.user.business.custom_brand_name }}
+                        </h2>
+                    {% else %}
+                        <!-- Lemon POS branding - Refinado -->
+                        <div class="flex items-baseline leading-none">
+                            <span class="text-2xl font-bold" style="background: linear-gradient(135deg, #16A34A 0%, #22c55e 50%, #16A34A 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Lemon</span>
+                            <span class="text-2xl font-semibold ml-1" style="color: #1F2937; letter-spacing: 2px;">POS</span>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -45,7 +51,8 @@
         <ul>
             <li class="mb-1 px-2">
                 <a href="{% url 'dashboard' %}"
-                    class="flex items-center px-4 py-3 text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 rounded-lg transition-all duration-200 {% if request.resolver_match.url_name == 'dashboard' %}bg-emerald-100 text-emerald-700 font-medium border-l-4 border-emerald-600{% endif %}">
+                    class="flex items-center px-4 py-3 text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 rounded-xl transition-all duration-300 {% if request.resolver_match.url_name == 'dashboard' %}bg-emerald-100 text-emerald-700 font-medium border-l-4 border-emerald-600{% endif %}"
+                    style="transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
                     <i data-lucide="layout-dashboard"
                         class="w-5 h-5 mr-3 {% if request.resolver_match.url_name == 'dashboard' %}text-emerald-600{% endif %}"></i>
                     <span>Dashboard</span>
@@ -53,7 +60,8 @@
             </li>
             <li class="mb-1 px-2">
                 <a href="{% url 'productos:lista' %}"
-                    class="flex items-center px-4 py-3 text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 rounded-lg transition-all duration-200 {% if 'productos' in request.path and 'categorias' not in request.path %}bg-emerald-100 text-emerald-700 font-medium border-l-4 border-emerald-600{% endif %}">
+                    class="flex items-center px-4 py-3 text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 rounded-xl transition-all duration-300 {% if 'productos' in request.path and 'categorias' not in request.path %}bg-emerald-100 text-emerald-700 font-medium border-l-4 border-emerald-600{% endif %}"
+                    style="transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
                     <i data-lucide="shopping-bag"
                         class="w-5 h-5 mr-3 {% if 'productos' in request.path and 'categorias' not in request.path %}text-emerald-600{% endif %}"></i>
                     <span>Productos</span>
@@ -61,7 +69,8 @@
             </li>
             <li class="mb-1 px-2">
                 <a href="{% url 'productos:lista_categorias' %}"
-                    class="flex items-center px-4 py-3 text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 rounded-lg transition-all duration-200 {% if 'categorias' in request.path %}bg-emerald-100 text-emerald-700 font-medium border-l-4 border-emerald-600{% endif %}">
+                    class="flex items-center px-4 py-3 text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 rounded-xl transition-all duration-300 {% if 'categorias' in request.path %}bg-emerald-100 text-emerald-700 font-medium border-l-4 border-emerald-600{% endif %}"
+                    style="transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
                     <i data-lucide="folder"
                         class="w-5 h-5 mr-3 {% if 'categorias' in request.path %}text-emerald-600{% endif %}"></i>
                     <span>Categorías</span>
@@ -69,7 +78,7 @@
             </li>
             <li class="mb-1 px-2">
                 <a href="{% url 'ventas:ventas' %}"
-                    class="flex items-center px-4 py-3 text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 rounded-lg transition-all duration-200 {% if 'ventas' in request.path %}bg-emerald-100 text-emerald-700 font-medium border-l-4 border-emerald-600{% endif %}">
+                    class="flex items-center px-4 py-3 text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 rounded-xl transition-all duration-300 {% if 'ventas' in request.path %}bg-emerald-100 text-emerald-700 font-medium border-l-4 border-emerald-600{% endif %}">
                     <i data-lucide="shopping-cart"
                         class="w-5 h-5 mr-3 {% if 'ventas' in request.path %}text-emerald-600{% endif %}"></i>
                     <span>Ventas</span>
@@ -77,7 +86,7 @@
             </li>
             <li class="mb-1 px-2">
                 <a href="{% url 'clients:lista' %}"
-                    class="flex items-center px-4 py-3 text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 rounded-lg transition-all duration-200 {% if 'clients' in request.path %}bg-emerald-100 text-emerald-700 font-medium border-l-4 border-emerald-600{% endif %}">
+                    class="flex items-center px-4 py-3 text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 rounded-xl transition-all duration-300 {% if 'clients' in request.path %}bg-emerald-100 text-emerald-700 font-medium border-l-4 border-emerald-600{% endif %}">
                     <i data-lucide="users"
                         class="w-5 h-5 mr-3 {% if 'clients' in request.path %}text-emerald-600{% endif %}"></i>
                     <span>Clientes</span>
@@ -85,7 +94,7 @@
             </li>
             <li class="mb-1 px-2">
                 <a href="{% url 'transacciones:lista_transacciones' %}"
-                    class="flex items-center px-4 py-3 text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 rounded-lg transition-all duration-200 {% if 'transacciones' in request.path %}bg-emerald-100 text-emerald-700 font-medium border-l-4 border-emerald-600{% endif %}">
+                    class="flex items-center px-4 py-3 text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 rounded-xl transition-all duration-300 {% if 'transacciones' in request.path %}bg-emerald-100 text-emerald-700 font-medium border-l-4 border-emerald-600{% endif %}">
                     <i data-lucide="credit-card"
                         class="w-5 h-5 mr-3 {% if 'transacciones' in request.path %}text-emerald-600{% endif %}"></i>
                     <span>Transacciones</span>
@@ -93,7 +102,7 @@
             </li>
             <li class="mb-1 px-2">
                 <a href="{% url 'reportes:index' %}"
-                    class="flex items-center px-4 py-3 text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 rounded-lg transition-all duration-200 {% if 'reportes' in request.path %}bg-emerald-100 text-emerald-700 font-medium border-l-4 border-emerald-600{% endif %}">
+                    class="flex items-center px-4 py-3 text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 rounded-xl transition-all duration-300 {% if 'reportes' in request.path %}bg-emerald-100 text-emerald-700 font-medium border-l-4 border-emerald-600{% endif %}">
                     <i data-lucide="bar-chart"
                         class="w-5 h-5 mr-3 {% if 'reportes' in request.path %}text-emerald-600{% endif %}"></i>
                     <span>Reportes</span>
@@ -101,7 +110,7 @@
             </li>
             <li class="mb-1 px-2">
                 <a href="{% url 'configuraciones:index' %}"
-                    class="flex items-center px-4 py-3 text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 rounded-lg transition-all duration-200 {% if 'configuracion' in request.path %}bg-emerald-100 text-emerald-700 font-medium border-l-4 border-emerald-600{% endif %}">
+                    class="flex items-center px-4 py-3 text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 rounded-xl transition-all duration-300 {% if 'configuracion' in request.path %}bg-emerald-100 text-emerald-700 font-medium border-l-4 border-emerald-600{% endif %}">
                     <i data-lucide="settings"
                         class="w-5 h-5 mr-3 {% if 'configuracion' in request.path %}text-emerald-600{% endif %}"></i>
                     <span>Configuración</span>
@@ -118,7 +127,7 @@
             {% if request.user.business.enable_kds %}
             <li class="mb-1 px-2">
                 <a href="{% url 'kds:kds' %}" target="_blank"
-                    class="flex items-center px-4 py-3 text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 rounded-lg transition-all duration-200">
+                    class="flex items-center px-4 py-3 text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 rounded-xl transition-all duration-300">
                     <i data-lucide="chef-hat"
                         class="w-5 h-5 mr-3"></i>
                     <span>Pantalla de Cocina</span>
@@ -128,7 +137,7 @@
             {% if request.user.business.enable_public_display %}
             <li class="mb-1 px-2">
                 <a href="{% url 'kds:public_display' %}" target="_blank"
-                    class="flex items-center px-4 py-3 text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 rounded-lg transition-all duration-200">
+                    class="flex items-center px-4 py-3 text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 rounded-xl transition-all duration-300">
                     <i data-lucide="monitor"
                         class="w-5 h-5 mr-3"></i>
                     <span>Pantalla Pública</span>
@@ -141,7 +150,8 @@
 
     <div class="p-4 border-t border-gray-200 flex-shrink-0">
         <a href="{% url 'logout' %}"
-            class="flex items-center text-gray-700 hover:text-emerald-600 transition-all duration-200 rounded-lg px-4 py-2 hover:bg-red-50">
+            class="flex items-center text-gray-700 hover:text-red-600 transition-all duration-300 rounded-xl px-4 py-2 hover:bg-red-50"
+            style="transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
             <i data-lucide="log-out" class="w-5 h-5 mr-3 text-red-500"></i>
             <span>Cerrar sesión</span>
         </a>
@@ -172,21 +182,60 @@
         class="bg-white dark:bg-gray-800 w-64 h-full overflow-y-auto transform transition-transform duration-300 -translate-x-full shadow-2xl flex flex-col">
         <!-- Header sin botón de cerrar -->
         <div class="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center flex-shrink-0 bg-white dark:bg-gray-800 sticky top-0 z-10">
-            <div class="flex items-center flex-1">
+            <div class="flex items-center">
                 <div class="flex-shrink-0">
-                    <div class="w-10 h-10 rounded-lg flex items-center justify-center">
+                    <div class="w-12 h-12 rounded-lg flex items-center justify-center">
                         {% if request.user.business.use_custom_logo and request.user.business.logo %}
                         <img src="{{ request.user.business.logo.url }}" alt="Custom Logo"
-                            class="w-10 h-10 object-contain">
+                            class="w-12 h-12 object-contain">
                         {% else %}
-                        <img src="{% static 'img/logo.png' %}" alt="SouthernPOS Logo" class="w-10 h-10 object-contain">
+                        <!-- Logo SVG de Lemon POS -->
+                        <svg class="w-12 h-12" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0 2px 8px rgba(34, 197, 94, 0.2));">
+                            <!-- Hoja estilizada -->
+                            <path d="M16 2C15.4477 2 15 2.44772 15 3V4.5C15 5.32843 15.6716 6 16.5 6C17.3284 6 18 5.32843 18 4.5V3C18 2.44772 17.5523 2 17 2H16Z" 
+                                  fill="url(#leafGradientMobile)"/>
+                            
+                            <!-- Limón -->
+                            <ellipse cx="16" cy="18" rx="9" ry="11" 
+                                     stroke="url(#lemonGradientMobile)" 
+                                     stroke-width="2.5" 
+                                     stroke-linecap="round"
+                                     fill="none"/>
+                            
+                            <!-- Detalle de corte -->
+                            <path d="M10 16C10 16 12 19 16 19C20 19 22 16 22 16" 
+                                  stroke="url(#lemonGradientMobile)" 
+                                  stroke-width="2" 
+                                  stroke-linecap="round"
+                                  opacity="0.7"/>
+                            
+                            <!-- Gradientes -->
+                            <defs>
+                                <linearGradient id="leafGradientMobile" x1="15" y1="2" x2="18" y2="6" gradientUnits="userSpaceOnUse">
+                                    <stop offset="0%" stop-color="#84cc16"/>
+                                    <stop offset="100%" stop-color="#65a30d"/>
+                                </linearGradient>
+                                <linearGradient id="lemonGradientMobile" x1="7" y1="7" x2="25" y2="29" gradientUnits="userSpaceOnUse">
+                                    <stop offset="0%" stop-color="#22c55e"/>
+                                    <stop offset="100%" stop-color="#16a34a"/>
+                                </linearGradient>
+                            </defs>
+                        </svg>
                         {% endif %}
                     </div>
                 </div>
-                <div class="ml-3 flex-1">
-                    <h2 class="text-lg font-bold text-emerald-600 dark:text-emerald-400">
-                        {% if request.user.is_authenticated and request.user.business.use_custom_brand_name and request.user.business.custom_brand_name %}{{ request.user.business.custom_brand_name }}{% else %}SouthernPOS{% endif %}
-                    </h2>
+                <div class="ml-3">
+                    {% if request.user.business.use_custom_brand_name and request.user.business.custom_brand_name %}
+                        <h2 class="text-xl font-bold text-emerald-600 dark:text-emerald-400">
+                            {{ request.user.business.custom_brand_name }}
+                        </h2>
+                    {% else %}
+                        <!-- Lemon POS branding -->
+                        <div class="flex flex-col leading-none">
+                            <span class="text-xl font-bold" style="background: linear-gradient(135deg, #22c55e 0%, #84cc16 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Lemon</span>
+                            <span class="text-xl font-semibold" style="background: linear-gradient(135deg, #22c55e 0%, #84cc16 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; letter-spacing: 0.5px;">POS</span>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -200,7 +249,7 @@
 
             <div class="px-4 py-1">
                 <a href="{% url 'dashboard' %}"
-                    class="flex items-center py-3 px-4 rounded-lg transition-all duration-200 {% if request.resolver_match.url_name == 'dashboard' %}bg-emerald-100 text-emerald-700 font-medium border-l-4 border-emerald-600{% else %}text-gray-700 hover:bg-gray-50{% endif %}">
+                    class="flex items-center py-3 px-4 rounded-xl transition-all duration-300 {% if request.resolver_match.url_name == 'dashboard' %}bg-emerald-100 text-emerald-700 font-medium border-l-4 border-emerald-600{% else %}text-gray-700 hover:bg-gray-50{% endif %}">
                     <i data-lucide="layout-dashboard"
                         class="w-5 h-5 mr-3 {% if request.resolver_match.url_name == 'dashboard' %}text-emerald-600{% endif %}"></i>
                     <span>Dashboard</span>
@@ -209,7 +258,7 @@
 
             <div class="px-4 py-1">
                 <a href="{% url 'productos:lista' %}"
-                    class="flex items-center py-3 px-4 rounded-lg transition-all duration-200 {% if 'productos' in request.path and 'categorias' not in request.path %}bg-emerald-100 text-emerald-700 font-medium border-l-4 border-emerald-600{% else %}text-gray-700 hover:bg-gray-50{% endif %}">
+                    class="flex items-center py-3 px-4 rounded-xl transition-all duration-300 {% if 'productos' in request.path and 'categorias' not in request.path %}bg-emerald-100 text-emerald-700 font-medium border-l-4 border-emerald-600{% else %}text-gray-700 hover:bg-gray-50{% endif %}">
                     <i data-lucide="shopping-bag"
                         class="w-5 h-5 mr-3 {% if 'productos' in request.path and 'categorias' not in request.path %}text-emerald-600{% endif %}"></i>
                     <span>Productos</span>
@@ -218,7 +267,7 @@
 
             <div class="px-4 py-1">
                 <a href="{% url 'productos:lista_categorias' %}"
-                    class="flex items-center py-3 px-4 rounded-lg transition-all duration-200 {% if 'categorias' in request.path %}bg-emerald-100 text-emerald-700 font-medium border-l-4 border-emerald-600{% else %}text-gray-700 hover:bg-gray-50{% endif %}">
+                    class="flex items-center py-3 px-4 rounded-xl transition-all duration-300 {% if 'categorias' in request.path %}bg-emerald-100 text-emerald-700 font-medium border-l-4 border-emerald-600{% else %}text-gray-700 hover:bg-gray-50{% endif %}">
                     <i data-lucide="folder"
                         class="w-5 h-5 mr-3 {% if 'categorias' in request.path %}text-emerald-600{% endif %}"></i>
                     <span>Categorías</span>
@@ -227,7 +276,7 @@
 
             <div class="px-4 py-1">
                 <a href="{% url 'ventas:ventas' %}"
-                    class="flex items-center py-3 px-4 rounded-lg transition-all duration-200 {% if 'ventas' in request.path %}bg-emerald-100 text-emerald-700 font-medium border-l-4 border-emerald-600{% else %}text-gray-700 hover:bg-gray-50{% endif %}">
+                    class="flex items-center py-3 px-4 rounded-xl transition-all duration-300 {% if 'ventas' in request.path %}bg-emerald-100 text-emerald-700 font-medium border-l-4 border-emerald-600{% else %}text-gray-700 hover:bg-gray-50{% endif %}">
                     <i data-lucide="shopping-cart"
                         class="w-5 h-5 mr-3 {% if 'ventas' in request.path %}text-emerald-600{% endif %}"></i>
                     <span>Ventas</span>
@@ -236,7 +285,7 @@
 
             <div class="px-4 py-1">
                 <a href="{% url 'clients:lista' %}"
-                    class="flex items-center py-3 px-4 rounded-lg transition-all duration-200 {% if 'clients' in request.path %}bg-emerald-100 text-emerald-700 font-medium border-l-4 border-emerald-600{% else %}text-gray-700 hover:bg-gray-50{% endif %}">
+                    class="flex items-center py-3 px-4 rounded-xl transition-all duration-300 {% if 'clients' in request.path %}bg-emerald-100 text-emerald-700 font-medium border-l-4 border-emerald-600{% else %}text-gray-700 hover:bg-gray-50{% endif %}">
                     <i data-lucide="users"
                         class="w-5 h-5 mr-3 {% if 'clients' in request.path %}text-emerald-600{% endif %}"></i>
                     <span>Clientes</span>
@@ -245,7 +294,7 @@
 
             <div class="px-4 py-1">
                 <a href="{% url 'transacciones:lista_transacciones' %}"
-                    class="flex items-center py-3 px-4 rounded-lg transition-all duration-200 {% if 'transacciones' in request.path %}bg-emerald-100 text-emerald-700 font-medium border-l-4 border-emerald-600{% else %}text-gray-700 hover:bg-gray-50{% endif %}">
+                    class="flex items-center py-3 px-4 rounded-xl transition-all duration-300 {% if 'transacciones' in request.path %}bg-emerald-100 text-emerald-700 font-medium border-l-4 border-emerald-600{% else %}text-gray-700 hover:bg-gray-50{% endif %}">
                     <i data-lucide="credit-card"
                         class="w-5 h-5 mr-3 {% if 'transacciones' in request.path %}text-emerald-600{% endif %}"></i>
                     <span>Transacciones</span>
@@ -254,7 +303,7 @@
 
             <div class="px-4 py-1">
                 <a href="{% url 'reportes:index' %}"
-                    class="flex items-center py-3 px-4 rounded-lg transition-all duration-200 {% if 'reportes' in request.path %}bg-emerald-100 text-emerald-700 font-medium border-l-4 border-emerald-600{% else %}text-gray-700 hover:bg-gray-50{% endif %}">
+                    class="flex items-center py-3 px-4 rounded-xl transition-all duration-300 {% if 'reportes' in request.path %}bg-emerald-100 text-emerald-700 font-medium border-l-4 border-emerald-600{% else %}text-gray-700 hover:bg-gray-50{% endif %}">
                     <i data-lucide="bar-chart"
                         class="w-5 h-5 mr-3 {% if 'reportes' in request.path %}text-emerald-600{% endif %}"></i>
                     <span>Reportes</span>
@@ -263,7 +312,7 @@
 
             <div class="px-4 py-1">
                 <a href="{% url 'configuraciones:index' %}"
-                    class="flex items-center py-3 px-4 rounded-lg transition-all duration-200 {% if 'configuracion' in request.path %}bg-emerald-100 text-emerald-700 font-medium border-l-4 border-emerald-600{% else %}text-gray-700 hover:bg-gray-50{% endif %}">
+                    class="flex items-center py-3 px-4 rounded-xl transition-all duration-300 {% if 'configuracion' in request.path %}bg-emerald-100 text-emerald-700 font-medium border-l-4 border-emerald-600{% else %}text-gray-700 hover:bg-gray-50{% endif %}">
                     <i data-lucide="settings"
                         class="w-5 h-5 mr-3 {% if 'configuracion' in request.path %}text-emerald-600{% endif %}"></i>
                     <span>Configuración</span>
@@ -279,7 +328,7 @@
             {% if request.user.business.enable_kds %}
             <div class="px-4 py-1">
                 <a href="{% url 'kds:kds' %}" target="_blank"
-                    class="flex items-center py-3 px-4 rounded-lg transition-all duration-200 text-gray-700 hover:bg-gray-50">
+                    class="flex items-center py-3 px-4 rounded-xl transition-all duration-300 text-gray-700 hover:bg-gray-50">
                     <i data-lucide="chef-hat"
                         class="w-5 h-5 mr-3"></i>
                     <span>Pantalla de Cocina</span>
@@ -290,7 +339,7 @@
             {% if request.user.business.enable_public_display %}
             <div class="px-4 py-1">
                 <a href="{% url 'kds:public_display' %}" target="_blank"
-                    class="flex items-center py-3 px-4 rounded-lg transition-all duration-200 text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700">
+                    class="flex items-center py-3 px-4 rounded-xl transition-all duration-300 text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700">
                     <i data-lucide="monitor"
                         class="w-5 h-5 mr-3"></i>
                     <span>Pantalla Pública</span>
@@ -302,7 +351,7 @@
             <!-- Cerrar sesión dentro del nav para que tenga scroll -->
             <div class="px-4 mb-2 mt-6 border-t border-gray-200 dark:border-gray-700 pt-4">
                 <a href="{% url 'logout' %}"
-                    class="flex items-center py-3 px-4 rounded-lg transition-all duration-200 text-gray-700 hover:text-red-600 hover:bg-red-50 dark:text-gray-300 dark:hover:bg-red-900 dark:hover:text-red-200">
+                    class="flex items-center py-3 px-4 rounded-xl transition-all duration-300 text-gray-700 hover:text-red-600 hover:bg-red-50 dark:text-gray-300 dark:hover:bg-red-900 dark:hover:text-red-200">
                     <i data-lucide="log-out" class="w-5 h-5 mr-3 text-red-500"></i>
                     <span>Cerrar sesión</span>
                 </a>

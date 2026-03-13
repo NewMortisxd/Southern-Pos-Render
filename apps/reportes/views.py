@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from apps.productos.models import Producto, Categoria
 from django.db.models import Sum, Count, F, ExpressionWrapper, DecimalField, FloatField
 from django.db.models.functions import Coalesce
+from django.db import models
 import csv
 from django.http import HttpResponse
 from datetime import datetime
@@ -40,38 +41,149 @@ def facturas_report(request):
 # Reportes Operativos
 @login_required
 def inventario_report(request):
-    """Reporte de inventario"""
-    # Obtener solo los productos del usuario actual ordenados por stock
-    productos = Producto.objects.filter(usuario_creador=request.user).order_by('stock')
+    """Reporte de inventario mejorado - Nivel ERP Empresarial"""
+    from decimal import Decimal
     
-    # Productos con stock bajo (menos de 10 unidades)
-    productos_stock_bajo = productos.filter(stock__lt=10)
+    # 🎯 Obtener datos del negocio del usuario
+    try:
+        from apps.usuarios.models import Business
+        business = Business.objects.get(user=request.user)
+        nombre_negocio = business.nombre_negocio or request.user.nombre_completo
+        ruc_negocio = business.ruc_negocio or 'N/A'
+    except Business.DoesNotExist:
+        nombre_negocio = request.user.nombre_completo
+        ruc_negocio = request.user.ruc_negocio if hasattr(request.user, 'ruc_negocio') else 'N/A'
     
-    # Productos agotados
+    # 🎯 CAMBIO 1: Filtrar SOLO productos inventariables (físicos e insumos)
+    # NO mostrar servicios ni combos sin inventario
+    productos = Producto.objects.filter(
+        usuario_creador=request.user,
+        activo=True,
+        tipo_producto__in=['fisico', 'insumo'],  # Solo inventariables
+        controla_stock=True  # Solo los que controlan stock
+    ).order_by('stock')
+    
+    # 🎯 CAMBIO 2: Stock bajo usando stock_minimo (dinámico, no fijo)
+    # Ahora es: stock_actual <= stock_minimo
+    productos_stock_bajo = productos.filter(
+        stock__lte=models.F('stock_minimo'),
+        stock__gt=0
+    )
+    
+    # Productos agotados (solo los que controlan stock y tienen 0)
     productos_agotados = productos.filter(stock=0)
     
-    # Productos por categoría - Solo categorías con productos del usuario
-    categorias = Categoria.objects.filter(producto__usuario_creador=request.user).distinct().annotate(
-        total_productos=Count('producto', filter=Q(producto__usuario_creador=request.user))
+    # Productos por categoría - Solo categorías con productos inventariables
+    categorias = Categoria.objects.filter(
+        producto__usuario_creador=request.user,
+        producto__tipo_producto__in=['fisico', 'insumo'],
+        producto__controla_stock=True
+    ).distinct().annotate(
+        total_productos=Count('producto', filter=Q(
+            producto__usuario_creador=request.user,
+            producto__tipo_producto__in=['fisico', 'insumo'],
+            producto__controla_stock=True
+        ))
     )
     
     # Calculate valor_inventario separately for each category
     for categoria in categorias:
-        productos_categoria = Producto.objects.filter(categoria=categoria, usuario_creador=request.user)
-        valor_inventario = sum(p.precio * p.stock for p in productos_categoria)
-        categoria.valor_inventario = valor_inventario
+        productos_categoria = Producto.objects.filter(
+            categoria=categoria, 
+            usuario_creador=request.user,
+            activo=True,
+            tipo_producto__in=['fisico', 'insumo'],
+            controla_stock=True
+        )
+        # Calcular valor basado en costo (contablemente correcto)
+        valor_inventario_costo = sum(
+            (p.costo or Decimal('0')) * Decimal(str(p.stock or 0)) 
+            for p in productos_categoria if p.stock is not None
+        )
+        # Calcular valor basado en precio de venta
+        valor_inventario_venta = sum(
+            p.precio * Decimal(str(p.stock or 0)) 
+            for p in productos_categoria if p.stock is not None
+        )
+        categoria.valor_inventario_costo = valor_inventario_costo
+        categoria.valor_inventario_venta = valor_inventario_venta
+        categoria.utilidad_potencial = valor_inventario_venta - valor_inventario_costo
     
-    # Valor total del inventario - Calculate directly
-    valor_total = sum(p.precio * p.stock for p in productos)
+    # Valor total del inventario basado en COSTO (contablemente correcto)
+    valor_total_costo = sum(
+        (p.costo or Decimal('0')) * Decimal(str(p.stock or 0)) 
+        for p in productos if p.stock is not None
+    )
+    
+    # Valor total del inventario basado en PRECIO DE VENTA
+    valor_total_venta = sum(
+        p.precio * Decimal(str(p.stock or 0)) 
+        for p in productos if p.stock is not None
+    )
+    
+    # 🎯 CAMBIO 3: Valor en riesgo más preciso (stock bajo × costo, no precio)
+    # Esto es el capital real en riesgo
+    valor_en_riesgo = sum(
+        (p.costo or Decimal('0')) * Decimal(str(p.stock or 0)) 
+        for p in productos_stock_bajo if p.stock is not None
+    )
+    
+    # Utilidad potencial (diferencia entre precio venta y costo)
+    utilidad_potencial = valor_total_venta - valor_total_costo
+    
+    # 🎯 CAMBIO 4: Separar utilidad por tipo
+    # Productos físicos
+    productos_fisicos = productos.filter(tipo_producto='fisico')
+    utilidad_fisicos = sum(
+        (p.precio - (p.costo or Decimal('0'))) * Decimal(str(p.stock or 0))
+        for p in productos_fisicos if p.stock is not None
+    )
+    
+    # Insumos
+    productos_insumos = productos.filter(tipo_producto='insumo')
+    utilidad_insumos = sum(
+        (p.precio - (p.costo or Decimal('0'))) * Decimal(str(p.stock or 0))
+        for p in productos_insumos if p.stock is not None
+    )
+    
+    # Promedio de valor por producto
+    promedio_valor = valor_total_costo / productos.count() if productos.count() > 0 else Decimal('0')
+    
+    # Check if export was requested
+    export_format = request.GET.get('export')
+    if export_format in ['excel', 'pdf']:
+        if export_format == 'excel':
+            return exportar_inventario_excel(
+                productos, categorias, valor_total_costo, valor_total_venta,
+                productos_stock_bajo, productos_agotados, valor_en_riesgo,
+                utilidad_potencial, promedio_valor, request.user
+            )
+        elif export_format == 'pdf':
+            return exportar_inventario_pdf(
+                productos, categorias, valor_total_costo, valor_total_venta,
+                productos_stock_bajo, productos_agotados, valor_en_riesgo,
+                utilidad_potencial, request.user
+            )
     
     context = {
         'productos': productos,
         'productos_stock_bajo': productos_stock_bajo,
         'productos_agotados': productos_agotados,
         'categorias': categorias,
-        'valor_total': valor_total,
+        'valor_total_costo': valor_total_costo,
+        'valor_total_venta': valor_total_venta,
+        'valor_en_riesgo': valor_en_riesgo,
+        'utilidad_potencial': utilidad_potencial,
+        'promedio_valor': promedio_valor,
+        # 🎯 Nuevos indicadores profesionales
+        'total_productos_fisicos': productos_fisicos.count(),
+        'total_productos_insumos': productos_insumos.count(),
+        'utilidad_fisicos': utilidad_fisicos,
+        'utilidad_insumos': utilidad_insumos,
         'total_productos': productos.count(),
         'total_categorias': categorias.count(),
+        'count_stock_bajo': productos_stock_bajo.count(),
+        'count_agotados': productos_agotados.count(),
     }
     
     return render(request, 'reportes/inventario.html', context)
@@ -236,6 +348,9 @@ def ventas(request):
     
     total_facturas = transacciones.count()
     
+    # MEJORA 1: Calcular Ticket Promedio
+    ticket_promedio = total_ventas / total_facturas if total_facturas > 0 else 0
+    
     # Calculate percentage change compared to previous period
     previous_start = fecha_desde_dt - (fecha_hasta_dt - fecha_desde_dt)
     previous_end = fecha_desde_dt - timedelta(days=1)
@@ -295,10 +410,12 @@ def ventas(request):
         periodo_texto = f"Período de {days_diff} días"
     
     # Check if export was requested
-    if request.GET.get('export') == '1':
-        # Implement export functionality here
-        # For example, return a CSV or Excel file
-        pass
+    export_format = request.GET.get('export')
+    if export_format in ['excel', 'pdf']:
+        if export_format == 'excel':
+            return exportar_excel(transacciones, fecha_desde_dt, fecha_hasta_dt, total_ventas, total_iva, total_facturas, ticket_promedio)
+        elif export_format == 'pdf':
+            return exportar_pdf(transacciones, fecha_desde_dt, fecha_hasta_dt, total_ventas, total_iva, total_facturas, ticket_promedio, request.user)
     
     context = {
         'transacciones': page_obj,
@@ -306,12 +423,11 @@ def ventas(request):
         'fecha_hasta': fecha_hasta_dt,
         'tipo_documento': tipo_documento,
         'total_ventas': total_ventas,
-
-        
         'total_iva': total_iva,
         'total_facturas': total_facturas,
+        'ticket_promedio': ticket_promedio,  # MEJORA 1: Agregar ticket promedio
         'porcentaje_cambio': porcentaje_cambio,
-        'ventas_chart_data': json.dumps(ventas_chart_data),  # Only include this once
+        'ventas_chart_data': json.dumps(ventas_chart_data),
         'periodo_texto': periodo_texto,
         'total_ventas_gravadas': total_ventas_gravadas,
         'proxima_declaracion': proxima_declaracion,
@@ -319,7 +435,6 @@ def ventas(request):
         'retenciones_efectuadas': retenciones_efectuadas,
         'estado_ats': estado_ats,
         'page_obj': page_obj,
-        
     }
     
     return render(request, 'reportes/ventas.html', context)
@@ -520,4 +635,905 @@ def ats(request):
     response = HttpResponse(xml_str, content_type='application/xml')
     response['Content-Disposition'] = f'attachment; filename=ATS_{datetime.now().strftime("%Y%m%d")}.xml'
     
+    return response
+
+# Funciones de exportación
+from django.http import HttpResponse
+from openpyxl import Workbook
+from openpyxl.styles import Font, Alignment, PatternFill, Border, Side
+from reportlab.lib.pagesizes import letter, A4
+from reportlab.lib import colors
+from reportlab.lib.units import inch
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.enums import TA_CENTER, TA_RIGHT
+
+def exportar_excel(transacciones, fecha_desde, fecha_hasta, total_ventas, total_iva, total_facturas, ticket_promedio):
+    """Exportar reporte de ventas a Excel - Formato profesional para contadores"""
+    
+    # Convertir Decimal a float al inicio para evitar errores de tipo
+    total_ventas = float(total_ventas)
+    total_iva = float(total_iva)
+    ticket_promedio = float(ticket_promedio)
+    
+    wb = Workbook()
+    
+    # === HOJA 1: RESUMEN EJECUTIVO ===
+    ws_resumen = wb.active
+    ws_resumen.title = "Resumen"
+    
+    # Encabezado principal
+    ws_resumen['A1'] = 'LEMON POS - REPORTE DE VENTAS'
+    ws_resumen['A1'].font = Font(size=18, bold=True, color="22C55E")
+    ws_resumen['A1'].alignment = Alignment(horizontal='center')
+    ws_resumen.merge_cells('A1:B1')
+    
+    # Período
+    ws_resumen['A3'] = 'Período:'
+    ws_resumen['B3'] = f"{fecha_desde.strftime('%d/%m/%Y')} - {fecha_hasta.strftime('%d/%m/%Y')}"
+    ws_resumen['A3'].font = Font(bold=True)
+    
+    ws_resumen['A4'] = 'Fecha de generación:'
+    ws_resumen['B4'] = datetime.now().strftime('%d/%m/%Y %H:%M')
+    
+    # KPIs principales
+    ws_resumen['A6'] = 'INDICADORES CLAVE'
+    ws_resumen['A6'].font = Font(size=12, bold=True, color="FFFFFF")
+    ws_resumen['A6'].fill = PatternFill(start_color="22C55E", end_color="22C55E", fill_type="solid")
+    ws_resumen['A6'].alignment = Alignment(horizontal='center')
+    ws_resumen.merge_cells('A6:B6')
+    
+    kpis = [
+        ('Ventas Totales', f"${total_ventas:.2f}"),
+        ('Facturas Emitidas', total_facturas),
+        ('Ticket Promedio', f"${ticket_promedio:.2f}"),
+        ('IVA Generado (15%)', f"${total_iva:.2f}"),
+        ('Ventas Gravadas', f"${(total_ventas - total_iva):.2f}")
+    ]
+    
+    row = 7
+    for label, value in kpis:
+        ws_resumen[f'A{row}'] = label
+        ws_resumen[f'B{row}'] = value
+        ws_resumen[f'A{row}'].font = Font(bold=True)
+        if row == 7:  # Ventas totales destacadas
+            ws_resumen[f'B{row}'].font = Font(size=14, bold=True, color="22C55E")
+        row += 1
+    
+    # MEJORA 4: Distribución por Método de Pago
+    ws_resumen[f'A{row+1}'] = 'DISTRIBUCIÓN POR MÉTODO DE PAGO'
+    ws_resumen[f'A{row+1}'].font = Font(size=12, bold=True, color="FFFFFF")
+    ws_resumen[f'A{row+1}'].fill = PatternFill(start_color="22C55E", end_color="22C55E", fill_type="solid")
+    ws_resumen[f'A{row+1}'].alignment = Alignment(horizontal='center')
+    ws_resumen.merge_cells(f'A{row+1}:B{row+1}')
+    
+    # Calcular totales por método
+    metodos_pago = {}
+    for t in transacciones:
+        metodo = t.metodo_pago
+        if metodo == 'cash':
+            metodo_es = 'Efectivo'
+        elif metodo == 'card':
+            metodo_es = 'Tarjeta'
+        elif metodo == 'transfer':
+            metodo_es = 'Transferencia'
+        else:
+            metodo_es = metodo.title()
+        
+        if metodo_es not in metodos_pago:
+            metodos_pago[metodo_es] = 0
+        metodos_pago[metodo_es] += float(t.monto)
+    
+    row += 3
+    for metodo, monto in metodos_pago.items():
+        ws_resumen[f'A{row}'] = metodo
+        ws_resumen[f'B{row}'] = f"${monto:.2f}"
+        ws_resumen[f'A{row}'].font = Font(bold=True)
+        row += 1
+    
+    # Ajustar anchos
+    ws_resumen.column_dimensions['A'].width = 25
+    ws_resumen.column_dimensions['B'].width = 20
+    
+    # === HOJA 2: DETALLE COMPLETO (Para contador) ===
+    ws_detalle = wb.create_sheet("Detalle Completo")
+    
+    # Encabezados técnicos
+    headers = ['ID Transacción', 'Factura #', 'Fecha', 'Hora', 'Cliente', 'Subtotal', 'IVA 15%', 'Total', 'Método Pago', 'Estado']
+    ws_detalle.append(headers)
+    
+    # Estilo de encabezados
+    for idx, cell in enumerate(ws_detalle[1], 1):
+        cell.font = Font(bold=True, color="FFFFFF")
+        cell.fill = PatternFill(start_color="22C55E", end_color="22C55E", fill_type="solid")
+        cell.alignment = Alignment(horizontal='center', vertical='center')
+    
+    # Congelar fila de encabezados (MEJORA 1)
+    ws_detalle.freeze_panes = 'A2'
+    
+    # Datos completos
+    for t in transacciones:
+        subtotal = float(t.monto) / 1.15
+        iva = float(t.monto) - subtotal
+        
+        # Traducir método de pago a español
+        metodo = t.metodo_pago
+        if metodo == 'cash':
+            metodo_es = 'Efectivo'
+        elif metodo == 'card':
+            metodo_es = 'Tarjeta'
+        elif metodo == 'transfer':
+            metodo_es = 'Transferencia'
+        else:
+            metodo_es = metodo.title()
+        
+        # Remover timezone para Excel
+        fecha_sin_tz = t.fecha.replace(tzinfo=None) if t.fecha.tzinfo else t.fecha
+        
+        ws_detalle.append([
+            t.transaction_id,
+            t.factuID,
+            fecha_sin_tz,  # Fecha sin timezone
+            fecha_sin_tz,  # Hora sin timezone
+            t.venta.cliente.nombre if t.venta.cliente else 'Consumidor Final',
+            round(subtotal, 2),
+            round(iva, 2),
+            float(t.monto),
+            metodo_es,  # Método en español
+            'Pagado'
+        ])
+    
+    # MEJORA 2: Formato correcto de columnas
+    # Formato de fecha (columna C)
+    for row in ws_detalle.iter_rows(min_row=2, min_col=3, max_col=3):
+        for cell in row:
+            cell.number_format = 'DD/MM/YYYY'
+    
+    # Formato de hora (columna D)
+    for row in ws_detalle.iter_rows(min_row=2, min_col=4, max_col=4):
+        for cell in row:
+            cell.number_format = 'HH:MM'
+    
+    # Formato de moneda (columnas F, G, H)
+    for row in ws_detalle.iter_rows(min_row=2, min_col=6, max_col=8):
+        for cell in row:
+            cell.number_format = '$#,##0.00'
+    
+    # Ajustar anchos
+    ws_detalle.column_dimensions['A'].width = 15
+    ws_detalle.column_dimensions['B'].width = 12
+    ws_detalle.column_dimensions['C'].width = 12
+    ws_detalle.column_dimensions['D'].width = 8
+    ws_detalle.column_dimensions['E'].width = 30
+    ws_detalle.column_dimensions['F'].width = 12
+    ws_detalle.column_dimensions['G'].width = 12
+    ws_detalle.column_dimensions['H'].width = 12
+    ws_detalle.column_dimensions['I'].width = 15
+    ws_detalle.column_dimensions['J'].width = 10
+    
+    # === HOJA 3: RESUMEN POR DÍA (Premium) ===
+    ws_diario = wb.create_sheet("Resumen por Día")
+    
+    # Encabezados
+    headers_diario = ['Fecha', 'Total Vendido', 'Número de Facturas', 'Ticket Promedio']
+    ws_diario.append(headers_diario)
+    
+    for cell in ws_diario[1]:
+        cell.font = Font(bold=True, color="FFFFFF")
+        cell.fill = PatternFill(start_color="22C55E", end_color="22C55E", fill_type="solid")
+        cell.alignment = Alignment(horizontal='center')
+    
+    # Agrupar por día
+    ventas_por_dia = {}
+    for t in transacciones:
+        fecha_str = t.fecha.strftime('%Y-%m-%d')
+        if fecha_str not in ventas_por_dia:
+            ventas_por_dia[fecha_str] = {'total': 0, 'facturas': 0}
+        ventas_por_dia[fecha_str]['total'] += float(t.monto)
+        ventas_por_dia[fecha_str]['facturas'] += 1
+    
+    # Agregar datos
+    for fecha_str in sorted(ventas_por_dia.keys()):
+        data = ventas_por_dia[fecha_str]
+        ticket_prom = data['total'] / data['facturas'] if data['facturas'] > 0 else 0
+        ws_diario.append([
+            datetime.strptime(fecha_str, '%Y-%m-%d').strftime('%d/%m/%Y'),
+            round(data['total'], 2),
+            data['facturas'],
+            round(ticket_prom, 2)
+        ])
+    
+    # Formato
+    for row in ws_diario.iter_rows(min_row=2, min_col=2, max_col=2):
+        for cell in row:
+            cell.number_format = '$#,##0.00'
+    for row in ws_diario.iter_rows(min_row=2, min_col=4, max_col=4):
+        for cell in row:
+            cell.number_format = '$#,##0.00'
+    
+    # Ajustar anchos
+    ws_diario.column_dimensions['A'].width = 15
+    ws_diario.column_dimensions['B'].width = 15
+    ws_diario.column_dimensions['C'].width = 20
+    ws_diario.column_dimensions['D'].width = 18
+    
+    # Crear respuesta HTTP
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = f'attachment; filename=ventas_lemon_{fecha_desde.strftime("%Y%m%d")}_{fecha_hasta.strftime("%Y%m%d")}.xlsx'
+    wb.save(response)
+    return response
+
+def exportar_pdf(transacciones, fecha_desde, fecha_hasta, total_ventas, total_iva, total_facturas, ticket_promedio, user):
+    """Exportar reporte de ventas a PDF - Formato ejecutivo y presentable"""
+    
+    # Convertir Decimal a float al inicio para evitar errores de tipo
+    total_ventas = float(total_ventas)
+    total_iva = float(total_iva)
+    ticket_promedio = float(ticket_promedio)
+    
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename=reporte_ventas_lemon_{fecha_desde.strftime("%Y%m%d")}_{fecha_hasta.strftime("%Y%m%d")}.pdf'
+    
+    doc = SimpleDocTemplate(response, pagesize=letter, topMargin=0.5*inch, bottomMargin=0.5*inch)
+    elements = []
+    styles = getSampleStyleSheet()
+    
+    # === PORTADA / ENCABEZADO ===
+    # Logo y título
+    title_style = ParagraphStyle(
+        'CustomTitle',
+        parent=styles['Heading1'],
+        fontSize=28,
+        textColor=colors.HexColor('#22C55E'),
+        spaceAfter=10,
+        alignment=TA_CENTER,
+        fontName='Helvetica-Bold'
+    )
+    
+    elements.append(Paragraph("🍋 LEMON POS", title_style))
+    
+    subtitle_style = ParagraphStyle(
+        'Subtitle',
+        parent=styles['Normal'],
+        fontSize=16,
+        textColor=colors.HexColor('#666666'),
+        spaceAfter=20,
+        alignment=TA_CENTER
+    )
+    elements.append(Paragraph("Reporte de Ventas", subtitle_style))
+    elements.append(Spacer(1, 0.3*inch))
+    
+    # Información del negocio
+    if hasattr(user, 'business') and user.business:
+        business_data = [
+            ['Negocio:', user.business.nombre_negocio or 'N/A'],
+            ['RUC:', user.business.ruc_negocio or 'N/A'],
+            ['Sucursal:', 'Matriz']
+        ]
+        business_table = Table(business_data, colWidths=[1.5*inch, 4*inch])
+        business_table.setStyle(TableStyle([
+            ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, -1), 10),
+            ('TEXTCOLOR', (0, 0), (0, -1), colors.HexColor('#666666')),
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
+        ]))
+        elements.append(business_table)
+        elements.append(Spacer(1, 0.2*inch))
+    
+    # Período y fecha de generación
+    periodo_data = [
+        ['Período:', f"{fecha_desde.strftime('%d/%m/%Y')} - {fecha_hasta.strftime('%d/%m/%Y')}"],
+        ['Generado:', datetime.now().strftime('%d/%m/%Y %H:%M')]
+    ]
+    periodo_table = Table(periodo_data, colWidths=[1.5*inch, 4*inch])
+    periodo_table.setStyle(TableStyle([
+        ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+    ]))
+    elements.append(periodo_table)
+    elements.append(Spacer(1, 0.4*inch))
+    
+    # === RESUMEN EJECUTIVO ===
+    elements.append(Paragraph("<b>RESUMEN EJECUTIVO</b>", styles['Heading2']))
+    elements.append(Spacer(1, 0.2*inch))
+    
+    # KPIs en tabla destacada
+    kpi_data = [
+        ['Ventas Totales', f'${float(total_ventas):,.2f}'],
+        ['Facturas Emitidas', f'{total_facturas:,}'],
+        ['Ticket Promedio', f'${float(ticket_promedio):,.2f}'],
+        ['IVA Generado', f'${float(total_iva):,.2f}']
+    ]
+    
+    kpi_table = Table(kpi_data, colWidths=[3.5*inch, 2*inch])
+    kpi_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, -1), colors.HexColor('#F0FDF4')),
+        ('TEXTCOLOR', (0, 0), (0, -1), colors.HexColor('#166534')),
+        ('TEXTCOLOR', (1, 0), (1, -1), colors.HexColor('#22C55E')),
+        ('ALIGN', (0, 0), (0, -1), 'LEFT'),
+        ('ALIGN', (1, 0), (1, -1), 'RIGHT'),
+        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, -1), 12),
+        ('FONTSIZE', (1, 0), (1, 0), 16),  # Ventas totales más grande
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 12),
+        ('TOPPADDING', (0, 0), (-1, -1), 12),
+        ('BOX', (0, 0), (-1, -1), 2, colors.HexColor('#22C55E')),
+        ('LINEBELOW', (0, 0), (-1, 0), 2, colors.HexColor('#22C55E')),
+    ]))
+    
+    elements.append(kpi_table)
+    elements.append(Spacer(1, 0.4*inch))
+    
+    # === DISTRIBUCIÓN POR MÉTODO DE PAGO (Premium) ===
+    elements.append(Paragraph("<b>DISTRIBUCIÓN POR MÉTODO DE PAGO</b>", styles['Heading2']))
+    elements.append(Spacer(1, 0.15*inch))
+    
+    # Calcular totales por método
+    metodos_pago = {}
+    for t in transacciones:
+        metodo = t.metodo_pago
+        if metodo == 'cash':
+            metodo_es = 'Efectivo'
+        elif metodo == 'card':
+            metodo_es = 'Tarjeta'
+        elif metodo == 'transfer':
+            metodo_es = 'Transferencia'
+        else:
+            metodo_es = metodo.title()
+        
+        if metodo_es not in metodos_pago:
+            metodos_pago[metodo_es] = 0
+        metodos_pago[metodo_es] += float(t.monto)
+    
+    metodos_data = [[metodo, f'${monto:,.2f}'] for metodo, monto in metodos_pago.items()]
+    metodos_table = Table(metodos_data, colWidths=[2.5*inch, 1.5*inch])
+    metodos_table.setStyle(TableStyle([
+        ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('ALIGN', (1, 0), (1, -1), 'RIGHT'),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+        ('BACKGROUND', (0, 0), (-1, -1), colors.HexColor('#F0FDF4')),
+        ('BOX', (0, 0), (-1, -1), 1, colors.HexColor('#22C55E')),
+    ]))
+    elements.append(metodos_table)
+    elements.append(Spacer(1, 0.4*inch))
+    
+    # === DETALLE DE TRANSACCIONES ===
+    elements.append(Paragraph("<b>DETALLE DE TRANSACCIONES</b>", styles['Heading2']))
+    elements.append(Spacer(1, 0.2*inch))
+    
+    # Tabla mejorada con hora y mejor formato
+    trans_data = [['Factura #', 'Fecha', 'Hora', 'Cliente', 'Total', 'Método']]
+    
+    for t in transacciones[:50]:
+        cliente = t.venta.cliente.nombre if t.venta.cliente else 'Consumidor Final'
+        if len(cliente) > 22:
+            cliente = cliente[:19] + '...'
+        
+        # Traducir método de pago
+        metodo = t.metodo_pago
+        if metodo == 'cash':
+            metodo_es = 'Efectivo'
+        elif metodo == 'card':
+            metodo_es = 'Tarjeta'
+        elif metodo == 'transfer':
+            metodo_es = 'Transferencia'
+        else:
+            metodo_es = metodo.title()
+        
+        trans_data.append([
+            str(t.factuID),
+            t.fecha.strftime('%d/%m/%Y'),
+            t.fecha.strftime('%H:%M'),
+            cliente,
+            f'${t.monto:,.2f}',
+            metodo_es
+        ])
+    
+    trans_table = Table(trans_data, colWidths=[0.8*inch, 0.9*inch, 0.6*inch, 2*inch, 0.9*inch, 1*inch])
+    trans_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#22C55E')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
+        ('ALIGN', (0, 1), (0, -1), 'CENTER'),
+        ('ALIGN', (1, 1), (1, -1), 'CENTER'),
+        ('ALIGN', (2, 1), (2, -1), 'CENTER'),
+        ('ALIGN', (4, 1), (4, -1), 'RIGHT'),  # Total alineado a la derecha
+        ('ALIGN', (5, 1), (5, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, 0), 9),
+        ('FONTSIZE', (0, 1), (-1, -1), 7.5),  # Texto más pequeño
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 10),
+        ('TOPPADDING', (0, 0), (-1, 0), 10),
+        ('TOPPADDING', (0, 1), (-1, -1), 6),
+        ('BOTTOMPADDING', (0, 1), (-1, -1), 6),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#F9FAFB')])  # Zebra stripes
+    ]))
+    
+    elements.append(trans_table)
+    
+    # === RESUMEN FINAL DE VERIFICACIÓN ===
+    elements.append(Spacer(1, 0.3*inch))
+    verificacion_data = [
+        ['Total de registros:', f'{transacciones.count():,}'],
+        ['Total verificado:', f'${total_ventas:,.2f}']
+    ]
+    verificacion_table = Table(verificacion_data, colWidths=[3*inch, 2*inch])
+    verificacion_table.setStyle(TableStyle([
+        ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('ALIGN', (1, 0), (1, -1), 'RIGHT'),
+        ('FONTNAME', (1, 1), (1, 1), 'Helvetica-Bold'),
+        ('TEXTCOLOR', (1, 1), (1, 1), colors.HexColor('#22C55E')),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
+        ('LINEABOVE', (0, 0), (-1, 0), 1, colors.grey),
+    ]))
+    elements.append(verificacion_table)
+    
+    # Nota si hay más registros
+    if transacciones.count() > 50:
+        elements.append(Spacer(1, 0.2*inch))
+        note_style = ParagraphStyle(
+            'Note',
+            parent=styles['Normal'],
+            fontSize=9,
+            textColor=colors.HexColor('#666666'),
+            alignment=TA_CENTER,
+            fontName='Helvetica-Oblique'
+        )
+        elements.append(Paragraph(f"Mostrando 50 de {transacciones.count()} transacciones. Descargue el Excel para ver el detalle completo.", note_style))
+    
+    # === RESUMEN TRIBUTARIO ===
+    elements.append(Spacer(1, 0.4*inch))
+    elements.append(Paragraph("<b>RESUMEN TRIBUTARIO</b>", styles['Heading2']))
+    elements.append(Spacer(1, 0.2*inch))
+    
+    ventas_gravadas = float(total_ventas) - float(total_iva)
+    sri_data = [
+        ['Ventas Gravadas:', f'${ventas_gravadas:,.2f}'],
+        ['IVA Generado (15%):', f'${float(total_iva):,.2f}'],
+        ['Estado SRI:', 'Pendiente de declaración']
+    ]
+    
+    sri_table = Table(sri_data, colWidths=[3*inch, 2.5*inch])
+    sri_table.setStyle(TableStyle([
+        ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('ALIGN', (1, 0), (1, -1), 'RIGHT'),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
+        ('LINEBELOW', (0, -1), (-1, -1), 1, colors.HexColor('#FCD34D')),
+    ]))
+    
+    elements.append(sri_table)
+    
+    # Footer
+    elements.append(Spacer(1, 0.5*inch))
+    footer_style = ParagraphStyle(
+        'Footer',
+        parent=styles['Normal'],
+        fontSize=8,
+        textColor=colors.HexColor('#999999'),
+        alignment=TA_CENTER
+    )
+    elements.append(Paragraph("Generado por Lemon POS - Sistema de Gestión Empresarial", footer_style))
+    
+    doc.build(elements)
+    return response
+
+
+# ============================================
+# FUNCIONES DE EXPORTACIÓN DE INVENTARIO
+# ============================================
+
+def exportar_inventario_excel(productos, categorias, valor_total_costo, valor_total_venta, 
+                               productos_stock_bajo, productos_agotados, valor_en_riesgo, 
+                               utilidad_potencial, promedio_valor, user):
+    """Exportar inventario a Excel - Formato profesional multi-hoja"""
+    from decimal import Decimal
+    from apps.usuarios.models import Business
+    
+    # Convertir Decimal a float
+    valor_total_costo = float(valor_total_costo)
+    valor_total_venta = float(valor_total_venta)
+    valor_en_riesgo = float(valor_en_riesgo)
+    utilidad_potencial = float(utilidad_potencial)
+    promedio_valor = float(promedio_valor)
+    
+    # 🎯 Obtener información del negocio del usuario
+    try:
+        business = Business.objects.get(user=user)
+        nombre_negocio = business.nombre_negocio or user.nombre_completo
+        ruc_negocio = str(business.ruc_negocio) if business.ruc_negocio else 'N/A'
+    except Business.DoesNotExist:
+        nombre_negocio = user.nombre_completo
+        ruc_negocio = user.ruc_negocio if hasattr(user, 'ruc_negocio') else 'N/A'
+    except Exception as e:
+        nombre_negocio = 'Lemon POS'
+        ruc_negocio = 'N/A'
+    
+    wb = Workbook()
+    
+    # === HOJA 1: RESUMEN EJECUTIVO ===
+    ws_resumen = wb.active
+    ws_resumen.title = "Resumen"
+    
+    # ENCABEZADO FORMAL
+    ws_resumen['A1'] = 'REPORTE DE INVENTARIO'
+    ws_resumen['A1'].font = Font(size=18, bold=True, color="22C55E")
+    ws_resumen['A1'].alignment = Alignment(horizontal='center')
+    ws_resumen.merge_cells('A1:B1')
+    
+    # Información del negocio
+    ws_resumen['A3'] = 'Nombre del negocio:'
+    ws_resumen['B3'] = nombre_negocio
+    ws_resumen['A3'].font = Font(bold=True)
+    
+    ws_resumen['A4'] = 'RUC:'
+    ws_resumen['B4'] = ruc_negocio
+    ws_resumen['A4'].font = Font(bold=True)
+    
+    ws_resumen['A5'] = 'Fecha de generación:'
+    ws_resumen['B5'] = datetime.now().strftime('%d/%m/%Y %H:%M')
+    ws_resumen['A5'].font = Font(bold=True)
+    
+    ws_resumen['A6'] = 'Ambiente:'
+    ws_resumen['B6'] = 'Producción'
+    ws_resumen['A6'].font = Font(bold=True)
+    
+    # KPIs principales
+    ws_resumen['A8'] = 'RESUMEN DEL INVENTARIO'
+    ws_resumen['A8'].font = Font(size=12, bold=True, color="FFFFFF")
+    ws_resumen['A8'].fill = PatternFill(start_color="22C55E", end_color="22C55E", fill_type="solid")
+    ws_resumen['A8'].alignment = Alignment(horizontal='center')
+    ws_resumen.merge_cells('A8:B8')
+    
+    kpis = [
+        ('Total Productos', productos.count()),
+        ('Valor Total Inventario (Costo)', f"${valor_total_costo:.2f}"),
+        ('Valor Total Inventario (Venta)', f"${valor_total_venta:.2f}"),
+        ('Utilidad Potencial', f"${utilidad_potencial:.2f}"),
+        ('Promedio Valor por Producto', f"${promedio_valor:.2f}"),
+        ('Productos con Stock Bajo', productos_stock_bajo.count()),
+        ('Productos Agotados', productos_agotados.count()),
+        ('Valor en Riesgo (Stock Bajo)', f"${valor_en_riesgo:.2f}"),
+    ]
+    
+    row = 9
+    for label, value in kpis:
+        ws_resumen[f'A{row}'] = label
+        ws_resumen[f'B{row}'] = value
+        ws_resumen[f'A{row}'].font = Font(bold=True)
+        if row == 10:  # Valor total destacado
+            ws_resumen[f'B{row}'].font = Font(size=14, bold=True, color="22C55E")
+        row += 1
+    
+    # Ajustar anchos
+    ws_resumen.column_dimensions['A'].width = 35
+    ws_resumen.column_dimensions['B'].width = 25
+    
+    # === HOJA 2: DETALLE COMPLETO ===
+    ws_detalle = wb.create_sheet("Detalle Completo")
+    
+    # 🎯 Encabezados profesionales con nuevos campos
+    headers = ['Producto', 'SKU', 'Tipo', 'Categoría', 'Stock', 'Stock Mín', 'Unidad', 'Costo Unit.', 'Precio Venta', 'Valor Costo', 'Valor Venta', 'Margen %']
+    ws_detalle.append(headers)
+    
+    # Estilo de encabezados
+    for idx, cell in enumerate(ws_detalle[1], 1):
+        cell.font = Font(bold=True, color="FFFFFF")
+        cell.fill = PatternFill(start_color="22C55E", end_color="22C55E", fill_type="solid")
+        cell.alignment = Alignment(horizontal='center', vertical='center')
+    
+    # Congelar fila de encabezados
+    ws_detalle.freeze_panes = 'A2'
+    
+    # Datos completos
+    for p in productos:
+        if p.stock is not None:
+            costo = float(p.costo) if p.costo else 0
+            precio_base = float(p.precio_base)
+            precio_venta = float(p.precio)
+            stock = p.stock or 0
+            stock_minimo = p.stock_minimo or 0
+            valor_costo = costo * stock
+            valor_venta = precio_venta * stock
+            margen_porcentaje = float(p.margen_utilidad) if p.costo and p.costo > 0 else 0
+            
+            # Traducir tipo de producto
+            tipo_display = dict(p.TIPO_PRODUCTO_CHOICES).get(p.tipo_producto, p.tipo_producto)
+            unidad_display = dict(p.UNIDAD_MEDIDA_CHOICES).get(p.unidad_medida, p.unidad_medida)
+            
+            ws_detalle.append([
+                p.nombre,
+                p.sku if p.sku else 'N/A',
+                tipo_display,
+                p.categoria.nombre if p.categoria else 'Sin categoría',
+                stock,
+                stock_minimo,
+                unidad_display,
+                costo,
+                precio_venta,
+                valor_costo,
+                valor_venta,
+                margen_porcentaje
+            ])
+    
+    # Formato de moneda (columnas H, I, J, K)
+    for row in ws_detalle.iter_rows(min_row=2, min_col=8, max_col=11):
+        for cell in row:
+            cell.number_format = '$#,##0.00'
+    
+    # Formato de porcentaje (columna L)
+    for row in ws_detalle.iter_rows(min_row=2, min_col=12, max_col=12):
+        for cell in row:
+            cell.number_format = '0.00"%"'
+    
+    # Ajustar anchos
+    ws_detalle.column_dimensions['A'].width = 30
+    ws_detalle.column_dimensions['B'].width = 15
+    ws_detalle.column_dimensions['C'].width = 18
+    ws_detalle.column_dimensions['D'].width = 20
+    ws_detalle.column_dimensions['E'].width = 10
+    ws_detalle.column_dimensions['F'].width = 12
+    ws_detalle.column_dimensions['G'].width = 12
+    ws_detalle.column_dimensions['H'].width = 12
+    ws_detalle.column_dimensions['I'].width = 13
+    ws_detalle.column_dimensions['J'].width = 14
+    ws_detalle.column_dimensions['K'].width = 14
+    ws_detalle.column_dimensions['L'].width = 12
+    
+    # === HOJA 3: PRODUCTOS CON STOCK BAJO ===
+    ws_bajo = wb.create_sheet("Stock Bajo")
+    
+    headers_bajo = ['Producto', 'Categoría', 'Stock Actual', 'Precio', 'Valor', 'Estado']
+    ws_bajo.append(headers_bajo)
+    
+    for cell in ws_bajo[1]:
+        cell.font = Font(bold=True, color="FFFFFF")
+        cell.fill = PatternFill(start_color="FFA500", end_color="FFA500", fill_type="solid")
+        cell.alignment = Alignment(horizontal='center')
+    
+    for p in productos_stock_bajo:
+        ws_bajo.append([
+            p.nombre,
+            p.categoria.nombre if p.categoria else 'Sin categoría',
+            p.stock,
+            float(p.precio),
+            float(p.precio) * (p.stock or 0),
+            'CRÍTICO' if p.stock < 5 else 'BAJO'
+        ])
+    
+    # Formato
+    for row in ws_bajo.iter_rows(min_row=2, min_col=4, max_col=5):
+        for cell in row:
+            cell.number_format = '$#,##0.00'
+    
+    ws_bajo.column_dimensions['A'].width = 30
+    ws_bajo.column_dimensions['B'].width = 20
+    ws_bajo.column_dimensions['C'].width = 12
+    ws_bajo.column_dimensions['D'].width = 12
+    ws_bajo.column_dimensions['E'].width = 15
+    ws_bajo.column_dimensions['F'].width = 12
+    
+    # === HOJA 4: RESUMEN POR CATEGORÍA ===
+    ws_categorias = wb.create_sheet("Por Categoría")
+    
+    headers_cat = ['Categoría', 'Total Productos', 'Valor Inventario (Costo)', 'Valor Inventario (Venta)', 'Utilidad Potencial']
+    ws_categorias.append(headers_cat)
+    
+    for cell in ws_categorias[1]:
+        cell.font = Font(bold=True, color="FFFFFF")
+        cell.fill = PatternFill(start_color="22C55E", end_color="22C55E", fill_type="solid")
+        cell.alignment = Alignment(horizontal='center')
+    
+    for cat in categorias:
+        valor_costo = float(cat.valor_inventario_costo)
+        valor_venta = float(cat.valor_inventario_venta)
+        utilidad = valor_venta - valor_costo
+        
+        ws_categorias.append([
+            cat.nombre,
+            cat.total_productos,
+            valor_costo,
+            valor_venta,
+            utilidad
+        ])
+    
+    # Formato
+    for row in ws_categorias.iter_rows(min_row=2, min_col=3, max_col=5):
+        for cell in row:
+            cell.number_format = '$#,##0.00'
+    
+    ws_categorias.column_dimensions['A'].width = 25
+    ws_categorias.column_dimensions['B'].width = 18
+    ws_categorias.column_dimensions['C'].width = 22
+    ws_categorias.column_dimensions['D'].width = 22
+    ws_categorias.column_dimensions['E'].width = 20
+    
+    # Crear respuesta HTTP
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = f'attachment; filename=inventario_lemon_{datetime.now().strftime("%Y%m%d_%H%M")}.xlsx'
+    wb.save(response)
+    return response
+
+
+def exportar_inventario_pdf(productos, categorias, valor_total_costo, valor_total_venta,
+                             productos_stock_bajo, productos_agotados, valor_en_riesgo,
+                             utilidad_potencial, user):
+    """Exportar inventario a PDF - Formato ejecutivo"""
+    from decimal import Decimal
+    from apps.usuarios.models import Business
+    
+    # Convertir Decimal a float
+    valor_total_costo = float(valor_total_costo)
+    valor_total_venta = float(valor_total_venta)
+    valor_en_riesgo = float(valor_en_riesgo)
+    utilidad_potencial = float(utilidad_potencial)
+    
+    # 🎯 Obtener información del negocio del usuario
+    try:
+        business = Business.objects.get(user=user)
+        nombre_negocio = business.nombre_negocio or user.nombre_completo
+        ruc_negocio = str(business.ruc_negocio) if business.ruc_negocio else 'N/A'
+    except Business.DoesNotExist:
+        nombre_negocio = user.nombre_completo
+        ruc_negocio = user.ruc_negocio if hasattr(user, 'ruc_negocio') else 'N/A'
+    except Exception as e:
+        nombre_negocio = 'Lemon POS'
+        ruc_negocio = 'N/A'
+    
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename=inventario_{nombre_negocio.replace(" ", "_")}_{datetime.now().strftime("%Y%m%d_%H%M")}.pdf'
+    
+    doc = SimpleDocTemplate(response, pagesize=letter, topMargin=0.5*inch, bottomMargin=0.5*inch)
+    elements = []
+    styles = getSampleStyleSheet()
+    
+    # Estilo personalizado para título
+    title_style = ParagraphStyle(
+        'CustomTitle',
+        parent=styles['Heading1'],
+        fontSize=24,
+        textColor=colors.HexColor('#22C55E'),
+        spaceAfter=20,
+        alignment=TA_CENTER
+    )
+    
+    # Título
+    elements.append(Paragraph("REPORTE DE INVENTARIO", title_style))
+    
+    # ENCABEZADO FORMAL
+    header_data = [
+        ['Nombre del negocio:', nombre_negocio],
+        ['RUC:', ruc_negocio],
+        ['Fecha de generación:', datetime.now().strftime('%d/%m/%Y %H:%M')],
+        ['Ambiente:', 'Producción'],
+    ]
+    
+    header_table = Table(header_data, colWidths=[2*inch, 4*inch])
+    header_table.setStyle(TableStyle([
+        ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+        ('TEXTCOLOR', (0, 0), (0, -1), colors.HexColor('#666666')),
+    ]))
+    
+    elements.append(header_table)
+    elements.append(Spacer(1, 0.3*inch))
+    
+    # === RESUMEN EJECUTIVO ===
+    resumen_data = [
+        ['RESUMEN DEL INVENTARIO', ''],
+        ['Total Productos', str(productos.count())],
+        ['Valor Total Inventario (Costo)', f'${valor_total_costo:,.2f}'],
+        ['Valor Total Inventario (Venta)', f'${valor_total_venta:,.2f}'],
+        ['Utilidad Potencial', f'${utilidad_potencial:,.2f}'],
+        ['Productos con Stock Bajo', str(productos_stock_bajo.count())],
+        ['Productos Agotados', str(productos_agotados.count())],
+        ['Valor en Riesgo (Stock Bajo)', f'${valor_en_riesgo:,.2f}'],
+    ]
+    
+    resumen_table = Table(resumen_data, colWidths=[4*inch, 2*inch])
+    resumen_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#22C55E')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('ALIGN', (1, 1), (1, -1), 'RIGHT'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, 0), 12),
+        ('FONTNAME', (0, 1), (0, -1), 'Helvetica-Bold'),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+        ('GRID', (0, 0), (-1, -1), 1, colors.grey),
+    ]))
+    
+    elements.append(resumen_table)
+    elements.append(Spacer(1, 0.3*inch))
+    
+    # === DETALLE DE PRODUCTOS ===
+    elements.append(Paragraph("DETALLE DE PRODUCTOS", styles['Heading2']))
+    elements.append(Spacer(1, 0.2*inch))
+    
+    # 🎯 Encabezados de tabla profesional con nuevos campos
+    detalle_data = [['Producto', 'SKU', 'Tipo', 'Categoría', 'Stock', 'Stock Mín', 'Unidad', 'Costo', 'Precio', 'Valor Costo', 'Valor Venta', 'Margen %']]
+    
+    # Agregar productos (limitar a primeros 25 para no saturar el PDF)
+    count = 0
+    for p in productos:
+        if p.stock is not None and count < 25:
+            costo = float(p.costo) if p.costo else 0
+            precio = float(p.precio)
+            stock = p.stock or 0
+            stock_minimo = p.stock_minimo or 0
+            valor_costo = costo * stock
+            valor_venta = precio * stock
+            margen = float(p.margen_utilidad) if p.costo and p.costo > 0 else 0
+            
+            # Traducir tipo
+            tipo_display = 'Físico' if p.tipo_producto == 'fisico' else 'Insumo'
+            unidad_display = dict(p.UNIDAD_MEDIDA_CHOICES).get(p.unidad_medida, p.unidad_medida)[:3]
+            
+            detalle_data.append([
+                p.nombre[:20],  # Truncar nombre largo
+                (p.sku if p.sku else 'N/A')[:10],
+                tipo_display[:6],
+                (p.categoria.nombre if p.categoria else 'N/A')[:12],
+                str(stock),
+                str(stock_minimo),
+                unidad_display,
+                f'${costo:.2f}',
+                f'${precio:.2f}',
+                f'${valor_costo:.2f}',
+                f'${valor_venta:.2f}',
+                f'{margen:.1f}%'
+            ])
+            count += 1
+    
+    if productos.count() > 25:
+        detalle_data.append(['...', '...', '...', '...', '...', '...', '...', '...', '...', '...', '...', '...'])
+        detalle_data.append([f'Total: {productos.count()} productos', '', '', '', '', '', '', '', '', '', '', ''])
+    
+    detalle_table = Table(detalle_data, colWidths=[1.3*inch, 0.6*inch, 0.5*inch, 0.7*inch, 0.4*inch, 0.5*inch, 0.4*inch, 0.5*inch, 0.5*inch, 0.7*inch, 0.7*inch, 0.5*inch])
+    detalle_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#22C55E')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('ALIGN', (4, 0), (5, -1), 'CENTER'),
+        ('ALIGN', (7, 0), (-1, -1), 'RIGHT'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, 0), 7),
+        ('FONTSIZE', (0, 1), (-1, -1), 6),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.lightgrey]),
+    ]))
+    
+    elements.append(detalle_table)
+    elements.append(Spacer(1, 0.3*inch))
+    
+    # === TOTAL GENERAL ===
+    total_data = [
+        ['TOTAL GENERAL INVENTARIO', f'${valor_total_costo:,.2f}']
+    ]
+    
+    total_table = Table(total_data, colWidths=[4*inch, 2*inch])
+    total_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#22C55E')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (0, 0), 'LEFT'),
+        ('ALIGN', (1, 0), (1, 0), 'RIGHT'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, 0), 14),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+    ]))
+    
+    elements.append(total_table)
+    
+    # Construir PDF
+    doc.build(elements)
     return response
